@@ -4,6 +4,8 @@
 
 data_dir: data
 duckdb_path: data/atalayero.duckdb
+rules_dir: config/rules
+alerts_dir: data/stream/alerts
 
 # IBM Transactions for Anti Money Laundering (AML), HI-Small variant. CDLA-Sharing-1.0.
 # Public Kaggle endpoint: anonymous HTTPS download, one file at a time, pinned to a dataset version.
@@ -17,3 +19,10 @@ dataset:
   patterns:
     name: HI-Small_Patterns.txt
     sha256: 2c546b5ce6009e73851f0139af053cf845f08bf92f3bc82fe1eb937dec2ef39b
+
+# Replay of the transactions through Redpanda (`make up`, then `make stream`).
+streaming:
+  bootstrap_servers: localhost:19092
+  topic: transactions
+  speedup: 0  # simulated seconds per real second; 0 = as fast as possible, 3600 = 1 h per second
+  idle_timeout_seconds: 10  # once the producer is done, fail if messages stop arriving this long
