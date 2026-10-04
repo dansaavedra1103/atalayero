@@ -39,7 +39,7 @@ flowchart TD
 
 ## 1. Datos: batch y streaming
 
-- **Fuente:** dataset *IBM Transactions for Anti Money Laundering* (Kaggle), variante HI-Small. Trae la etiqueta de lavado y un archivo de patrones (fan-out, fan-in, ciclos, scatter-gather). El archivo de patrones es el ground truth para evaluar al agente. Licencia CDLA-Sharing-1.0: toda muestra que se redistribuya (p. ej. el fixture de tests) va con el texto de la licencia y la atribución. Descarga anónima por HTTPS con checksum SHA-256, sin token de Kaggle.
+- **Fuente:** dataset *IBM Transactions for Anti Money Laundering* (Kaggle), variante HI-Small. Trae la etiqueta de lavado y un archivo de patrones con 370 intentos en 8 tipologías (fan-out, fan-in, ciclo, bipartito, stack, random, scatter-gather y gather-scatter). El archivo de patrones es el ground truth de tipologías, pero cubre solo 3.209 de las 5.177 transacciones de lavado (62 %); el resto es lavado sin tipología documentada. Licencia CDLA-Sharing-1.0: toda muestra que se redistribuya (p. ej. el fixture de tests) va con el texto de la licencia y la atribución. Descarga anónima por HTTPS con checksum SHA-256, sin token de Kaggle.
 - **Batch:** descarga → Parquet → DuckDB. dbt corre sobre DuckDB, el único destino. El pipeline debe recrearse desde cero con un comando.
 - **Streaming:** un productor reproduce las transacciones en orden temporal hacia Redpanda (Docker, protocolo Kafka). Un consumidor aplica reglas rápidas en línea y escribe alertas. En la Fase 1 son dos reglas (R02 y R04) en YAML, validadas con un esquema Pydantic mínimo; el motor completo llega en la Fase 2.
 - **Capas dbt:** staging (limpieza y tipado), intermediate (actividad diaria por cuenta, aristas cuenta→cuenta), marts (hechos, dimensiones, features, alertas, KPIs).
@@ -71,7 +71,7 @@ history:
 ## 3. Modelos y presupuesto de alertas
 
 - **Comparación con piso sin modelo:** (1) solo reglas como benchmark, (2) regresión logística como GLM interpretable, (3) gradient boosting (LightGBM) con features tabulares y de grafo, (4) Isolation Forest como referencia no supervisada.
-- **Partición temporal:** entrenar con semanas iniciales, evaluar con las finales. Nunca partición aleatoria.
+- **Partición temporal:** entrenar con los días iniciales y evaluar con los finales, dentro del 1 al 10 de septiembre de 2022. La simulación termina en la práctica el día 10: del 11 al 18 solo quedan colas de intentos de lavado (1.108 transacciones, 59 % de lavado), que inflarían cualquier métrica. Nunca partición aleatoria. El detalle va en el ADR de partición temporal.
 - **Métrica central, el presupuesto de alertas:** con N alertas diarias revisables, ¿qué % del lavado se detecta y cuántas alertas son falsos positivos? Curvas de detección vs. volumen de alertas y PR-AUC por el desbalance de clases.
 - **MLflow:** registra cada corrida y el modelo campeón.
 - **Monitoreo:** PSI de las features entre ventanas y volumen de alertas. Si hay deriva, se dispara reentrenamiento.
@@ -89,7 +89,12 @@ Recibe una alerta y produce un informe de caso estructurado. Flujo en LangGraph:
 class CaseReport(BaseModel):
     alert_id: str
     decision: Literal["escalate", "close"]
-    typology: Literal["fan_out", "fan_in", "cycle", "scatter_gather", "none"]
+    typology: Literal[
+        "fan_out", "fan_in", "cycle", "bipartite", "stack", "random",
+        "scatter_gather", "gather_scatter",
+        "unclassified",  # laundering without a clear typology
+        "none",  # no laundering
+    ]
     evidence: list[str]  # cited transaction IDs
     confidence: float
     narrative: str
@@ -99,8 +104,14 @@ Solo modelos locales: Ollama por defecto o modelos de Hugging Face ejecutados en
 
 ## 5. Evaluación del agente (el diferencial)
 
-- **Golden set** de 150–200 alertas con respuesta conocida (lavado sí/no y tipología, del archivo de patrones).
-- **Métricas:** exactitud de decisión (escalate/close), exactitud de tipología, tasa de grounding, IDs alucinados por informe, pasos y latencia por caso.
+- **Golden set** de 150–200 alertas con respuesta conocida, en tres grupos que se reportan por separado:
+  - **Lavado con patrón documentado:** respuesta `escalate` y la tipología del archivo de patrones.
+  - **Lavado sin patrón (casos límite):** respuesta `escalate`, sin tipología de referencia. El 98 % no toca cuentas de los intentos documentados y usa medios de pago variados (los intentos documentados son casi todos ACH): no hay una estructura de manual que reconocer.
+  - **Falsos positivos:** transacciones normales que las reglas o el modelo marcaron; respuesta `close`.
+
+  La mezcla de grupos en el golden set es una decisión de diseño, no la prevalencia real.
+- **Métricas:** exactitud de decisión (escalate/close) en los tres grupos; exactitud de tipología solo en el lavado con patrón; en el lavado sin patrón, cuántas veces el agente afirma una tipología específica en vez de `unclassified`; tasa de grounding, IDs alucinados por informe, pasos y latencia por caso.
+- **Sin acceso a la respuesta:** las herramientas del agente nunca exponen `is_laundering` ni el archivo de patrones.
 - **Baseline sin agente:** decidir solo con el score del modelo. Si el agente no le gana, se reporta tal cual.
 
 ## 6. Operación y producto
@@ -244,7 +255,7 @@ Fechas tentativas a medio tiempo (8 semanas). Cada fase cierra con un tag (v0.1 
 - [ ]  Servidor MCP con las cinco herramientas
 - [ ]  Grafo de LangGraph: triage, investigación, redacción, verificación de grounding
 - [ ]  Esquema `CaseReport` con Pydantic
-- [ ]  Golden set de 150–200 alertas a partir del archivo de patrones
+- [ ]  Golden set de 150–200 alertas en tres grupos: lavado con patrón, lavado sin patrón y falsos positivos
 - [ ]  Runner de evals y métricas; comparación contra baseline sin agente
 - [ ]  `agent_eval.md` con resultados y errores típicos
 - [ ]  Tag v0.3 y post: cuánto se equivoca el agente y cómo se midió
@@ -261,5 +272,6 @@ Fechas tentativas a medio tiempo (8 semanas). Cada fase cierra con un tag (v0.1 
 ## Trampas a evitar
 
 - **Fuga temporal en las features de grafo:** la que más tumba proyectos así.
+- **Los días 11 a 18 de septiembre:** son casi solo colas de intentos de lavado; usarlos para evaluar infla las métricas.
 - **Ampliar el alcance antes de cerrar la fase:** la fase 1 publicada antes de tocar el agente.
 - **Prometer de más en el README:** es un dataset sintético; demuestra diseño, rigor y operación, no desempeño en datos reales.
