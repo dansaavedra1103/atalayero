@@ -27,6 +27,8 @@ Dev environment: WSL2 (Ubuntu) on Windows. Run everything from WSL, never from P
 All commands go through the Makefile. When you add a new command, add it to the Makefile AND to this list.
 - `make setup`    — install dependencies with uv, install pre-commit hooks
 - `make check`    — ruff format --check + ruff lint + pytest
+- `make ingest`   — download the dataset (SHA-256 verified) and load it: CSV → Parquet → DuckDB `raw.transactions`
+- `make fixture`  — regenerate the 1,000-row test fixture from the downloaded dataset
 - `make dbt`      — dbt build --target dev (DuckDB)
 - `make pipeline` — end-to-end batch run on the dev target
 - `make up`       — docker compose up (redpanda, api, mlflow, airflow, ollama)
