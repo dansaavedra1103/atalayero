@@ -9,7 +9,8 @@ from atalayero.ingestion.load_batch import load_batch
 from atalayero.ingestion.sample import write_sample
 from atalayero.settings import Settings
 
-FIXTURE_PATH = Path("tests/fixtures/hi_small_sample.csv")
+FIXTURE_CSV = Path("tests/fixtures/hi_small_sample.csv")
+FIXTURE_PATTERNS = Path("tests/fixtures/hi_small_patterns_sample.txt")
 
 
 def main() -> None:
@@ -18,7 +19,7 @@ def main() -> None:
         "command",
         choices=["download", "load", "sample"],
         help="download: fetch and verify the dataset; load: CSV -> Parquet -> DuckDB; "
-        f"sample: regenerate {FIXTURE_PATH}",
+        f"sample: regenerate {FIXTURE_CSV} and {FIXTURE_PATTERNS}",
     )
     args = parser.parse_args()
     logging.basicConfig(
@@ -31,7 +32,12 @@ def main() -> None:
     elif args.command == "load":
         load_batch(settings)
     else:
-        write_sample(settings.raw_dir / settings.dataset.transactions.name, FIXTURE_PATH)
+        write_sample(
+            settings.raw_dir / settings.dataset.transactions.name,
+            settings.raw_dir / settings.dataset.patterns.name,
+            FIXTURE_CSV,
+            FIXTURE_PATTERNS,
+        )
 
 
 if __name__ == "__main__":
