@@ -43,7 +43,7 @@ flowchart TD
 - **Batch:** descarga → Parquet → DuckDB. dbt corre sobre DuckDB, el único destino. El pipeline debe recrearse desde cero con un comando.
 - **Streaming:** un productor reproduce las transacciones en orden temporal hacia Redpanda (Docker, protocolo Kafka). Un consumidor aplica reglas rápidas en línea y escribe alertas. En la Fase 1 son dos reglas (R02 y R04) en YAML, validadas con un esquema Pydantic mínimo; el motor completo llega en la Fase 2.
 - **Capas dbt:** staging (limpieza y tipado), intermediate (actividad diaria por cuenta, aristas cuenta→cuenta), marts (hechos, dimensiones, features, alertas, KPIs).
-- **Tests:** unique y not_null, más tests propios: sin timestamps futuros, montos conciliados que cuadran, frescura de la fuente.
+- **Tests:** unique y not_null, más tests propios: sin timestamps futuros, montos conciliados que cuadran. La frescura de la fuente llega con las cargas programadas de Airflow (fase 4): con un dataset estático no mide nada (ADR-0003).
 
 ## 2. Features y reglas
 
