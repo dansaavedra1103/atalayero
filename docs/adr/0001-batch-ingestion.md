@@ -1,6 +1,6 @@
 # ADR-0001: Batch ingestion — source, raw schema and transaction IDs
 
-- Status: accepted
+- Status: accepted; decision 5 (test fixture) superseded by ADR-0002
 - Date: 2026-10-04
 
 ## Context
