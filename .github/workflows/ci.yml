@@ -18,3 +18,4 @@ jobs:
           enable-cache: true
       - run: uv sync --locked
       - run: make check
+      - run: make dbt-sample
