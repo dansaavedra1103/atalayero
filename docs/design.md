@@ -1,19 +1,19 @@
 # Atalayero — Proyecto insignia de portafolio (monitoreo de fraude/AML con IA agéntica)
 
-> Sistema de monitoreo transaccional con reglas versionadas, modelos y un agente investigador evaluado. Objetivo: un solo proyecto, por fases publicables, que ejercite BigQuery, streaming, calendarización, GLM, MLOps, evals de LLM, base vectorial y BI, con foco en datos e IA confiable para finanzas reguladas.
+> Sistema de monitoreo transaccional con reglas versionadas, modelos y un agente investigador evaluado. Objetivo: un solo proyecto, por fases publicables, todo en local, que ejercite modelado de datos con dbt, streaming, calendarización, GLM, MLOps, evals de LLM, base vectorial y BI, con foco en datos e IA confiable para finanzas reguladas.
 
 ## Fases
 
 | Fase | Qué se construye | Capacidades que ejercita |
 | --- | --- | --- |
-| 1. Datos | Ingesta batch + stream simulado (Redpanda), dbt en DuckDB y BigQuery, Airflow | GCP/BigQuery, streaming, calendarización |
+| 1. Datos | Ingesta batch + stream simulado (Redpanda), dbt en DuckDB | Modelado con dbt, streaming |
 | 2. Modelos | Reglas, GLM, gradient boosting con variables de grafo, MLflow, indicadores de fraude | GLM, MLOps, métricas de fraude |
 | 3. Agente | Agente investigador con MCP + FAISS y set de evaluación | Evals de LLM, base vectorial, prompt agéntico |
-| 4. Producto | FastAPI + Docker, dashboard en Looker Studio, README en inglés | BI, Looker Studio, documentación |
+| 4. Producto | FastAPI + Docker, Airflow, dashboard en Streamlit, README en inglés | BI, calendarización, documentación |
 
 ## Principios de diseño
 
-- **Costo cero:** modelos locales con Ollama, sandbox de BigQuery, Looker Studio, Airflow y MLflow en local.
+- **Costo cero y todo local:** DuckDB, LLMs locales (Ollama o Hugging Face), Streamlit, Airflow y MLflow corren en la máquina. Sin servicios de nube.
 - **Cero datos reales:** nada de datos de empleadores ni de personas reales. Solo datos sintéticos públicos.
 - **Cada fase se publica sola:** si el proyecto se detiene en la fase 2, ya hay algo terminado que mostrar.
 - **Honestidad en el README:** decir qué demuestra un dataset sintético y qué no.
@@ -22,13 +22,13 @@
 
 ```mermaid
 flowchart TD
-  A["Carga batch<br>dbt sobre DuckDB / BigQuery"] --> C["Reglas versionadas<br>YAML con trazabilidad"]
+  A["Carga batch<br>dbt sobre DuckDB"] --> C["Reglas versionadas<br>YAML con trazabilidad"]
   A --> D["Modelos<br>GLM, GBM, variables de grafo"]
   B["Stream simulado<br>Redpanda + consumidor"] --> C
   C --> E["Alertas priorizadas<br>presupuesto diario"]
   D --> E
   E --> F["Agente investigador<br>LangGraph + MCP + FAISS"]
-  E --> G["Dashboard y API<br>Looker Studio + FastAPI"]
+  E --> G["Dashboard y API<br>Streamlit + FastAPI"]
   F --> G
   subgraph T["Soporte transversal"]
     H["Airflow: calendariza"]
@@ -39,9 +39,9 @@ flowchart TD
 
 ## 1. Datos: batch y streaming
 
-- **Fuente:** dataset *IBM Transactions for Anti Money Laundering* (Kaggle), variante HI-Small. Trae la etiqueta de lavado y un archivo de patrones (fan-out, fan-in, ciclos, scatter-gather). El archivo de patrones es el ground truth para evaluar al agente. Revisar la licencia antes de publicar derivados.
-- **Batch:** descarga → Parquet → carga. Mismo código dbt con dos destinos: DuckDB para desarrollo y BigQuery como destino productivo. El sandbox tiene límites (p. ej. expiración de tablas), así que el pipeline debe recrearse desde cero con un comando.
-- **Streaming:** un productor reproduce las transacciones en orden temporal hacia Redpanda (Docker, protocolo Kafka). Un consumidor aplica reglas rápidas en línea y escribe alertas.
+- **Fuente:** dataset *IBM Transactions for Anti Money Laundering* (Kaggle), variante HI-Small. Trae la etiqueta de lavado y un archivo de patrones (fan-out, fan-in, ciclos, scatter-gather). El archivo de patrones es el ground truth para evaluar al agente. Licencia CDLA-Sharing-1.0: toda muestra que se redistribuya (p. ej. el fixture de tests) va con el texto de la licencia y la atribución. Descarga anónima por HTTPS con checksum SHA-256, sin token de Kaggle.
+- **Batch:** descarga → Parquet → DuckDB. dbt corre sobre DuckDB, el único destino. El pipeline debe recrearse desde cero con un comando.
+- **Streaming:** un productor reproduce las transacciones en orden temporal hacia Redpanda (Docker, protocolo Kafka). Un consumidor aplica reglas rápidas en línea y escribe alertas. En la Fase 1 son dos reglas (R02 y R04) en YAML, validadas con un esquema Pydantic mínimo; el motor completo llega en la Fase 2.
 - **Capas dbt:** staging (limpieza y tipado), intermediate (actividad diaria por cuenta, aristas cuenta→cuenta), marts (hechos, dimensiones, features, alertas, KPIs).
 - **Tests:** unique y not_null, más tests propios: sin timestamps futuros, montos conciliados que cuadran, frescura de la fuente.
 
@@ -50,22 +50,22 @@ flowchart TD
 - **Tabulares:** velocidad (transacciones por hora o día), estadísticas de montos, diversidad de contrapartes, mezcla de monedas y formatos de pago.
 - **De grafo** (networkx o igraph): grado de entrada y salida en ventana, pertenencia a ciclos cortos, PageRank, comunidad.
 - **Regla de oro:** cada feature se calcula solo con datos anteriores al momento de la transacción. Usar el grafo completo filtra información del futuro e infla las métricas. Documentarlo en un ADR.
-- **Reglas como configuración versionada:** cada regla es un YAML con dueño, versión e historial de cambios (trazabilidad).
+- **Reglas como configuración versionada:** cada regla es un YAML con dueño, versión e historial de cambios (trazabilidad). Los identificadores (claves, valores, nombres de archivo) van en inglés.
 
 ```yaml
 id: R02
-nombre: dispersion_rapida
-tipologia: fan_out
+name: rapid_dispersion
+typology: fan_out
 version: 1.2
-descripcion: Cuenta que envía a 10 o más contrapartes distintas en 24 h
-ventana: 24h
-umbral:
-  contrapartes_distintas: 10
-  monto_minimo: 5000
-historial:
+description: Account sending to 10 or more distinct counterparties within 24 h
+window: 24h
+threshold:
+  distinct_counterparties: 10
+  min_amount: 5000
+history:
   - version: 1.2
-    fecha: 2026-10-20
-    motivo: "Reducir falsos positivos: monto mínimo de 1000 a 5000 (ver ADR-0007)"
+    date: 2026-10-20
+    reason: "Reduce false positives: minimum amount from 1000 to 5000 (see ADR-0007)"
 ```
 
 ## 3. Modelos y presupuesto de alertas
@@ -88,26 +88,26 @@ Recibe una alerta y produce un informe de caso estructurado. Flujo en LangGraph:
 ```python
 class CaseReport(BaseModel):
     alert_id: str
-    decision: Literal["escalar", "cerrar"]
-    tipologia: Literal["fan_out", "fan_in", "ciclo", "scatter_gather", "ninguna"]
-    evidencia: list[str]   # IDs de transacciones citadas
-    confianza: float
-    narrativa: str
+    decision: Literal["escalate", "close"]
+    typology: Literal["fan_out", "fan_in", "cycle", "scatter_gather", "none"]
+    evidence: list[str]  # cited transaction IDs
+    confidence: float
+    narrative: str
 ```
 
-Modelo por defecto local (Ollama) para mantener costo cero. API de Claude solo como comparación opcional (tiene costo).
+Solo modelos locales: Ollama por defecto o modelos de Hugging Face ejecutados en local. Sin APIs de pago ni de nube.
 
 ## 5. Evaluación del agente (el diferencial)
 
 - **Golden set** de 150–200 alertas con respuesta conocida (lavado sí/no y tipología, del archivo de patrones).
-- **Métricas:** exactitud de decisión (escalar/cerrar), exactitud de tipología, tasa de grounding, IDs alucinados por informe, pasos y latencia por caso.
+- **Métricas:** exactitud de decisión (escalate/close), exactitud de tipología, tasa de grounding, IDs alucinados por informe, pasos y latencia por caso.
 - **Baseline sin agente:** decidir solo con el score del modelo. Si el agente no le gana, se reporta tal cual.
 
 ## 6. Operación y producto
 
 - **Airflow:** DAG de batch diario (ingesta → dbt build → features → scoring → reglas → alertas → KPIs), DAG de reentrenamiento semanal (solo promueve si le gana al campeón), DAG de monitoreo de deriva.
 - **FastAPI:** `/score`, `/alerts`, `/cases/{id}`. Todo se levanta con `docker compose up`.
-- **Looker Studio:** alertas por día, tasa de falsos positivos, % de detección, desempeño por regla, mezcla de tipologías.
+- **Streamlit:** dashboard local sobre las tablas de KPIs en DuckDB: alertas por día, tasa de falsos positivos, % de detección, desempeño por regla, mezcla de tipologías.
 - **CI (GitHub Actions):** ruff, pytest, `dbt build` sobre muestra en DuckDB y validación del esquema del último reporte de evals. El LLM no corre en CI; los evals se ejecutan offline y el reporte se versiona.
 - **Documentación:** `runbook.md` (guía operativa), ADRs (bitácora de decisiones), `model_card.md`.
 
@@ -128,10 +128,10 @@ atalayero/
 ├── config/
 │   ├── settings.yaml              # rutas, ventanas, presupuesto de alertas
 │   └── rules/
-│       ├── R01_fraccionamiento.yaml
-│       ├── R02_dispersion_rapida.yaml
-│       ├── R03_ciclo_corto.yaml
-│       └── R04_velocidad_alta.yaml
+│       ├── R01_structuring.yaml
+│       ├── R02_rapid_dispersion.yaml
+│       ├── R03_short_cycle.yaml
+│       └── R04_high_velocity.yaml
 ├── data/                          # en .gitignore
 │   └── README.md                  # cómo descargar el dataset
 ├── src/atalayero/
@@ -170,7 +170,7 @@ atalayero/
 │       └── routers/
 ├── dbt/
 │   ├── dbt_project.yml
-│   ├── profiles.yml.example       # targets duckdb y bigquery
+│   ├── profiles.yml.example       # target duckdb
 │   ├── models/
 │   │   ├── staging/
 │   │   ├── intermediate/
@@ -198,14 +198,14 @@ atalayero/
 ├── tests/
 │   ├── unit/
 │   └── integration/
-├── dashboards/
-│   └── looker_studio.md           # link y capturas
+├── dashboard/
+│   └── app.py                     # Streamlit; solo llama funciones de src/atalayero
 └── docs/
     ├── architecture.md
     ├── adr/
-    │   ├── 0001-particion-temporal.md
-    │   ├── 0002-reglas-como-yaml.md
-    │   └── 0003-features-de-grafo-sin-fuga.md
+    │   ├── 0001-temporal-split.md
+    │   ├── 0002-rules-as-yaml.md
+    │   └── 0003-leak-free-graph-features.md
     ├── model_card.md
     ├── data_card.md
     ├── agent_eval.md
@@ -222,15 +222,14 @@ Fechas tentativas a medio tiempo (8 semanas). Cada fase cierra con un tag (v0.1 
 - [ ]  Descargar el dataset HI-Small y documentar la descarga en `data/README.md`
 - [ ]  Carga batch a Parquet y a DuckDB
 - [ ]  Modelos dbt staging, intermediate y marts con tests estándar y propios
-- [ ]  Configurar el target de BigQuery (sandbox) en `profiles.yml`
-- [ ]  Productor y consumidor en Redpanda con dos reglas en línea
+- [ ]  Productor y consumidor en Redpanda con dos reglas en línea (umbrales en YAML)
 - [ ]  CI con ruff, pytest y `dbt build` sobre muestra
 - [ ]  ADR-0001 partición temporal
 - [ ]  Tag v0.1 y post sobre el pipeline reproducible
 
 ### Fase 2 — Reglas y modelos (19 de octubre de 2026 → 1 de noviembre de 2026)
 
-- [ ]  Motor de reglas YAML con validación de esquema (4 reglas iniciales)
+- [ ]  Motor de reglas YAML con validación de esquema (4 reglas iniciales; amplía el esquema mínimo de la Fase 1)
 - [ ]  Features tabulares y de grafo sin fuga temporal (ADR-0003)
 - [ ]  Baselines: solo reglas, regresión logística, LightGBM, Isolation Forest
 - [ ]  Evaluación por presupuesto de alertas: detección, falsos positivos, PR-AUC
@@ -254,7 +253,7 @@ Fechas tentativas a medio tiempo (8 semanas). Cada fase cierra con un tag (v0.1 
 
 - [ ]  DAGs de Airflow: batch diario, reentrenamiento semanal, deriva
 - [ ]  API con FastAPI y `docker compose up` de punta a punta
-- [ ]  Dashboard en Looker Studio conectado a la tabla de KPIs
+- [ ]  Dashboard en Streamlit sobre la tabla de KPIs en DuckDB
 - [ ]  `runbook.md`, `architecture.md` y `data_card.md`
 - [ ]  README en inglés con diagrama y resultados, y versión en español
 - [ ]  Tag v0.4 y post de cierre del proyecto
