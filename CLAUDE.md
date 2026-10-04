@@ -7,6 +7,8 @@ project. Full design: `docs/design.md` — read it before planning work on a new
 ## Language
 - Talk to me in Spanish.
 - Write code, comments, docstrings, commit messages and docs in English.
+  Identifiers are English too (YAML keys, enum values, field names).
+  Only exception: `docs/design.md`, the original design, stays in Spanish.
 
 ## Current status
 - Current phase: **1 — Data** (batch ingestion, streaming replay, dbt models).
@@ -14,9 +16,11 @@ project. Full design: `docs/design.md` — read it before planning work on a new
 - Do not start work from a later phase unless I ask. I update this section when a phase closes.
 
 ## Stack
-Python 3.11 · uv · DuckDB (dev) / BigQuery sandbox (prod target) · dbt · Redpanda (Kafka API)
+Python 3.11 · uv · DuckDB · dbt · Redpanda (Kafka API)
 · scikit-learn · LightGBM · networkx · MLflow (local) · LangGraph · MCP Python SDK · FAISS
-· Ollama (default LLM) · FastAPI · Airflow · Docker Compose.
+· local LLMs: Ollama (default) or Hugging Face models · FastAPI · Streamlit (dashboard)
+· Airflow (local, Docker) · Docker Compose.
+Everything runs locally: no cloud services.
 Dev environment: WSL2 (Ubuntu) on Windows. Run everything from WSL, never from PowerShell.
 
 ## Commands
@@ -39,10 +43,10 @@ All commands go through the Makefile. When you add a new command, add it to the 
 
 ## Non-negotiable rules
 1. **No real data, ever.** Only the public synthetic IBM AML dataset. Never add data from employers or any real person.
-2. **Zero cost by default.** No paid services. The Anthropic API is optional, only behind `LLM_PROVIDER=anthropic`, and never used in CI or tests.
+2. **Zero cost, local only.** No paid or cloud services. DuckDB is the only warehouse; LLMs run locally (Ollama by default, or Hugging Face models). GitHub Actions CI is the only hosted service.
 3. **No temporal leakage.** A feature for a transaction at time t uses only data with timestamp < t — graph features included. Train/test splits are temporal, never random.
-4. **Thin interfaces.** FastAPI routers, MCP tools and Airflow DAGs only call functions from `src/atalayero/`. Never duplicate logic in them.
-5. **Rules are config.** Thresholds live in `config/rules/*.yaml`, never hardcoded in Python. Changing a rule = bump `version` + add a `historial` entry with the reason.
+4. **Thin interfaces.** FastAPI routers, MCP tools, Airflow DAGs and the Streamlit dashboard only call functions from `src/atalayero/`. Never duplicate logic in them.
+5. **Rules are config.** Thresholds live in `config/rules/*.yaml`, never hardcoded in Python. Changing a rule = bump `version` + add a `history` entry with the reason.
 6. **Shared schemas.** Pydantic models (`Transaction`, `CaseReport`, …) are defined once and reused by API, agent and tests.
 7. **Always compare against a baseline.** Models vs rules-only; agent vs score-only. If something loses to its baseline, report it — don't hide it.
 8. **Never commit** `data/`, `mlruns/`, `.env`, credentials (e.g. Kaggle token) or model artifacts.
@@ -53,7 +57,8 @@ All commands go through the Makefile. When you add a new command, add it to the 
 - For any non-trivial task: propose a short plan first and wait for my OK before editing files.
 - Write or update tests together with the code. Run `make check` (and `make dbt` if dbt changed) before telling me a task is done.
 - Commits follow Conventional Commits (`feat:`, `fix:`, `test:`, `docs:`, `refactor:`, `chore:`).
-- New dependency, schema change or change to the evaluation protocol → new ADR in `docs/adr/NNNN-short-title.md` (Context, Decision, Consequences).
+- New runtime dependency, schema change or change to the evaluation protocol → new ADR in `docs/adr/NNNN-short-title.md` (Context, Decision, Consequences).
+  Dev-only tools (linters, test runners, pre-commit hooks) don't need an ADR.
 - Keep diffs small and focused. Do not refactor unrelated code.
 - If something in this file is wrong, outdated or missing, tell me instead of working around it.
 
@@ -64,6 +69,6 @@ All commands go through the Makefile. When you add a new command, add it to the 
 - Tests use small fixtures in `tests/fixtures/` (≈1,000 rows), never the full dataset.
 
 ## Gotchas
-- BigQuery sandbox tables can expire: the pipeline must always be rebuildable from scratch.
+- The pipeline must always be rebuildable from scratch with one command; `data/` is disposable.
 - The dataset is synthetic: docs must not claim real-world performance.
 - Airflow runs only inside Docker on WSL.
