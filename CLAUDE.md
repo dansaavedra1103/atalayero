@@ -33,7 +33,10 @@ All commands go through the Makefile. When you add a new command, add it to the 
 - `make dbt`      — dbt build on the full dataset (needs `make ingest`)
 - `make dbt-sample` — load the test fixtures into `data/sample/` and dbt build on them (what CI runs)
 - `make pipeline` — end-to-end batch run on the dev target
-- `make up`       — docker compose up (redpanda, api, mlflow, airflow, ollama)
+- `make up`       — docker compose up and wait until healthy (phase 1: redpanda; later api, mlflow, airflow, ollama)
+- `make down`     — docker compose down
+- `make stream`   — replay the transactions through Redpanda and evaluate the YAML rules online; alerts to `data/stream/alerts/` (needs `make up` and `make dbt`)
+- `make test-integration` — tests that need running services (Redpanda); not run in CI
 - `make eval`     — run agent evals offline and write a dated report to evals/reports/
 
 ## Repo map

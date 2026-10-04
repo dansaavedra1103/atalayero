@@ -19,7 +19,7 @@ or token) and verifies their SHA-256. URL, dataset version and checksums live in
 [`config/settings.yaml`](../config/settings.yaml). Files already present with the right checksum
 are not downloaded again, so a manual download from the Kaggle page into `data/raw/` also works.
 
-## Layout after `make ingest`
+## Layout
 
 ```
 data/
@@ -27,7 +27,9 @@ data/
 │   ├── HI-Small_Trans.csv      # source file
 │   ├── HI-Small_Patterns.txt   # source file
 │   └── transactions.parquet    # typed transactions + transaction_id
-└── atalayero.duckdb            # tables raw.transactions and raw.laundering_attempts
+├── atalayero.duckdb            # tables raw.transactions and raw.laundering_attempts; dbt models
+├── sample/                     # the test fixtures, loaded by make dbt-sample
+└── stream/alerts/              # part-*.parquet: alerts of the last make stream
 ```
 
 ## `raw.transactions`
