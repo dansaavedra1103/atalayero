@@ -1,0 +1,37 @@
+version: 2
+
+# Whole-period aggregates: descriptive only. Phase 2 features must use only data before each
+# transaction (no temporal leakage, ADR-0003).
+models:
+  - name: int_transactions_usd
+    description: Transactions with both amounts converted to US Dollar through `fx_rates_usd`.
+    columns:
+      - name: transaction_id
+        data_tests: [unique, not_null]
+      - name: amount_paid_usd
+        data_tests: [not_null]
+      - name: amount_received_usd
+        data_tests: [not_null]
+
+  - name: int_account_legs
+    description: One row per (transaction, side), so per-account logic sees every transaction once per side.
+    columns:
+      - name: transaction_id
+        data_tests: [not_null]
+      - name: direction
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [out, in]
+
+  - name: int_account_daily_activity
+    description: Transactions, US Dollar amounts and distinct counterparties per account and day.
+    data_tests:
+      - unique:
+          column_name: "account_key || '|' || activity_date"
+
+  - name: int_account_edges
+    description: Account-to-account edges over the whole period.
+    data_tests:
+      - unique:
+          column_name: "sender_account_key || '>' || receiver_account_key"

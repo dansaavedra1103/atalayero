@@ -230,3 +230,4 @@ mlruns/
 *.joblib
 kaggle.json
 .claude/settings.local.json
+dbt/.user.yml

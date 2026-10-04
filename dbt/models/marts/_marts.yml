@@ -1,0 +1,37 @@
+version: 2
+
+models:
+  - name: fct_transactions
+    description: >
+      One row per transaction with US Dollar amounts and no labels. Labels are in
+      `fct_laundering_labels`, kept apart so the agent's tools never see the answer.
+    columns:
+      - name: transaction_id
+        data_tests: [unique, not_null]
+      - name: transacted_at
+        data_tests: [not_null]
+
+  - name: fct_laundering_labels
+    description: >
+      Ground truth per transaction. `label_group`: `patterned` (part of a documented attempt),
+      `untyped` (laundering outside every attempt) or `clean`.
+    columns:
+      - name: transaction_id
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('fct_transactions')
+                field: transaction_id
+      - name: label_group
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [patterned, untyped, clean]
+
+  - name: dim_accounts
+    description: One row per account (`bank:account`) with whole-period activity.
+    columns:
+      - name: account_key
+        data_tests: [unique, not_null]

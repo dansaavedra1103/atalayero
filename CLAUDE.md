@@ -29,7 +29,9 @@ All commands go through the Makefile. When you add a new command, add it to the 
 - `make check`    — ruff format --check + ruff lint + pytest
 - `make ingest`   — download the dataset (SHA-256 verified) and load DuckDB `raw.transactions` (via Parquet) and `raw.laundering_attempts`
 - `make fixture`  — regenerate the story-based test fixtures from the downloaded dataset
-- `make dbt`      — dbt build --target dev (DuckDB)
+- `make fx-rates` — regenerate the exchange-rate seed `dbt/seeds/fx_rates_usd.csv` from the full dataset
+- `make dbt`      — dbt build on the full dataset (needs `make ingest`)
+- `make dbt-sample` — load the test fixtures into `data/sample/` and dbt build on them (what CI runs)
 - `make pipeline` — end-to-end batch run on the dev target
 - `make up`       — docker compose up (redpanda, api, mlflow, airflow, ollama)
 - `make eval`     — run agent evals offline and write a dated report to evals/reports/

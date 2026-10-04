@@ -102,3 +102,12 @@ def test_load_batch_end_to_end(
             "SELECT count(DISTINCT attempt_id) FROM raw.laundering_attempts"
         ).fetchone()
     assert attempts == 8
+
+
+def test_load_batch_from_explicit_files(
+    sample_csv: Path, sample_patterns: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.chdir(REPO_ROOT)
+    settings = Settings(data_dir=tmp_path, duckdb_path=tmp_path / "atalayero.duckdb")
+
+    assert load_batch(settings, sample_csv, sample_patterns) == len(_source_rows(sample_csv))
