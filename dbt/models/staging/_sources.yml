@@ -1,0 +1,14 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: raw
+    description: Loaded by `make ingest` (src/atalayero/ingestion); see ADR-0001 and ADR-0002.
+    tables:
+      - name: transactions
+        description: Source transactions, typed; transaction_id is the row number in the source file.
+        columns:
+          - name: transaction_id
+            data_tests: [unique, not_null]
+      - name: laundering_attempts
+        description: Documented laundering attempts, one row per (attempt, transaction).

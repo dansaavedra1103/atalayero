@@ -1,0 +1,29 @@
+name: atalayero
+version: "0.1.0"
+profile: atalayero
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+clean-targets: ["target", "logs"]
+
+flags:
+  # Local only: no usage statistics sent to dbt Labs.
+  send_anonymous_usage_stats: false
+
+models:
+  atalayero:
+    staging:
+      +schema: staging
+      +materialized: view
+    intermediate:
+      +schema: intermediate
+      +materialized: table
+    marts:
+      +schema: marts
+      +materialized: table
+
+seeds:
+  atalayero:
+    +schema: reference

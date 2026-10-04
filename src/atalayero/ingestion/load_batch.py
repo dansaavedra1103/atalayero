@@ -63,12 +63,19 @@ def load_parquet_to_duckdb(parquet_path: Path, duckdb_path: Path) -> int:
     return rows
 
 
-def load_batch(settings: Settings) -> int:
-    """Load `raw.transactions` and `raw.laundering_attempts`; return the transaction count."""
+def load_batch(
+    settings: Settings,
+    transactions_csv: Path | None = None,
+    patterns_txt: Path | None = None,
+) -> int:
+    """Load `raw.transactions` and `raw.laundering_attempts`; return the transaction count.
+
+    Reads the downloaded files unless others are given (e.g. the test fixtures).
+    """
+    transactions_csv = transactions_csv or settings.raw_dir / settings.dataset.transactions.name
+    patterns_txt = patterns_txt or settings.raw_dir / settings.dataset.patterns.name
     parquet_path = settings.raw_dir / TRANSACTIONS_PARQUET
-    csv_to_parquet(settings.raw_dir / settings.dataset.transactions.name, parquet_path)
+    csv_to_parquet(transactions_csv, parquet_path)
     rows = load_parquet_to_duckdb(parquet_path, settings.duckdb_path)
-    load_laundering_attempts(
-        settings.raw_dir / settings.dataset.patterns.name, settings.duckdb_path
-    )
+    load_laundering_attempts(patterns_txt, settings.duckdb_path)
     return rows

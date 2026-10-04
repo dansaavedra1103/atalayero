@@ -1,0 +1,9 @@
+# Local DuckDB only, no secrets. Run dbt from the repository root (the Makefile does):
+# the path is relative to the working directory and shared with config/settings.yaml.
+atalayero:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "{{ env_var('ATALAYERO_DUCKDB_PATH', 'data/atalayero.duckdb') }}"
+      threads: 4

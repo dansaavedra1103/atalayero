@@ -1,0 +1,53 @@
+version: 2
+
+models:
+  - name: stg_transactions
+    description: >
+      One row per source transaction, renamed. Accounts are keyed by `bank:account`, since account
+      IDs are unique only together with their bank.
+    columns:
+      - name: transaction_id
+        data_tests: [unique, not_null]
+      - name: transacted_at
+        description: Minute resolution; the source is not sorted by time.
+        data_tests: [not_null]
+      - name: sender_account_key
+        data_tests: [not_null]
+      - name: receiver_account_key
+        data_tests: [not_null]
+      - name: payment_currency
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('fx_rates_usd')
+                field: currency
+      - name: receiving_currency
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('fx_rates_usd')
+                field: currency
+      - name: payment_format
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [ach, bitcoin, cash, cheque, credit_card, reinvestment, wire]
+
+  - name: stg_laundering_attempts
+    description: Documented laundering attempts, one row per (attempt, transaction).
+    columns:
+      - name: transaction_id
+        description: A transaction belongs to at most one attempt.
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_transactions')
+                field: transaction_id
+      - name: typology
+        data_tests:
+          - accepted_values:
+              arguments:
+                values:
+                  [fan_out, fan_in, cycle, bipartite, stack, random, scatter_gather, gather_scatter]

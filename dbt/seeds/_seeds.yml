@@ -1,0 +1,21 @@
+version: 2
+
+seeds:
+  - name: fx_rates_usd
+    description: >
+      Exchange rates to US Dollar implied by the cross-currency transactions (median), regenerated
+      with `make fx-rates` from the full dataset. Committed because the test fixture has too few
+      cross-currency transactions to derive them (ADR-0003).
+    config:
+      column_types:
+        currency: varchar
+        usd_per_unit: double
+        observations: integer
+    columns:
+      - name: currency
+        data_tests: [unique, not_null]
+      - name: usd_per_unit
+        description: US Dollars per unit of the currency.
+        data_tests: [not_null]
+      - name: observations
+        description: Cross-currency transactions against US Dollar behind the median.
