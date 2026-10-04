@@ -220,9 +220,11 @@ atalayero/
 └── docs/
     ├── architecture.md
     ├── adr/
-    │   ├── 0001-temporal-split.md
-    │   ├── 0002-rules-as-yaml.md
-    │   └── 0003-leak-free-graph-features.md
+    │   ├── 0001-batch-ingestion.md
+    │   ├── 0002-laundering-attempts-and-story-fixture.md
+    │   ├── 0003-dbt-models.md
+    │   ├── 0004-streaming-replay-and-online-rules.md
+    │   └── 0005-temporal-split.md
     ├── model_card.md
     ├── data_card.md
     ├── agent_eval.md
@@ -235,19 +237,20 @@ Fechas tentativas a medio tiempo (8 semanas). Cada fase cierra con un tag (v0.1 
 
 ### Fase 1 — Datos (5 de octubre de 2026 → 18 de octubre de 2026)
 
-- [ ]  Crear el repo con la estructura base, `pyproject.toml`, Makefile y pre-commit
-- [ ]  Descargar el dataset HI-Small y documentar la descarga en `data/README.md`
-- [ ]  Carga batch a Parquet y a DuckDB
-- [ ]  Modelos dbt staging, intermediate y marts con tests estándar y propios
-- [ ]  Productor y consumidor en Redpanda con dos reglas en línea (umbrales en YAML)
-- [ ]  CI con ruff, pytest y `dbt build` sobre muestra
-- [ ]  ADR-0001 partición temporal
-- [ ]  Tag v0.1 y post sobre el pipeline reproducible
+- [x]  Crear el repo con la estructura base, `pyproject.toml`, Makefile y pre-commit
+- [x]  Descargar el dataset HI-Small y documentar la descarga en `data/README.md`
+- [x]  Carga batch a Parquet y a DuckDB
+- [x]  Modelos dbt staging, intermediate y marts con tests estándar y propios
+- [x]  Productor y consumidor en Redpanda con dos reglas en línea (umbrales en YAML)
+- [x]  CI con ruff, pytest y `dbt build` sobre muestra
+- [x]  ADR de partición temporal (ADR-0005)
+- [x]  Tag v0.1
+- [ ]  Post sobre el pipeline reproducible
 
 ### Fase 2 — Reglas y modelos (19 de octubre de 2026 → 1 de noviembre de 2026)
 
 - [ ]  Motor de reglas YAML con validación de esquema (4 reglas iniciales; amplía el esquema mínimo de la Fase 1)
-- [ ]  Features tabulares y de grafo sin fuga temporal (ADR-0003)
+- [ ]  Features tabulares y de grafo sin fuga temporal (ADR propio)
 - [ ]  Baselines: solo reglas, regresión logística, LightGBM, Isolation Forest
 - [ ]  Evaluación por presupuesto de alertas: detección, falsos positivos, PR-AUC
 - [ ]  Tracking y registro en MLflow
