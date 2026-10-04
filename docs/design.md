@@ -56,16 +56,22 @@ flowchart TD
 id: R02
 name: rapid_dispersion
 typology: fan_out
-version: 1.2
-description: Account sending to 10 or more distinct counterparties within 24 h
+owner: aml-monitoring
+version: "1.1"
+description: Account sending to 10 or more distinct counterparties within 24 h, counting transactions of 5,000 USD or more
+metric: distinct_counterparties
 window: 24h
 threshold:
-  distinct_counterparties: 10
-  min_amount: 5000
+  min_count: 10
+  min_amount_usd: 5000
+cooldown: 24h
 history:
-  - version: 1.2
+  - version: "1.0"
+    date: 2026-10-04
+    reason: "Initial version"
+  - version: "1.1"
     date: 2026-10-20
-    reason: "Reduce false positives: minimum amount from 1000 to 5000 (see ADR-0007)"
+    reason: "Reduce false positives: minimum amount from 1000 to 5000 USD (see ADR-0007)"
 ```
 
 ## 3. Modelos y presupuesto de alertas
