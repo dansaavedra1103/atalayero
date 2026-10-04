@@ -1,0 +1,14 @@
+id: R04
+name: high_velocity
+owner: aml-monitoring
+version: "1.0"
+description: Account sending 10 or more transactions within 1 h
+metric: outgoing_transactions
+window: 1h
+threshold:
+  min_count: 10
+cooldown: 24h
+history:
+  - version: "1.0"
+    date: 2026-10-04
+    reason: "Initial version. On 1-10 Sep: about 45 alerts/day on 287 accounts, a third of them on 15 high-volume accounts (ADR-0004)"

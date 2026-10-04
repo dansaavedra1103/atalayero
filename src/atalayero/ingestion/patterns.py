@@ -16,19 +16,9 @@ from pathlib import Path
 import duckdb
 
 from atalayero.ingestion.source import SOURCE_COLUMNS, typed_columns_sql
+from atalayero.schemas import TYPOLOGIES
 
 logger = logging.getLogger(__name__)
-
-TYPOLOGIES = (
-    "fan_out",
-    "fan_in",
-    "cycle",
-    "bipartite",
-    "stack",
-    "random",
-    "scatter_gather",
-    "gather_scatter",
-)
 
 _BEGIN = re.compile(r"BEGIN LAUNDERING ATTEMPT - (?P<kind>[A-Z-]+)(?::\s*(?P<description>.*))?")
 _END = re.compile(r"END LAUNDERING ATTEMPT - (?P<kind>[A-Z-]+)")
