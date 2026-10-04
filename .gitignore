@@ -218,3 +218,15 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Atalayero: never commit data, experiment runs, model artifacts or credentials
+/data/*
+!/data/README.md
+mlruns/
+*.duckdb
+*.duckdb.wal
+*.parquet
+*.pkl
+*.joblib
+kaggle.json
+.claude/settings.local.json
