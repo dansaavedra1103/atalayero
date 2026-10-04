@@ -1,0 +1,19 @@
+# Runtime settings. Paths are relative to the repository root.
+# Any value can be overridden with ATALAYERO_* environment variables; nested fields use "__"
+# (e.g. ATALAYERO_DATA_DIR=/tmp/data, ATALAYERO_DATASET__BASE_URL=...).
+
+data_dir: data
+duckdb_path: data/atalayero.duckdb
+
+# IBM Transactions for Anti Money Laundering (AML), HI-Small variant. CDLA-Sharing-1.0.
+# Public Kaggle endpoint: anonymous HTTPS download, one file at a time, pinned to a dataset version.
+# Checksums pin the exact files: a changed or unavailable file fails the download loudly.
+dataset:
+  base_url: https://www.kaggle.com/api/v1/datasets/download/ealtman2019/ibm-transactions-for-anti-money-laundering-aml
+  version: 8
+  transactions:
+    name: HI-Small_Trans.csv
+    sha256: b19d39f515523373f991b689c07e11e7b0b95c17a2c27a87d91584ae16c5b040
+  patterns:
+    name: HI-Small_Patterns.txt
+    sha256: 2c546b5ce6009e73851f0139af053cf845f08bf92f3bc82fe1eb937dec2ef39b
