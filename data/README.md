@@ -25,9 +25,9 @@ are not downloaded again, so a manual download from the Kaggle page into `data/r
 data/
 ├── raw/
 │   ├── HI-Small_Trans.csv      # source file
-│   ├── HI-Small_Patterns.txt   # source file (not parsed yet)
+│   ├── HI-Small_Patterns.txt   # source file
 │   └── transactions.parquet    # typed transactions + transaction_id
-└── atalayero.duckdb            # table raw.transactions, loaded from the Parquet file
+└── atalayero.duckdb            # tables raw.transactions and raw.laundering_attempts
 ```
 
 ## `raw.transactions`
@@ -37,8 +37,20 @@ data/
 | `transaction_id` | BIGINT | 1-based row number in the source file (ADR-0001) |
 | `timestamp` | TIMESTAMP | Minute resolution; the source file is not sorted by time |
 | `from_bank`, `to_bank` | VARCHAR | Leading zeros are significant (`010` is not `10`) |
-| `from_account`, `to_account` | VARCHAR | Hex account IDs |
+| `from_account`, `to_account` | VARCHAR | Hex account IDs, unique only together with the bank |
 | `amount_received`, `amount_paid` | DECIMAL(20, 6) | Exact: up to 6 decimals (Bitcoin) and 13 integer digits |
 | `receiving_currency`, `payment_currency` | VARCHAR | |
 | `payment_format` | VARCHAR | Cheque, Credit Card, ACH, Cash, Reinvestment, Wire, Bitcoin |
 | `is_laundering` | BOOLEAN | Source label |
+
+## `raw.laundering_attempts`
+
+The documented laundering attempts of the patterns file, one row per (attempt, transaction).
+Only 3,209 of the 5,177 laundering transactions belong to an attempt (ADR-0002).
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `attempt_id` | INTEGER | 1-based position of the attempt in the patterns file |
+| `typology` | VARCHAR | `fan_out`, `fan_in`, `cycle`, `bipartite`, `stack`, `random`, `scatter_gather`, `gather_scatter` |
+| `description` | VARCHAR | Source text, e.g. `Max 16-degree Fan-Out`; empty when the source gives none |
+| `transaction_id` | BIGINT | Matched to `raw.transactions` on every source column |

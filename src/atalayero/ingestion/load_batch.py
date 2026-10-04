@@ -1,37 +1,17 @@
-"""Batch load: source CSV -> typed Parquet -> DuckDB table `raw.transactions`."""
+"""Batch load into the DuckDB `raw` schema: transactions (via Parquet) and laundering attempts."""
 
 import logging
 from pathlib import Path
 
 import duckdb
 
+from atalayero.ingestion.patterns import load_laundering_attempts
+from atalayero.ingestion.source import SOURCE_COLUMNS, SOURCE_TIMESTAMP_FORMAT, sql_literal
 from atalayero.settings import Settings
 
 logger = logging.getLogger(__name__)
 
-# The source header repeats "Account" (sender, then receiver), so columns are named explicitly.
-# Bank IDs have leading zeros ("010" is not "10"), so they stay VARCHAR.
-# Amounts have up to 6 decimals (Bitcoin) and 13 integer digits: DECIMAL(20, 6) is exact.
-SOURCE_COLUMNS: dict[str, str] = {
-    "timestamp": "TIMESTAMP",
-    "from_bank": "VARCHAR",
-    "from_account": "VARCHAR",
-    "to_bank": "VARCHAR",
-    "to_account": "VARCHAR",
-    "amount_received": "DECIMAL(20, 6)",
-    "receiving_currency": "VARCHAR",
-    "amount_paid": "DECIMAL(20, 6)",
-    "payment_currency": "VARCHAR",
-    "payment_format": "VARCHAR",
-    "is_laundering": "BOOLEAN",
-}
-SOURCE_TIMESTAMP_FORMAT = "%Y/%m/%d %H:%M"
 TRANSACTIONS_PARQUET = "transactions.parquet"
-
-
-def sql_literal(value: object) -> str:
-    """Quote a value as a SQL string literal (COPY and DDL statements take no parameters)."""
-    return "'" + str(value).replace("'", "''") + "'"
 
 
 def csv_to_parquet(csv_path: Path, parquet_path: Path) -> int:
@@ -84,6 +64,11 @@ def load_parquet_to_duckdb(parquet_path: Path, duckdb_path: Path) -> int:
 
 
 def load_batch(settings: Settings) -> int:
+    """Load `raw.transactions` and `raw.laundering_attempts`; return the transaction count."""
     parquet_path = settings.raw_dir / TRANSACTIONS_PARQUET
     csv_to_parquet(settings.raw_dir / settings.dataset.transactions.name, parquet_path)
-    return load_parquet_to_duckdb(parquet_path, settings.duckdb_path)
+    rows = load_parquet_to_duckdb(parquet_path, settings.duckdb_path)
+    load_laundering_attempts(
+        settings.raw_dir / settings.dataset.patterns.name, settings.duckdb_path
+    )
+    return rows

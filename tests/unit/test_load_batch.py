@@ -7,12 +7,8 @@ from pathlib import Path
 import duckdb
 import pytest
 
-from atalayero.ingestion.load_batch import (
-    SOURCE_COLUMNS,
-    csv_to_parquet,
-    load_batch,
-    load_parquet_to_duckdb,
-)
+from atalayero.ingestion.load_batch import csv_to_parquet, load_batch, load_parquet_to_duckdb
+from atalayero.ingestion.source import SOURCE_COLUMNS
 from atalayero.settings import Settings
 
 REPO_ROOT = Path(__file__).parents[2]
@@ -78,25 +74,31 @@ def test_malformed_csv_fails_the_load(sample_csv: Path, tmp_path: Path) -> None:
 def test_duckdb_load_is_idempotent(sample_csv: Path, tmp_path: Path) -> None:
     parquet = tmp_path / "transactions.parquet"
     db = tmp_path / "db" / "atalayero.duckdb"
-    csv_to_parquet(sample_csv, parquet)
+    rows = csv_to_parquet(sample_csv, parquet)
 
-    assert load_parquet_to_duckdb(parquet, db) == 1000
-    assert load_parquet_to_duckdb(parquet, db) == 1000
+    assert load_parquet_to_duckdb(parquet, db) == rows
+    assert load_parquet_to_duckdb(parquet, db) == rows
 
     with duckdb.connect(str(db), read_only=True) as con:
         counts = con.execute(
             "SELECT count(*), count(DISTINCT transaction_id) FROM raw.transactions"
         ).fetchone()
-    assert counts == (1000, 1000)
+    assert counts == (rows, rows)
 
 
 def test_load_batch_end_to_end(
-    sample_csv: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    sample_csv: Path, sample_patterns: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.chdir(REPO_ROOT)  # settings.yaml is resolved from the repository root
     settings = Settings(data_dir=tmp_path, duckdb_path=tmp_path / "atalayero.duckdb")
     settings.raw_dir.mkdir()
     shutil.copy(sample_csv, settings.raw_dir / settings.dataset.transactions.name)
+    shutil.copy(sample_patterns, settings.raw_dir / settings.dataset.patterns.name)
 
-    assert load_batch(settings) == 1000
+    assert load_batch(settings) == len(_source_rows(sample_csv))
     assert (settings.raw_dir / "transactions.parquet").exists()
+    with duckdb.connect(str(settings.duckdb_path), read_only=True) as con:
+        (attempts,) = con.execute(
+            "SELECT count(DISTINCT attempt_id) FROM raw.laundering_attempts"
+        ).fetchone()
+    assert attempts == 8
