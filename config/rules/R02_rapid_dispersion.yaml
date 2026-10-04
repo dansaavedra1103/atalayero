@@ -1,0 +1,16 @@
+id: R02
+name: rapid_dispersion
+typology: fan_out
+owner: aml-monitoring
+version: "1.0"
+description: Account sending to 10 or more distinct counterparties within 24 h, counting transactions of 5,000 USD or more
+metric: distinct_counterparties
+window: 24h
+threshold:
+  min_count: 10
+  min_amount_usd: 5000
+cooldown: 24h
+history:
+  - version: "1.0"
+    date: 2026-10-04
+    reason: "Initial version. On 1-10 Sep: about 16 alerts/day, 95% of them on 15 high-volume accounts (ADR-0004)"
