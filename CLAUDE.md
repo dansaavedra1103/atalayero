@@ -42,6 +42,7 @@ All commands go through the Makefile. When you add a new command, add it to the 
 - `make rules`    — evaluate the YAML rules over the batch data (1–10 Sep, same engine as `make stream`); alerts to `data/rules/alerts/` (needs `make dbt`)
 - `make features` — point-in-time tabular and graph features of every transaction (1–10 Sep), no labels, to `data/features/` (about 5 min; needs `make dbt`)
 - `make evaluate` — alert-budget evaluation of the rules-only baseline on validation; report to `data/reports/` (needs `make rules`)
+- `make tune`     — Optuna search of the hyperparameters on validation (PR-AUC); writes a new version of `config/models.yaml` (about 45 min; needs `make features` and `make rules`)
 - `make train`    — fit the model families of `config/models.yaml`, compare them with the rules on validation, log to MLflow and promote the champion (needs `make features` and `make rules`)
 - `make mlflow-ui` — local MLflow UI on http://localhost:5000
 - `make test-integration` — tests that need running services (Redpanda); not run in CI

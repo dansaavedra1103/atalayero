@@ -1,3 +1,4 @@
+import random
 from collections.abc import Callable
 from datetime import datetime, timedelta
 from decimal import Decimal
@@ -7,14 +8,17 @@ import duckdb
 import numpy as np
 import pandas as pd
 import pytest
+import yaml
 
 from atalayero.features.tabular import CATEGORICAL
 from atalayero.models.data import BOOLEAN, FEATURES, NUMERIC, Dataset
-from atalayero.schemas import Transaction
+from atalayero.schemas import Alert, Transaction
+from atalayero.settings import Settings
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 REPO_ROOT = Path(__file__).parent.parent
 T0 = datetime(2022, 9, 5, 9, 0)
+DAY = 24 * 60  # minutes
 
 _DUCKDB_TYPES = {
     int: "BIGINT",
@@ -129,7 +133,7 @@ def small_params() -> dict[str, dict]:
             "min_child_samples": 5,
             "subsample": 1.0,
             "colsample_bytree": 1.0,
-            "reg_lambda": 0.0,
+            "reg_lambda": 0.001,
             "negative_rate": 0.5,
         },
         "isolation_forest": {"n_estimators": 20, "max_samples": 64, "max_features": 1.0},
@@ -156,3 +160,97 @@ def synthetic() -> Callable[..., Dataset]:
         return Dataset(np.arange(n), features[list(FEATURES)], labels)
 
     return synthetic
+
+
+@pytest.fixture
+def model_settings(
+    make_tx: MakeTx,
+    fct_transactions_db: WriteDb,
+    small_params: dict[str, dict],
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> Settings:
+    """Four days of random transactions where large amounts are laundering: 5 Sep is warm-up,
+    6-7 Sep train, 8 Sep validation. Features, rule alerts and a small model config are ready."""
+    from atalayero.features.graph import build_graph_features
+    from atalayero.features.tabular import build_tabular_features
+    from atalayero.models.families import FAMILIES
+    from atalayero.rules.schema import load_rules
+    from atalayero.streaming.consumer import AlertSink
+
+    monkeypatch.chdir(REPO_ROOT)
+    rng = random.Random(0)
+    accounts = [f"00{i % 3}:{i}" for i in range(40)]
+    transactions = [
+        make_tx(
+            i,
+            rng.randrange(0, 4 * DAY - 540),
+            sender=rng.choice(accounts),
+            receiver=rng.choice(accounts),
+            usd=rng.choice([500.0, 1500.0, 9500.0]),
+        )
+        for i in range(800)
+    ]
+    db = fct_transactions_db(transactions)
+    with duckdb.connect(str(db)) as con:
+        con.execute(
+            "CREATE TABLE marts.fct_laundering_labels AS SELECT transaction_id, "
+            "amount_paid_usd > 9000 AND transaction_id % 3 = 0 AS is_laundering, "
+            "'untyped' AS label_group, NULL::INTEGER AS attempt_id, NULL AS typology "
+            "FROM marts.fct_transactions"
+        )
+    config = tmp_path / "models.yaml"
+    config.write_text(
+        yaml.safe_dump(
+            {
+                "version": "1.0",
+                "families": {name: {"params": small_params[name]} for name in FAMILIES},
+                "history": [{"version": "1.0", "date": "2026-10-05", "reason": "Tests"}],
+            }
+        )
+    )
+    base = Settings()
+    settings = base.model_copy(
+        update={
+            "duckdb_path": db,
+            "features_dir": tmp_path / "features",
+            "rule_alerts_dir": tmp_path / "alerts",
+            "graph_workers": 1,
+            "splits": base.splits.model_copy(
+                update={
+                    "train_end": datetime(2022, 9, 8),
+                    "validation_end": datetime(2022, 9, 9),
+                    "test_end": datetime(2022, 9, 10),
+                }
+            ),
+            "evaluation": base.evaluation.model_copy(
+                update={"hub_accounts": 1, "reports_dir": tmp_path / "reports"}
+            ),
+            "models": base.models.model_copy(
+                update={
+                    "config_path": config,
+                    "train_start": datetime(2022, 9, 6),
+                    "mlflow_tracking_uri": f"sqlite:///{tmp_path}/mlflow/mlflow.db",
+                    "mlflow_artifacts_dir": tmp_path / "mlflow" / "artifacts",
+                }
+            ),
+        }
+    )
+    build_tabular_features(settings)
+    build_graph_features(settings)
+    sink = AlertSink(settings.rule_alerts_dir)
+    sink.extend(
+        Alert(
+            alert_id=f"R01:{i}",
+            rule_id="R01",
+            rule_version=load_rules(settings.rules_dir)[0].version,
+            account_key=accounts[i],
+            triggered_at=datetime(2022, 9, 8, 12) + timedelta(minutes=i),
+            transaction_id=i,
+            value=10,
+            evidence=(i,),
+        )
+        for i in range(3)
+    )
+    sink.flush()
+    return settings

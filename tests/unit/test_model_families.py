@@ -32,7 +32,7 @@ def test_repository_config_is_valid() -> None:
 @pytest.mark.parametrize(
     ("change", "error"),
     [
-        ({"version": "1.1"}, "add an entry with the reason"),
+        ({"version": "9.9"}, "add an entry with the reason"),
         ({"families": {"lightgbm": {"params": {"num_leaves": 31}}}}, "lightgbm takes exactly"),
         ({"families": {"random_forest": {"params": {}}}}, "Input should be"),
     ],

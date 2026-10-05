@@ -1,4 +1,4 @@
-"""CLI: python -m atalayero.models evaluate [--split validation|test] | train."""
+"""CLI: python -m atalayero.models evaluate [--split validation|test] | tune | train."""
 
 import argparse
 import logging
@@ -11,9 +11,9 @@ def main() -> None:
     parser = argparse.ArgumentParser(prog="python -m atalayero.models")
     parser.add_argument(
         "command",
-        choices=["evaluate", "train"],
-        help="evaluate the rules-only baseline on a split, or train the models and compare them "
-        "with the rules on validation",
+        choices=["evaluate", "tune", "train"],
+        help="evaluate the rules-only baseline on a split; tune the hyperparameters on "
+        "validation; or train the models and compare them with the rules on validation",
     )
     parser.add_argument("--split", choices=["validation", "test"], default="validation")
     args = parser.parse_args()
@@ -23,8 +23,12 @@ def main() -> None:
     settings = Settings()
     if args.command == "evaluate":
         evaluate_rules_only(settings, args.split)
+    elif args.command == "tune":
+        from atalayero.models.tune import tune  # MLflow and Optuna are slow to import
+
+        tune(settings)
     else:
-        from atalayero.models.train import train_and_evaluate  # MLflow is slow to import
+        from atalayero.models.train import train_and_evaluate
 
         train_and_evaluate(settings)
 
