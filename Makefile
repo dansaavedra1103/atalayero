@@ -2,7 +2,7 @@ DBT_BUILD := uv run dbt build --project-dir dbt --profiles-dir dbt
 # The test fixtures, loaded into their own disposable DuckDB file.
 SAMPLE_ENV := ATALAYERO_DATA_DIR=data/sample ATALAYERO_DUCKDB_PATH=data/sample/atalayero.duckdb
 
-.PHONY: setup check test-integration ingest fixture fx-rates dbt dbt-sample up down stream
+.PHONY: setup check test-integration ingest fixture fx-rates dbt dbt-sample up down stream rules
 
 setup:
 	uv sync
@@ -41,3 +41,6 @@ down:
 
 stream:
 	uv run python -m atalayero.streaming replay
+
+rules:
+	uv run python -m atalayero.rules evaluate

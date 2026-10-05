@@ -1,0 +1,16 @@
+id: R03
+name: short_cycle
+typology: cycle
+owner: aml-monitoring
+version: "1.0"
+description: Funds returning to the account that sent them through a chain of at most 12 transactions in time order within 96 h, each of 5,000 USD or more
+metric: short_cycle
+window: 96h
+threshold:
+  max_hops: 12
+  min_amount_usd: 5000
+cooldown: 24h
+history:
+  - version: "1.0"
+    date: 2026-10-05
+    reason: "Initial version. On 1-8 Sep: about 10 alerts/day, none on the 15 hub accounts (ADR-0006)"

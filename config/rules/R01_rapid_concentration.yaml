@@ -1,0 +1,17 @@
+id: R01
+name: rapid_concentration
+typology: fan_in
+owner: aml-monitoring
+version: "1.0"
+description: Account receiving from 10 or more distinct counterparties within 96 h, counting transactions of 5,000 USD or more
+metric: distinct_counterparties
+direction: in
+window: 96h
+threshold:
+  min_count: 10
+  min_amount_usd: 5000
+cooldown: 24h
+history:
+  - version: "1.0"
+    date: 2026-10-05
+    reason: "Initial version, replaces structuring from the design. On 1-8 Sep: about 24 alerts/day, none on the 15 hub accounts (ADR-0006)"

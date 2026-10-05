@@ -41,8 +41,13 @@ def test_replay_through_redpanda_matches_offline_evaluation(
             make_tx(100 + i, 200 + 2 * i, sender="003:X", receiver="004:Y", usd=50)
             for i in range(15)
         ),
+        # R01: 12 senders pay the same account 6,000 USD each
+        *(make_tx(200 + i, 7 * i, sender=f"005:N{i}", receiver="006:M") for i in range(12)),
+        # R03: the money comes back to 007:A through 007:B
+        make_tx(300, 50, sender="007:A", receiver="007:B"),
+        make_tx(301, 60, sender="007:B", receiver="007:A"),
         # quiet accounts
-        *(make_tx(200 + i, 7 * i, sender=f"005:N{i}", receiver="006:M") for i in range(20)),
+        *(make_tx(400 + i, 9 * i, sender=f"008:Q{i}", receiver=f"009:P{i}") for i in range(10)),
     ]
     db = fct_transactions_db(transactions)
     topic = f"test-replay-{uuid4().hex}"
@@ -59,6 +64,6 @@ def test_replay_through_redpanda_matches_offline_evaluation(
     rel = duckdb.sql(f"SELECT * FROM read_parquet('{settings.alerts_dir}/part-*.parquet')")
     got = [Alert(**dict(zip(rel.columns, row, strict=True))) for row in rel.fetchall()]
     assert produced == len(transactions)
-    assert {a.rule_id for a in expected} == {"R02", "R04"}
+    assert {a.rule_id for a in expected} == {"R01", "R02", "R03", "R04"}
     assert written == len(expected)
     assert sorted(got, key=lambda a: a.alert_id) == sorted(expected, key=lambda a: a.alert_id)

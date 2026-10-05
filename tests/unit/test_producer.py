@@ -19,6 +19,13 @@ def test_transactions_come_in_event_time_order(
     assert next(iter_transactions(db)) == make_tx(4, 0)
 
 
+def test_until_is_exclusive(make_tx: MakeTx, fct_transactions_db: WriteDb) -> None:
+    db = fct_transactions_db([make_tx(1, 0), make_tx(2, 5), make_tx(3, 10)])
+
+    until = make_tx(3, 10).transacted_at
+    assert [tx.transaction_id for tx in iter_transactions(db, until=until)] == [1, 2]
+
+
 def _fake_time() -> tuple[Callable[[], float], Callable[[float], None], list[float]]:
     now, sleeps = [0.0], []
 
