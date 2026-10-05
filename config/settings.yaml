@@ -15,6 +15,13 @@ splits:
   validation_end: 2022-09-09
   test_end: 2022-09-11
 
+# Alert-budget evaluation (ADR-0007). An alert is an account-day: one account's transactions of
+# one day, sent and received. Detectors fill a daily budget of them.
+evaluation:
+  budgets: [50, 100, 200, 400]  # alerts per day; models are also compared at the rules' volume
+  hub_accounts: 15  # the top senders of the train split, by transactions, reported apart
+  reports_dir: data/reports
+
 # IBM Transactions for Anti Money Laundering (AML), HI-Small variant. CDLA-Sharing-1.0.
 # Public Kaggle endpoint: anonymous HTTPS download, one file at a time, pinned to a dataset version.
 # Checksums pin the exact files: a changed or unavailable file fails the download loudly.
