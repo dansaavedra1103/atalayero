@@ -145,7 +145,7 @@ atalayero/
 ├── config/
 │   ├── settings.yaml              # rutas, ventanas, presupuesto de alertas
 │   └── rules/
-│       ├── R01_structuring.yaml
+│       ├── R01_rapid_concentration.yaml   # fan-in; sustituye a structuring (ADR-0006)
 │       ├── R02_rapid_dispersion.yaml
 │       ├── R03_short_cycle.yaml
 │       └── R04_high_velocity.yaml
