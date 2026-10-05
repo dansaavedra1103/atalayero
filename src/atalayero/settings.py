@@ -78,6 +78,7 @@ class Settings(BaseSettings):
     rules_dir: Path
     alerts_dir: Path
     rule_alerts_dir: Path
+    features_dir: Path
     splits: SplitSettings
     evaluation: EvaluationSettings
     dataset: DatasetSettings
