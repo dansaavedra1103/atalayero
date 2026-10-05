@@ -1,0 +1,28 @@
+# Hyperparameters of the model families (ADR-0009). `make train` fits them. A change bumps
+# `version` and adds a `history` entry with the reason, as for the rules.
+version: "1.0"
+families:
+  logistic_regression:
+    params:
+      C: 1.0
+      class_weight: balanced
+      negative_rate: 0.1  # share of clean training rows kept; every laundering row is kept
+  lightgbm:
+    params:
+      n_estimators: 500
+      learning_rate: 0.05
+      num_leaves: 31
+      min_child_samples: 100
+      subsample: 0.8
+      colsample_bytree: 0.8
+      reg_lambda: 1.0
+      negative_rate: 0.1
+  isolation_forest:
+    params:
+      n_estimators: 200
+      max_samples: 256
+      max_features: 1.0
+history:
+  - version: "1.0"
+    date: 2026-10-05
+    reason: "Hand-picked defaults before any tuning (ADR-0009)"

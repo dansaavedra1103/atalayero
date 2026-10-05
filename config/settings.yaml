@@ -24,6 +24,17 @@ evaluation:
   hub_accounts: 15  # the top senders of the train split, by transactions, reported apart
   reports_dir: data/reports
 
+# Models (ADR-0009). Training rows start after the warm-up day (ADR-0008). MLflow runs locally
+# and keeps everything under data/, so it can be rebuilt like the rest.
+models:
+  config_path: config/models.yaml  # hyperparameters, versioned like the rules
+  train_start: 2022-09-02
+  seed: 0
+  mlflow_tracking_uri: sqlite:///data/mlflow/mlflow.db
+  mlflow_artifacts_dir: data/mlflow/artifacts
+  experiment: atalayero-detectors
+  registered_model: atalayero-detector
+
 # IBM Transactions for Anti Money Laundering (AML), HI-Small variant. CDLA-Sharing-1.0.
 # Public Kaggle endpoint: anonymous HTTPS download, one file at a time, pinned to a dataset version.
 # Checksums pin the exact files: a changed or unavailable file fails the download loudly.
