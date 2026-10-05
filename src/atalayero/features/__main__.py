@@ -3,6 +3,7 @@
 import argparse
 import logging
 
+from atalayero.features.graph import build_graph_features
 from atalayero.features.tabular import build_tabular_features
 from atalayero.settings import Settings
 
@@ -16,7 +17,9 @@ def main() -> None:
     logging.basicConfig(
         level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s"
     )
-    build_tabular_features(Settings())
+    settings = Settings()
+    build_tabular_features(settings)
+    build_graph_features(settings)
 
 
 if __name__ == "__main__":

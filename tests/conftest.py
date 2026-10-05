@@ -89,3 +89,25 @@ def fct_transactions_db(tmp_path: Path) -> WriteDb:
         return db
 
     return write
+
+
+LoadTx = Callable[[list[Transaction]], duckdb.DuckDBPyConnection]
+
+
+@pytest.fixture
+def load_tx() -> LoadTx:
+    """An in-memory DuckDB with the transactions in table `tx`, in the columns of
+    `marts.fct_transactions` that features read."""
+
+    def load(transactions: list[Transaction]) -> duckdb.DuckDBPyConnection:
+        con = duckdb.connect()
+        fields = Transaction.model_fields
+        columns = ", ".join(f"{name} {_DUCKDB_TYPES[f.annotation]}" for name, f in fields.items())
+        con.execute(f"CREATE TABLE tx ({columns})")
+        con.executemany(
+            f"INSERT INTO tx VALUES ({', '.join('?' * len(fields))})",
+            [list(tx.model_dump().values()) for tx in transactions],
+        )
+        return con
+
+    return load

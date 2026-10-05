@@ -8,6 +8,7 @@ rules_dir: config/rules
 alerts_dir: data/stream/alerts  # online rules over the Redpanda replay (`make stream`)
 rule_alerts_dir: data/rules/alerts  # the same rules over the batch data (`make rules`)
 features_dir: data/features  # point-in-time features, no labels (`make features`)
+graph_workers: 4  # graph snapshots built in parallel; each process takes about 1.5 GB
 
 # Temporal split (ADR-0005): half-open boundaries on `transacted_at`. Train starts with the data
 # (1 Sep 2022). Transactions from `test_end` on are never used, not even as history.
