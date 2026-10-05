@@ -11,7 +11,10 @@ project. Full design: `docs/design.md` — read it before planning work on a new
   Only exception: `docs/design.md`, the original design, stays in Spanish.
 
 ## Current status
-- Current phase: **1 — Data** (batch ingestion, streaming replay, dbt models).
+- Current phase: **2 — Rules & models** (rule engine, leak-free tabular and graph features,
+  baselines vs rules-only, alert-budget evaluation, MLflow, drift).
+- Phase 1 closed with tag `v0.1` (ADR-0001…0005). Phase 2 starts from the rules-only baseline
+  (ADR-0004) and the temporal split (ADR-0005).
 - Phases: 1 Data · 2 Rules & models · 3 Agent & evals · 4 Product & ops.
 - Do not start work from a later phase unless I ask. I update this section when a phase closes.
 
