@@ -4,8 +4,12 @@ from decimal import Decimal
 from pathlib import Path
 
 import duckdb
+import numpy as np
+import pandas as pd
 import pytest
 
+from atalayero.features.tabular import CATEGORICAL
+from atalayero.models.data import BOOLEAN, FEATURES, NUMERIC, Dataset
 from atalayero.schemas import Transaction
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
@@ -111,3 +115,44 @@ def load_tx() -> LoadTx:
         return con
 
     return load
+
+
+@pytest.fixture
+def small_params() -> dict[str, dict]:
+    """Hyperparameters of each model family that train in a blink."""
+    return {
+        "logistic_regression": {"C": 1.0, "class_weight": "balanced", "negative_rate": 0.5},
+        "lightgbm": {
+            "n_estimators": 30,
+            "learning_rate": 0.1,
+            "num_leaves": 7,
+            "min_child_samples": 5,
+            "subsample": 1.0,
+            "colsample_bytree": 1.0,
+            "reg_lambda": 0.0,
+            "negative_rate": 0.5,
+        },
+        "isolation_forest": {"n_estimators": 20, "max_samples": 64, "max_features": 1.0},
+    }
+
+
+@pytest.fixture
+def synthetic() -> Callable[..., Dataset]:
+    """A factory of model inputs with a planted signal."""
+
+    def synthetic(n: int = 600, seed: int = 0) -> Dataset:
+        """Random features; laundering has larger amounts and fewer earlier pair transactions."""
+        rng = np.random.default_rng(seed)
+        labels = rng.random(n) < 0.05
+        features = pd.DataFrame(
+            {name: rng.lognormal(2, 1, n) for name in NUMERIC}
+            | {name: (rng.random(n) < 0.2).astype(float) for name in BOOLEAN}
+            | {name: rng.choice(["ach", "wire", "cheque"], n) for name in CATEGORICAL}
+        )
+        features["amount_usd"] *= np.where(labels, 20, 1)
+        features["pair_count_before"] = np.where(labels, 0, features["pair_count_before"])
+        features["hour"] = rng.integers(0, 24, n).astype(float)
+        features.loc[rng.random(n) < 0.1, "sender_minutes_since_previous"] = np.nan
+        return Dataset(np.arange(n), features[list(FEATURES)], labels)
+
+    return synthetic

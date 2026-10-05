@@ -28,7 +28,7 @@ Dev environment: WSL2 (Ubuntu) on Windows. Run everything from WSL, never from P
 
 ## Commands
 All commands go through the Makefile. When you add a new command, add it to the Makefile AND to this list.
-- `make setup`    — install dependencies with uv, install pre-commit hooks
+- `make setup`    — install dependencies with uv, install pre-commit hooks (LightGBM needs `sudo apt-get install libgomp1`)
 - `make check`    — ruff format --check + ruff lint + pytest
 - `make ingest`   — download the dataset (SHA-256 verified) and load DuckDB `raw.transactions` (via Parquet) and `raw.laundering_attempts`
 - `make fixture`  — regenerate the story-based test fixtures from the downloaded dataset
@@ -42,6 +42,8 @@ All commands go through the Makefile. When you add a new command, add it to the 
 - `make rules`    — evaluate the YAML rules over the batch data (1–10 Sep, same engine as `make stream`); alerts to `data/rules/alerts/` (needs `make dbt`)
 - `make features` — point-in-time tabular and graph features of every transaction (1–10 Sep), no labels, to `data/features/` (about 5 min; needs `make dbt`)
 - `make evaluate` — alert-budget evaluation of the rules-only baseline on validation; report to `data/reports/` (needs `make rules`)
+- `make train`    — fit the model families of `config/models.yaml`, compare them with the rules on validation, log to MLflow and promote the champion (needs `make features` and `make rules`)
+- `make mlflow-ui` — local MLflow UI on http://localhost:5000
 - `make test-integration` — tests that need running services (Redpanda); not run in CI
 - `make eval`     — run agent evals offline and write a dated report to evals/reports/
 

@@ -66,6 +66,16 @@ class EvaluationSettings(BaseModel):
     reports_dir: Path
 
 
+class ModelSettings(BaseModel):
+    config_path: Path
+    train_start: datetime  # the first day of training rows, after the warm-up (ADR-0008)
+    seed: int
+    mlflow_tracking_uri: str
+    mlflow_artifacts_dir: Path
+    experiment: str
+    registered_model: str
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_prefix="ATALAYERO_",
@@ -82,6 +92,7 @@ class Settings(BaseSettings):
     graph_workers: int = Field(ge=1)
     splits: SplitSettings
     evaluation: EvaluationSettings
+    models: ModelSettings
     dataset: DatasetSettings
     streaming: StreamingSettings
 

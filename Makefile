@@ -1,9 +1,12 @@
 DBT_BUILD := uv run dbt build --project-dir dbt --profiles-dir dbt
 # The test fixtures, loaded into their own disposable DuckDB file.
 SAMPLE_ENV := ATALAYERO_DATA_DIR=data/sample ATALAYERO_DUCKDB_PATH=data/sample/atalayero.duckdb
+# MLflow prints a hint for coding agents on import; it is noise in the logs.
+MLFLOW_ENV := MLFLOW_DISABLE_AGENT_HINT=1
 
-.PHONY: setup check test-integration ingest fixture fx-rates dbt dbt-sample up down stream rules evaluate features
+.PHONY: setup check test-integration ingest fixture fx-rates dbt dbt-sample up down stream rules evaluate features train mlflow-ui
 
+# LightGBM needs the system OpenMP runtime: sudo apt-get install libgomp1 (ADR-0009).
 setup:
 	uv sync
 	uv run pre-commit install
@@ -50,3 +53,9 @@ evaluate:
 
 features:
 	uv run python -m atalayero.features build
+
+train:
+	$(MLFLOW_ENV) uv run python -m atalayero.models train
+
+mlflow-ui:
+	$(MLFLOW_ENV) uv run mlflow ui --backend-store-uri sqlite:///data/mlflow/mlflow.db --port 5000
