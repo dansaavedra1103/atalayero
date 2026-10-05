@@ -30,7 +30,8 @@ data/
 ├── atalayero.duckdb            # tables raw.transactions and raw.laundering_attempts; dbt models
 ├── sample/                     # the test fixtures, loaded by make dbt-sample
 ├── stream/alerts/              # part-*.parquet: alerts of the last make stream
-└── rules/alerts/               # part-*.parquet: alerts of the last make rules
+├── rules/alerts/               # part-*.parquet: alerts of the last make rules
+└── reports/                    # evaluation reports (JSON) of make evaluate
 ```
 
 ## `raw.transactions`
