@@ -102,3 +102,6 @@
 - **PR-AUC and detection at a small budget disagree for LightGBM.** A smoother version of the
   primary metric, such as detection averaged over several budgets, could replace PR-AUC as the
   objective later. That would mean a new ADR.
+- Registered models are cloudpickled, so they refer to the functions in their pipelines by name
+  (ADR-0009). Renaming one, such as the LightGBM category helper, stops those models from
+  loading. Such a rename needs a retrain and a new champion.

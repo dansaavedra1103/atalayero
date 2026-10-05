@@ -38,8 +38,9 @@ def _numeric() -> Pipeline:
     )
 
 
-def as_categories(features: pd.DataFrame) -> pd.DataFrame:
-    """LightGBM splits on pandas categories natively."""
+def _as_categories(features: pd.DataFrame) -> pd.DataFrame:
+    """LightGBM splits on pandas categories natively. Registered models pickle this function by
+    its name: renaming it breaks loading them."""
     return features.astype({name: "category" for name in CATEGORICAL})
 
 
@@ -73,7 +74,7 @@ def lightgbm(params: Params, seed: int) -> Pipeline:
         force_row_wise=True,
         verbose=-1,
     )
-    return Pipeline([("categories", FunctionTransformer(as_categories)), ("model", model)])
+    return Pipeline([("categories", FunctionTransformer(_as_categories)), ("model", model)])
 
 
 def isolation_forest(params: Params, seed: int) -> Pipeline:
