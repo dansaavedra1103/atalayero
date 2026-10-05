@@ -29,7 +29,8 @@ data/
 │   └── transactions.parquet    # typed transactions + transaction_id
 ├── atalayero.duckdb            # tables raw.transactions and raw.laundering_attempts; dbt models
 ├── sample/                     # the test fixtures, loaded by make dbt-sample
-└── stream/alerts/              # part-*.parquet: alerts of the last make stream
+├── stream/alerts/              # part-*.parquet: alerts of the last make stream
+└── rules/alerts/               # part-*.parquet: alerts of the last make rules
 ```
 
 ## `raw.transactions`
