@@ -1,12 +1,14 @@
-# Hyperparameters of the model families (ADR-0009). `make train` fits them. A change bumps
+# Hyperparameters of the model families (ADR-0009). `make tune` searches them with
+# Optuna and writes this file (ADR-0010); `make train` fits them. A change bumps
 # `version` and adds a `history` entry with the reason, as for the rules.
-version: "1.0"
+# `negative_rate`: share of clean training rows kept; every laundering row is kept.
+version: '1.1'
 families:
   logistic_regression:
     params:
-      C: 1.0
-      class_weight: balanced
-      negative_rate: 0.1  # share of clean training rows kept; every laundering row is kept
+      C: 6.238155402018423
+      class_weight: null
+      negative_rate: 0.08054641489830232
   lightgbm:
     params:
       n_estimators: 500
@@ -19,10 +21,16 @@ families:
       negative_rate: 0.1
   isolation_forest:
     params:
-      n_estimators: 200
-      max_samples: 256
-      max_features: 1.0
+      n_estimators: 391
+      max_samples: 6265
+      max_features: 0.5806106015226714
 history:
-  - version: "1.0"
-    date: 2026-10-05
-    reason: "Hand-picked defaults before any tuning (ADR-0009)"
+- version: '1.0'
+  date: '2026-10-05'
+  reason: Hand-picked defaults before any tuning (ADR-0009)
+- version: '1.1'
+  date: '2026-10-05'
+  reason: 'make tune: Optuna TPE, 70 trials on validation. logistic_regression PR-AUC
+    0.2456, detection without hubs 7.8%; lightgbm kept: best PR-AUC trial detects
+    17.0% without hubs against 17.8%; isolation_forest PR-AUC 0.0044, detection without
+    hubs 1.1% (ADR-0010)'
