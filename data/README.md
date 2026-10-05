@@ -31,6 +31,7 @@ data/
 ├── sample/                     # the test fixtures, loaded by make dbt-sample
 ├── stream/alerts/              # part-*.parquet: alerts of the last make stream
 ├── rules/alerts/               # part-*.parquet: alerts of the last make rules
+├── features/tabular.parquet     # point-in-time features of make features, no labels
 └── reports/                    # evaluation reports (JSON) of make evaluate
 ```
 
