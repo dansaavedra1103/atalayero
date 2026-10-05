@@ -5,7 +5,15 @@
 data_dir: data
 duckdb_path: data/atalayero.duckdb
 rules_dir: config/rules
-alerts_dir: data/stream/alerts
+alerts_dir: data/stream/alerts  # online rules over the Redpanda replay (`make stream`)
+rule_alerts_dir: data/rules/alerts  # the same rules over the batch data (`make rules`)
+
+# Temporal split (ADR-0005): half-open boundaries on `transacted_at`. Train starts with the data
+# (1 Sep 2022). Transactions from `test_end` on are never used, not even as history.
+splits:
+  train_end: 2022-09-07
+  validation_end: 2022-09-09
+  test_end: 2022-09-11
 
 # IBM Transactions for Anti Money Laundering (AML), HI-Small variant. CDLA-Sharing-1.0.
 # Public Kaggle endpoint: anonymous HTTPS download, one file at a time, pinned to a dataset version.

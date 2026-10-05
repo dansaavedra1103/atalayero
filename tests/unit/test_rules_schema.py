@@ -29,9 +29,11 @@ VALID = {
 def test_repository_rules_are_valid() -> None:
     rules = load_rules(REPO_ROOT / "config" / "rules")
 
-    assert [(r.id, r.metric) for r in rules] == [
-        ("R02", "distinct_counterparties"),
-        ("R04", "outgoing_transactions"),
+    assert [(r.id, r.metric, r.direction) for r in rules] == [
+        ("R01", "distinct_counterparties", "in"),
+        ("R02", "distinct_counterparties", "out"),
+        ("R03", "short_cycle", "out"),
+        ("R04", "outgoing_transactions", "out"),
     ]
 
 
@@ -58,11 +60,24 @@ def test_rejects_bad_durations(text: object) -> None:
         ({"typology": "smurfing"}, "unknown typology"),
         ({"metric": "amount"}, "distinct_counterparties"),
         ({"threshold": {"min_count": 0}}, "greater than or equal to 1"),
+        ({"threshold": {}}, "takes threshold.min_count, not max_hops"),
+        ({"threshold": {"min_count": 3, "max_hops": 3}}, "takes threshold.min_count"),
+        ({"metric": "short_cycle"}, "short_cycle takes threshold.max_hops, not min_count"),
+        ({"metric": "short_cycle", "threshold": {"max_hops": 1}}, "greater than or equal to 2"),
+        ({"direction": "in"}, "outgoing_transactions has no direction"),
+        ({"direction": "both"}, "'out' or 'in'"),
     ],
 )
 def test_rejects_invalid_rules(change: dict, error: str) -> None:
     with pytest.raises(pydantic.ValidationError, match=error):
         Rule.model_validate(VALID | change)
+
+
+def test_accepts_the_new_metric_and_direction() -> None:
+    fan_in = Rule.model_validate(VALID | {"metric": "distinct_counterparties", "direction": "in"})
+    cycle = Rule.model_validate(VALID | {"metric": "short_cycle", "threshold": {"max_hops": 4}})
+
+    assert (fan_in.direction, cycle.direction, cycle.threshold.max_hops) == ("in", "out", 4)
 
 
 def _write(directory: Path, filename: str, rule: dict) -> None:

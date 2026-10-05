@@ -20,6 +20,23 @@ def test_reads_settings_yaml() -> None:
     assert len(settings.dataset.transactions.sha256) == 64
 
 
+def test_splits_follow_adr_0005() -> None:
+    splits = Settings().splits
+
+    assert [d.isoformat() for d in (splits.train_end, splits.validation_end, splits.test_end)] == [
+        "2022-09-07T00:00:00",
+        "2022-09-09T00:00:00",
+        "2022-09-11T00:00:00",
+    ]
+
+
+def test_splits_must_be_ordered(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("ATALAYERO_SPLITS__VALIDATION_END", "2022-09-12")
+
+    with pytest.raises(ValueError, match="train_end < validation_end < test_end"):
+        Settings()
+
+
 def test_url_pins_the_dataset_version() -> None:
     dataset = Settings().dataset
 

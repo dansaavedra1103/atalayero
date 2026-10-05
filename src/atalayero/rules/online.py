@@ -1,8 +1,7 @@
 """Online evaluation of the rules over a transaction stream, in event-time order.
 
-Each rule keeps, per sender account, the outgoing transactions inside its trailing window
-(`transacted_at >= t - window`, both ends included). Only transactions already seen count, so the
-evaluation cannot look ahead in time.
+Each rule keeps the transactions inside its trailing window (`transacted_at >= t - window`, both
+ends included). Only transactions already seen count, so the evaluation cannot look ahead in time.
 """
 
 from collections import Counter, deque
@@ -20,11 +19,13 @@ class _Window:
     __slots__ = ("counterparties", "entries")
 
     def __init__(self) -> None:
-        self.entries: deque[tuple[datetime, str, int]] = deque()  # (time, receiver, id)
+        self.entries: deque[tuple[datetime, str, int]] = deque()  # (time, counterparty, id)
         self.counterparties: Counter[str] = Counter()
 
 
 class OnlineRule:
+    """Count metrics (`distinct_counterparties`, `outgoing_transactions`), per account."""
+
     def __init__(self, rule: Rule) -> None:
         self.rule = rule
         self._windows: dict[str, _Window] = {}
@@ -41,22 +42,28 @@ class OnlineRule:
         }
 
     def observe(self, tx: Transaction) -> Alert | None:
-        rule, account = self.rule, tx.sender_account_key
+        rule = self.rule
+        if rule.direction == "out":
+            account, counterparty = tx.sender_account_key, tx.receiver_account_key
+            amount_usd = tx.amount_paid_usd
+        else:
+            account, counterparty = tx.receiver_account_key, tx.sender_account_key
+            amount_usd = tx.amount_received_usd
         if self._next_sweep is None or tx.transacted_at >= self._next_sweep:
             self._sweep(tx.transacted_at)
             self._next_sweep = tx.transacted_at + rule.window
-        if account == tx.receiver_account_key or tx.amount_paid_usd < rule.threshold.min_amount_usd:
+        if account == counterparty or amount_usd < rule.threshold.min_amount_usd:
             return None
 
         window = self._windows.setdefault(account, _Window())
-        window.entries.append((tx.transacted_at, tx.receiver_account_key, tx.transaction_id))
-        window.counterparties[tx.receiver_account_key] += 1
+        window.entries.append((tx.transacted_at, counterparty, tx.transaction_id))
+        window.counterparties[counterparty] += 1
         start = tx.transacted_at - rule.window
         while window.entries[0][0] < start:
-            _, receiver, _ = window.entries.popleft()
-            window.counterparties[receiver] -= 1
-            if not window.counterparties[receiver]:
-                del window.counterparties[receiver]
+            _, gone, _ = window.entries.popleft()
+            window.counterparties[gone] -= 1
+            if not window.counterparties[gone]:
+                del window.counterparties[gone]
 
         if rule.metric == "distinct_counterparties":
             value = len(window.counterparties)
@@ -81,11 +88,173 @@ class OnlineRule:
         )
 
 
+_Leg = tuple[datetime, int]  # (time, transaction_id)
+_Legs = dict[str, dict[str, deque[_Leg]]]  # account -> counterparty -> legs, oldest first
+_Label = tuple[datetime, int, str]  # (time, transaction_id, neighbour one level down)
+
+
+class CycleRule:
+    """`short_cycle`: on each transaction C→A, look for an earlier chain A→…→C of at most
+    `max_hops - 1` legs inside the window, each leg at or after the previous one. Money that left
+    A has come back to it, so A gets the alert.
+
+    The search runs from both ends, forward from A over outgoing legs and backward from C over
+    incoming ones, and always expands the cheaper side. Hubs send to thousands of accounts but
+    receive from few, so they only cost much when the chain really goes through them.
+    """
+
+    def __init__(self, rule: Rule) -> None:
+        self.rule = rule
+        self._legs: deque[tuple[datetime, str, str, int]] = deque()  # in the window, by time
+        self._out: _Legs = {}  # sender -> receiver -> legs
+        self._in: _Legs = {}  # receiver -> sender -> legs
+        self._last_alert: dict[str, datetime] = {}
+        self._next_sweep: datetime | None = None
+
+    def _expire(self, now: datetime) -> None:
+        start = now - self.rule.window
+        while self._legs and self._legs[0][0] < start:
+            _, sender, receiver, _ = self._legs.popleft()
+            for index, account, counterparty in (
+                (self._out, sender, receiver),
+                (self._in, receiver, sender),
+            ):
+                legs = index[account][counterparty]
+                legs.popleft()
+                if not legs:
+                    del index[account][counterparty]
+                    if not index[account]:
+                        del index[account]
+        if self._next_sweep is None or now >= self._next_sweep:
+            self._last_alert = {
+                a: t for a, t in self._last_alert.items() if now - t < self.rule.cooldown
+            }
+            self._next_sweep = now + self.rule.cooldown
+
+    def _add(self, tx: Transaction) -> None:
+        sender, receiver = tx.sender_account_key, tx.receiver_account_key
+        leg = (tx.transacted_at, tx.transaction_id)
+        self._legs.append((tx.transacted_at, sender, receiver, tx.transaction_id))
+        self._out.setdefault(sender, {}).setdefault(receiver, deque()).append(leg)
+        self._in.setdefault(receiver, {}).setdefault(sender, deque()).append(leg)
+
+    def _find_chain(self, origin: str, target: str, now: datetime) -> list[int] | None:
+        """Transaction IDs of a shortest chain origin→…→target in time order, or None.
+
+        Level k of a side holds the accounts whose label improved with k legs. Forward labels
+        are the earliest arrival from `origin`; backward labels are the latest departure that
+        still reaches `target` by `now`. The sides meet at an account reached no later than it
+        can leave.
+        """
+        start = now - self.rule.window
+        forward: list[dict[str, _Label]] = [{origin: (start, -1, "")}]
+        backward: list[dict[str, _Label]] = [{target: (now, -1, "")}]
+        best_forward = {origin: (start, 0)}
+        best_backward = {target: (now, 0)}
+        for _ in range(self.rule.threshold.max_hops - 1):
+            cost_forward = sum(len(self._out.get(a, ())) for a in forward[-1])
+            cost_backward = sum(len(self._in.get(a, ())) for a in backward[-1])
+            if not cost_forward and not cost_backward:
+                return None
+            go_forward = not cost_backward or 0 < cost_forward <= cost_backward
+            if go_forward:
+                level = self._expand(forward[-1], self._out, best_forward, len(forward), True)
+                forward.append(level)
+            else:
+                level = self._expand(backward[-1], self._in, best_backward, len(backward), False)
+                backward.append(level)
+            for account, (time, _, _) in level.items():
+                if go_forward and account in best_backward:
+                    departure, b = best_backward[account]
+                    if time <= departure:
+                        return self._chain(forward, backward, account, len(forward) - 1, b)
+                elif not go_forward and account in best_forward:
+                    arrival, f = best_forward[account]
+                    if arrival <= time:
+                        return self._chain(forward, backward, account, f, len(backward) - 1)
+        return None
+
+    @staticmethod
+    def _expand(
+        frontier: dict[str, _Label],
+        index: _Legs,
+        best: dict[str, tuple[datetime, int]],
+        depth: int,
+        later: bool,
+    ) -> dict[str, _Label]:
+        """Level `depth`: one more leg from every account in the frontier. Forward (`later`)
+        takes the earliest leg at or after the arrival, backward the latest leg at or before the
+        departure. Keeps only accounts whose label improves."""
+        level: dict[str, _Label] = {}
+        for account, (time, _, _) in frontier.items():
+            for other, legs in index.get(account, {}).items():
+                if later:
+                    leg = next((leg for leg in legs if leg[0] >= time), None)
+                else:
+                    leg = next((leg for leg in reversed(legs) if leg[0] <= time), None)
+                if leg is None:
+                    continue
+                current = level.get(other) or best.get(other)
+                if current is None or (leg[0] < current[0] if later else leg[0] > current[0]):
+                    level[other] = (leg[0], leg[1], account)
+        for account, (time, _, _) in level.items():
+            best[account] = (time, depth)
+        return level
+
+    @staticmethod
+    def _chain(
+        forward: list[dict[str, _Label]],
+        backward: list[dict[str, _Label]],
+        meeting: str,
+        f: int,
+        b: int,
+    ) -> list[int]:
+        chain = []
+        account = meeting
+        for k in range(f, 0, -1):
+            _, transaction_id, account = forward[k][account]
+            chain.append(transaction_id)
+        chain.reverse()
+        account = meeting
+        for k in range(b, 0, -1):
+            _, transaction_id, account = backward[k][account]
+            chain.append(transaction_id)
+        return chain
+
+    def observe(self, tx: Transaction) -> Alert | None:
+        rule, now = self.rule, tx.transacted_at
+        self._expire(now)
+        sender, receiver = tx.sender_account_key, tx.receiver_account_key
+        if sender == receiver or tx.amount_paid_usd < rule.threshold.min_amount_usd:
+            return None
+
+        alert = None
+        last = self._last_alert.get(receiver)
+        if last is None or now - last >= rule.cooldown:
+            chain = self._find_chain(receiver, sender, now)
+            if chain is not None:
+                self._last_alert[receiver] = now
+                alert = Alert(
+                    alert_id=f"{rule.id}:{tx.transaction_id}",
+                    rule_id=rule.id,
+                    rule_version=rule.version,
+                    account_key=receiver,
+                    triggered_at=now,
+                    transaction_id=tx.transaction_id,
+                    value=len(chain) + 1,
+                    evidence=(tx.transaction_id, *reversed(chain)),
+                )
+        self._add(tx)
+        return alert
+
+
 class OnlineEvaluator:
     """Runs every rule on each transaction; fails on input out of event-time order."""
 
     def __init__(self, rules: Iterable[Rule]) -> None:
-        self._rules = [OnlineRule(rule) for rule in rules]
+        self._rules = [
+            CycleRule(rule) if rule.metric == "short_cycle" else OnlineRule(rule) for rule in rules
+        ]
         self._last: tuple[datetime, int] | None = None
 
     def observe(self, tx: Transaction) -> list[Alert]:

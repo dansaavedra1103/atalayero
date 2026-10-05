@@ -19,17 +19,20 @@ logger = logging.getLogger(__name__)
 FIELDS = tuple(Transaction.model_fields)
 
 
-def iter_transactions(duckdb_path: Path, limit: int | None = None) -> Iterator[Transaction]:
-    """Yield transactions (no labels) by event time; same-minute ties by transaction_id."""
-    query = (
-        f"SELECT {', '.join(FIELDS)} FROM marts.fct_transactions "
-        "ORDER BY transacted_at, transaction_id"
-    )
+def iter_transactions(
+    duckdb_path: Path, limit: int | None = None, until: datetime | None = None
+) -> Iterator[Transaction]:
+    """Yield transactions (no labels) by event time, before `until` if given; same-minute ties
+    by transaction_id."""
+    query = f"SELECT {', '.join(FIELDS)} FROM marts.fct_transactions"
+    if until is not None:
+        query += " WHERE transacted_at < $until"
+    query += " ORDER BY transacted_at, transaction_id"
     if limit is not None:
         query += f" LIMIT {int(limit)}"
     with duckdb.connect(str(duckdb_path), read_only=True) as con:
         con.execute("SET enable_progress_bar = false")
-        cursor = con.execute(query)
+        cursor = con.execute(query, {"until": until} if until is not None else None)
         while rows := cursor.fetchmany(10_000):
             for row in rows:
                 yield Transaction(**dict(zip(FIELDS, row, strict=True)))

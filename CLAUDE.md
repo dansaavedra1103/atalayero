@@ -39,6 +39,7 @@ All commands go through the Makefile. When you add a new command, add it to the 
 - `make up`       — docker compose up and wait until healthy (phase 1: redpanda; later api, mlflow, airflow, ollama)
 - `make down`     — docker compose down
 - `make stream`   — replay the transactions through Redpanda and evaluate the YAML rules online; alerts to `data/stream/alerts/` (needs `make up` and `make dbt`)
+- `make rules`    — evaluate the YAML rules over the batch data (1–10 Sep, same engine as `make stream`); alerts to `data/rules/alerts/` (needs `make dbt`)
 - `make test-integration` — tests that need running services (Redpanda); not run in CI
 - `make eval`     — run agent evals offline and write a dated report to evals/reports/
 

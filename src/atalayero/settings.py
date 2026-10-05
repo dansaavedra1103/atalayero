@@ -1,8 +1,9 @@
 """Runtime settings: `config/settings.yaml`, overridable with ATALAYERO_* environment variables."""
 
+from datetime import datetime
 from pathlib import Path
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 from pydantic_settings import (
     BaseSettings,
     PydanticBaseSettingsSource,
@@ -33,6 +34,20 @@ class StreamingSettings(BaseModel):
     idle_timeout_seconds: float = Field(gt=0)
 
 
+class SplitSettings(BaseModel):
+    """Half-open boundaries of the temporal split (ADR-0005)."""
+
+    train_end: datetime
+    validation_end: datetime
+    test_end: datetime
+
+    @model_validator(mode="after")
+    def _ordered(self) -> "SplitSettings":
+        if not self.train_end < self.validation_end < self.test_end:
+            raise ValueError("splits must satisfy train_end < validation_end < test_end")
+        return self
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_prefix="ATALAYERO_",
@@ -44,6 +59,8 @@ class Settings(BaseSettings):
     duckdb_path: Path
     rules_dir: Path
     alerts_dir: Path
+    rule_alerts_dir: Path
+    splits: SplitSettings
     dataset: DatasetSettings
     streaming: StreamingSettings
 
