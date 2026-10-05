@@ -38,7 +38,7 @@ def _numeric() -> Pipeline:
     )
 
 
-def _as_categories(features: pd.DataFrame) -> pd.DataFrame:
+def as_categories(features: pd.DataFrame) -> pd.DataFrame:
     """LightGBM splits on pandas categories natively."""
     return features.astype({name: "category" for name in CATEGORICAL})
 
@@ -73,7 +73,7 @@ def lightgbm(params: Params, seed: int) -> Pipeline:
         force_row_wise=True,
         verbose=-1,
     )
-    return Pipeline([("categories", FunctionTransformer(_as_categories)), ("model", model)])
+    return Pipeline([("categories", FunctionTransformer(as_categories)), ("model", model)])
 
 
 def isolation_forest(params: Params, seed: int) -> Pipeline:
@@ -89,7 +89,7 @@ def isolation_forest(params: Params, seed: int) -> Pipeline:
         max_samples=params["max_samples"],
         max_features=params["max_features"],
         random_state=seed,
-        n_jobs=-1,
+        n_jobs=4,  # as fast as all cores on 2M rows; each extra thread holds a copy of the data
     )
     return Pipeline([("prepare", prepare), ("model", model)])
 

@@ -34,6 +34,10 @@ models:
   mlflow_artifacts_dir: data/mlflow/artifacts
   experiment: atalayero-detectors
   registered_model: atalayero-detector
+  tuning_trials:  # Optuna trials per family for `make tune` (ADR-0010)
+    logistic_regression: 15
+    lightgbm: 40
+    isolation_forest: 15
 
 # IBM Transactions for Anti Money Laundering (AML), HI-Small variant. CDLA-Sharing-1.0.
 # Public Kaggle endpoint: anonymous HTTPS download, one file at a time, pinned to a dataset version.

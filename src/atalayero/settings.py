@@ -74,6 +74,7 @@ class ModelSettings(BaseModel):
     mlflow_artifacts_dir: Path
     experiment: str
     registered_model: str
+    tuning_trials: dict[str, int]  # family -> Optuna trials
 
 
 class Settings(BaseSettings):
