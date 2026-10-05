@@ -1,1 +1,1 @@
-"""Point-in-time features: tabular now, graph next (ADR-0008)."""
+"""Point-in-time features, tabular and graph (ADR-0008)."""

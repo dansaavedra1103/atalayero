@@ -40,7 +40,7 @@ All commands go through the Makefile. When you add a new command, add it to the 
 - `make down`     — docker compose down
 - `make stream`   — replay the transactions through Redpanda and evaluate the YAML rules online; alerts to `data/stream/alerts/` (needs `make up` and `make dbt`)
 - `make rules`    — evaluate the YAML rules over the batch data (1–10 Sep, same engine as `make stream`); alerts to `data/rules/alerts/` (needs `make dbt`)
-- `make features` — point-in-time tabular features of every transaction (1–10 Sep), no labels, to `data/features/` (needs `make dbt`)
+- `make features` — point-in-time tabular and graph features of every transaction (1–10 Sep), no labels, to `data/features/` (about 5 min; needs `make dbt`)
 - `make evaluate` — alert-budget evaluation of the rules-only baseline on validation; report to `data/reports/` (needs `make rules`)
 - `make test-integration` — tests that need running services (Redpanda); not run in CI
 - `make eval`     — run agent evals offline and write a dated report to evals/reports/

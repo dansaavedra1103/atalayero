@@ -79,6 +79,7 @@ class Settings(BaseSettings):
     alerts_dir: Path
     rule_alerts_dir: Path
     features_dir: Path
+    graph_workers: int = Field(ge=1)
     splits: SplitSettings
     evaluation: EvaluationSettings
     dataset: DatasetSettings

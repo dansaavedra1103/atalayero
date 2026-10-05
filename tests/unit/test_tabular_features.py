@@ -11,25 +11,11 @@ from atalayero.schemas import Transaction
 from atalayero.settings import Settings
 
 MakeTx = Callable[..., Transaction]
+LoadTx = Callable[[list[Transaction]], duckdb.DuckDBPyConnection]
 WriteDb = Callable[[list[Transaction]], Path]
 
 REPO_ROOT = Path(__file__).parents[2]
 DAY = 24 * 60  # minutes
-
-
-def _load(transactions: list[Transaction]) -> duckdb.DuckDBPyConnection:
-    con = duckdb.connect()
-    con.execute(
-        "CREATE TABLE tx (transaction_id BIGINT, transacted_at TIMESTAMP, "
-        "sender_account_key VARCHAR, receiver_account_key VARCHAR, amount_paid DECIMAL(20, 6), "
-        "payment_currency VARCHAR, amount_paid_usd DOUBLE, amount_received DECIMAL(20, 6), "
-        "receiving_currency VARCHAR, amount_received_usd DOUBLE, payment_format VARCHAR)"
-    )
-    con.executemany(
-        f"INSERT INTO tx VALUES ({', '.join('?' * 11)})",
-        [list(tx.model_dump().values()) for tx in transactions],
-    )
-    return con
 
 
 def _query(con: duckdb.DuckDBPyConnection, source: str) -> dict[int, dict[str, object]]:
@@ -37,19 +23,27 @@ def _query(con: duckdb.DuckDBPyConnection, source: str) -> dict[int, dict[str, o
     return {row[0]: dict(zip(rel.columns, row, strict=True)) for row in rel.fetchall()}
 
 
-def _features(transactions: list[Transaction]) -> dict[int, dict[str, object]]:
-    """Features of each transaction, computed from `transactions` alone."""
-    with _load(transactions) as con:
-        return _query(con, "tx")
+@pytest.fixture
+def features(load_tx: LoadTx) -> Callable[[list[Transaction]], dict[int, dict[str, object]]]:
+    """Features of each transaction, computed from the given transactions alone."""
+
+    def compute(transactions: list[Transaction]) -> dict[int, dict[str, object]]:
+        with load_tx(transactions) as con:
+            return _query(con, "tx")
+
+    return compute
 
 
-def test_own_fields(make_tx: MakeTx) -> None:
+Features = Callable[[list[Transaction]], dict[int, dict[str, object]]]
+
+
+def test_own_fields(make_tx: MakeTx, features: Features) -> None:
     tx = make_tx(1, 75, sender="001:A", receiver="002:B", usd=1234.5).model_copy(
         update={"receiving_currency": "Euro", "payment_format": "wire"}
     )
     self_transfer = make_tx(2, 0, sender="001:A", receiver="001:A")
 
-    f, g = _features([tx, self_transfer])[1], _features([self_transfer])[2]
+    f, g = features([tx, self_transfer])[1], features([self_transfer])[2]
 
     assert (f["amount_usd"], f["hour"], f["payment_format"]) == (1234.5, 10, "wire")
     assert (f["payment_currency"], f["receiving_currency"]) == ("US Dollar", "Euro")
@@ -57,12 +51,12 @@ def test_own_fields(make_tx: MakeTx) -> None:
     assert (g["is_cross_currency"], g["is_self_transfer"], g["same_bank"]) == (False, True, True)
 
 
-def test_history_ignores_the_same_minute(make_tx: MakeTx) -> None:
-    features = _features([make_tx(1, 0), make_tx(2, 0), make_tx(3, 0, sender="001:B")])
+def test_history_ignores_the_same_minute(make_tx: MakeTx, features: Features) -> None:
+    f = features([make_tx(1, 0), make_tx(2, 0), make_tx(3, 0, sender="001:B")])
 
-    assert {f["sender_out_count_1h"] for f in features.values()} == {0}
-    assert {f["receiver_in_count_1h"] for f in features.values()} == {0}
-    assert features[2]["pair_count_before"] == features[3]["reverse_pair_count_before"] == 0
+    assert {g["sender_out_count_1h"] for g in f.values()} == {0}
+    assert {g["receiver_in_count_1h"] for g in f.values()} == {0}
+    assert f[2]["pair_count_before"] == f[3]["reverse_pair_count_before"] == 0
 
 
 @pytest.mark.parametrize(
@@ -70,14 +64,14 @@ def test_history_ignores_the_same_minute(make_tx: MakeTx) -> None:
     [(60, 1, 1), (61, 0, 1), (DAY, 0, 1), (DAY + 1, 0, 0)],
 )
 def test_windows_include_their_start(
-    make_tx: MakeTx, minutes: int, in_1h: int, in_24h: int
+    make_tx: MakeTx, features: Features, minutes: int, in_1h: int, in_24h: int
 ) -> None:
-    f = _features([make_tx(1, 0), make_tx(2, minutes)])[2]
+    f = features([make_tx(1, 0), make_tx(2, minutes)])[2]
 
     assert (f["sender_out_count_1h"], f["sender_out_count_24h"]) == (in_1h, in_24h)
 
 
-def test_account_history_in_both_directions(make_tx: MakeTx) -> None:
+def test_account_history_in_both_directions(make_tx: MakeTx, features: Features) -> None:
     txs = [
         make_tx(1, 0, sender="001:A", receiver="001:B", usd=100),
         make_tx(2, 10, sender="001:A", receiver="001:B", usd=200),
@@ -86,7 +80,7 @@ def test_account_history_in_both_directions(make_tx: MakeTx) -> None:
         make_tx(5, 40, sender="001:C", receiver="001:B", usd=900),  # C received 3; B received 1, 2
     ]
 
-    f = _features(txs)
+    f = features(txs)
     a, c = f[4], f[5]
 
     assert (a["receiver_out_count_24h"], a["receiver_out_amount_24h"]) == (3, 600)
@@ -98,7 +92,7 @@ def test_account_history_in_both_directions(make_tx: MakeTx) -> None:
     assert f[1]["sender_minutes_since_previous"] is None
 
 
-def test_pairs_and_the_reverse_direction(make_tx: MakeTx) -> None:
+def test_pairs_and_the_reverse_direction(make_tx: MakeTx, features: Features) -> None:
     txs = [
         make_tx(1, 0, sender="001:A", receiver="001:B"),
         make_tx(2, 10, sender="001:A", receiver="001:B"),
@@ -106,23 +100,25 @@ def test_pairs_and_the_reverse_direction(make_tx: MakeTx) -> None:
         make_tx(4, 20, sender="001:A", receiver="001:B"),
     ]
 
-    f = _features(txs)
+    f = features(txs)
 
     assert [f[i]["pair_count_before"] for i in (1, 2, 3, 4)] == [0, 1, 0, 2]
     assert [f[i]["reverse_pair_count_before"] for i in (1, 2, 3, 4)] == [0, 0, 1, 1]
 
 
-def test_amount_against_the_sender_mean(make_tx: MakeTx) -> None:
+def test_amount_against_the_sender_mean(make_tx: MakeTx, features: Features) -> None:
     txs = [make_tx(1, 0, usd=100), make_tx(2, 10, usd=300), make_tx(3, 20, usd=1000)]
 
-    f = _features(txs)
+    f = features(txs)
 
     assert f[1]["amount_to_sender_mean_24h"] is None
     assert f[3]["amount_to_sender_mean_24h"] == 5.0
 
 
 @pytest.mark.parametrize("seed", range(5))
-def test_features_see_nothing_from_their_minute_or_later(make_tx: MakeTx, seed: int) -> None:
+def test_features_see_nothing_from_their_minute_or_later(
+    make_tx: MakeTx, load_tx: LoadTx, seed: int
+) -> None:
     """The leakage guard: removing every other transaction at or after t leaves the features of
     a transaction at t unchanged."""
     rng = random.Random(seed)
@@ -137,7 +133,7 @@ def test_features_see_nothing_from_their_minute_or_later(make_tx: MakeTx, seed: 
         )
         for i in range(200)
     ]
-    con = _load(txs)
+    con = load_tx(txs)
     full = _query(con, "tx")
 
     for target in rng.sample(txs, 15):
