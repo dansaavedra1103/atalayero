@@ -29,7 +29,7 @@ from atalayero.models.families import (
     FamilyName,
     ModelsConfig,
     Params,
-    as_categories,
+    _as_categories,
     fit,
     load_models_config,
     training_rows,
@@ -109,7 +109,7 @@ def _fit_lightgbm(
     model.fit(
         train.features[keep],
         train.labels[keep],
-        model__eval_X=(as_categories(validation.features),),
+        model__eval_X=(_as_categories(validation.features),),
         model__eval_y=(validation.labels,),
         model__callbacks=[
             lightgbm.early_stopping(PATIENCE, verbose=False),
