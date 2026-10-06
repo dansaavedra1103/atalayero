@@ -2,7 +2,7 @@
 # Optuna and writes this file (ADR-0010); `make train` fits them. A change bumps
 # `version` and adds a `history` entry with the reason, as for the rules.
 # `negative_rate`: share of clean training rows kept; every laundering row is kept.
-version: '1.2'
+version: '1.3'
 families:
   logistic_regression:
     params:
@@ -21,9 +21,9 @@ families:
       n_estimators: 2272
   isolation_forest:
     params:
-      n_estimators: 329
-      max_samples: 7567
-      max_features: 0.8105671936912345
+      n_estimators: 136
+      max_samples: 4842
+      max_features: 0.9745639323507205
 history:
 - version: '1.0'
   date: '2026-10-05'
@@ -39,3 +39,9 @@ history:
   reason: 'make tune: Optuna TPE, 70 trials on validation. logistic_regression PR-AUC
     0.3500, detection without hubs 13.2%; lightgbm PR-AUC 0.5950, detection without
     hubs 18.0%; isolation_forest PR-AUC 0.0112, detection without hubs 4.4% (ADR-0010)'
+- version: '1.3'
+  date: '2026-10-05'
+  reason: 'make tune: Optuna TPE, 70 trials on validation. logistic_regression PR-AUC
+    0.2863, detection without hubs 12.0%; lightgbm kept: best PR-AUC trial detects
+    18.4% without hubs against 18.9%; isolation_forest PR-AUC 0.0128, detection without
+    hubs 7.7% (ADR-0010)'
