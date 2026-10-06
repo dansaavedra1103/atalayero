@@ -1,6 +1,6 @@
 import hashlib
 import re
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from pathlib import Path
 
 import numpy as np
@@ -8,9 +8,11 @@ import pytest
 
 from atalayero.agent.knowledge import Knowledge, build_index, read_notes
 from atalayero.agent.tools import ToolBox
-from atalayero.schemas import TYPOLOGIES
+from atalayero.schemas import TYPOLOGIES, Transaction
 from atalayero.settings import Settings
 
+MakeTx = Callable[..., Transaction]
+WriteDb = Callable[[list[Transaction]], Path]
 NOTES = Path(__file__).parents[2] / "knowledge_base" / "typologies"
 
 
@@ -24,13 +26,15 @@ def fake_embedder(texts: Sequence[str]) -> np.ndarray:
 
 
 @pytest.fixture
-def settings(tmp_path: Path) -> Settings:
+def settings(make_tx: MakeTx, fct_transactions_db: WriteDb, tmp_path: Path) -> Settings:
+    """The real notes, an index in a temporary directory, and a warehouse of one transaction."""
     base = Settings()
     return base.model_copy(
         update={
+            "duckdb_path": fct_transactions_db([make_tx(0, 0)]),
             "knowledge": base.knowledge.model_copy(
                 update={"notes_dir": NOTES, "index_dir": tmp_path / "knowledge"}
-            )
+            ),
         }
     )
 
