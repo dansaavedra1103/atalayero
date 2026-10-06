@@ -1,6 +1,8 @@
 """MLflow tracking and model registry, local and under `data/mlflow/` (ADR-0009)."""
 
+import hashlib
 import logging
+from collections.abc import Sequence
 from importlib.metadata import version
 from pathlib import Path
 
@@ -16,8 +18,14 @@ logger = logging.getLogger(__name__)
 
 CHAMPION = "champion"
 PRIMARY = "validation_detection_without_hubs"  # model version tag that champions compete on
+FEATURES = "features"  # model version tag: a signature of the feature list the model takes
 # What a logged model needs to load; listed, because inferring it spawns a slow subprocess.
 _REQUIREMENTS = ("scikit-learn", "lightgbm", "pandas", "numpy", "cloudpickle")
+
+
+def feature_signature(features: Sequence[str]) -> str:
+    """A short hash of the ordered feature names a model takes."""
+    return hashlib.sha256(",".join(features).encode()).hexdigest()[:12]
 
 
 class Registry:
@@ -68,18 +76,40 @@ class Registry:
                 model_uri = info.model_uri
         return run.info.run_id, model_uri
 
-    def champion_value(self) -> float | None:
+    def champion(self) -> tuple[float, str | None] | None:
+        """The current champion's primary validation metric and feature signature."""
         try:
             champion = self.client.get_model_version_by_alias(self.model_name, CHAMPION)
         except MlflowException:
             return None
-        return float(champion.tags[PRIMARY])
+        return float(champion.tags[PRIMARY]), champion.tags.get(FEATURES)
 
-    def promote(self, model_uri: str, value: float) -> bool:
+    def champion_value(self) -> float | None:
+        current = self.champion()
+        return None if current is None else current[0]
+
+    def promote(self, model_uri: str, value: float, features: Sequence[str]) -> bool:
         """Register the model; it becomes the champion if it beats the current champion's primary
-        validation metric (or there is none)."""
-        current = self.champion_value()
-        registered = mlflow.register_model(model_uri, self.model_name, tags={PRIMARY: str(value)})
+        validation metric, or if there is none. A champion that takes another feature list
+        cannot score this model's inputs: the new model starts a new line of champions."""
+        signature = feature_signature(features)
+        champion = self.champion()
+        registered = mlflow.register_model(
+            model_uri, self.model_name, tags={PRIMARY: str(value), FEATURES: signature}
+        )
+        current = None if champion is None else champion[0]
+        if champion is not None and champion[1] != signature:
+            logger.warning(
+                "The champion takes other features (%s, now %s): %s v%s replaces it at %.4f, "
+                "against its %.4f",
+                champion[1],
+                signature,
+                self.model_name,
+                registered.version,
+                value,
+                champion[0],
+            )
+            current = None
         if current is not None and value <= current:
             logger.info(
                 "%s v%s (%.4f) does not beat the champion (%.4f)",

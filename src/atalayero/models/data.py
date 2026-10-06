@@ -7,12 +7,13 @@ import numpy as np
 import pandas as pd
 
 from atalayero.features.graph import GRAPH
+from atalayero.features.motifs import MOTIFS
 from atalayero.features.tabular import CATEGORICAL
 from atalayero.features.tabular import FEATURES as TABULAR
 from atalayero.ingestion.source import sql_literal
 from atalayero.settings import Settings, Split
 
-FEATURES = (*TABULAR, *GRAPH)
+FEATURES = (*TABULAR, *GRAPH, *MOTIFS)
 BOOLEAN = tuple(
     name for name in FEATURES if name.startswith("is_") or name.endswith(("same_bank", "cycle"))
 )
@@ -34,7 +35,8 @@ def load_split(settings: Settings, split: Split) -> Dataset:
         start = settings.models.train_start
     tabular = settings.features_dir / "tabular.parquet"
     graph = settings.features_dir / "graph.parquet"
-    for path in (tabular, graph):
+    motifs = settings.features_dir / "motifs.parquet"
+    for path in (tabular, graph, motifs):
         if not path.exists():
             raise FileNotFoundError(f"{path} is missing: run `make features` first")
     with duckdb.connect() as con:
@@ -43,9 +45,10 @@ def load_split(settings: Settings, split: Split) -> Dataset:
         frame = con.execute(
             f"""
             SELECT t.transaction_id, l.is_laundering, {", ".join(f"t.{n}" for n in TABULAR)},
-                {", ".join(f"g.{n}" for n in GRAPH)}
+                {", ".join(f"g.{n}" for n in GRAPH)}, {", ".join(f"m.{n}" for n in MOTIFS)}
             FROM read_parquet({sql_literal(str(tabular))}) AS t
             JOIN read_parquet({sql_literal(str(graph))}) AS g USING (transaction_id)
+            JOIN read_parquet({sql_literal(str(motifs))}) AS m USING (transaction_id)
             JOIN wh.marts.fct_laundering_labels AS l USING (transaction_id)
             WHERE t.transacted_at >= $start AND t.transacted_at < $end
             ORDER BY t.transaction_id

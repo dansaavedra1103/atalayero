@@ -286,7 +286,7 @@ def test_cycle_state_follows_the_window(make_tx: MakeTx) -> None:
 
     rule.observe(make_tx(100, 2 * DAY, sender="X", receiver="Y"))
 
-    assert (len(rule._legs), set(rule._out), set(rule._in)) == (1, {"X"}, {"Y"})
+    assert (len(rule.legs), set(rule.legs.out), set(rule.legs.into)) == (1, {"X"}, {"Y"})
 
 
 def test_repository_r03_fires_on_the_fixture_cycle(make_tx: MakeTx) -> None:

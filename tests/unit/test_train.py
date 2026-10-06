@@ -6,7 +6,7 @@ from pathlib import Path
 import duckdb
 from mlflow import MlflowClient
 
-from atalayero.models.data import load_split
+from atalayero.models.data import FEATURES, load_split
 from atalayero.models.families import FAMILIES, transaction_scores
 from atalayero.models.registry import Registry
 from atalayero.models.train import train_and_evaluate
@@ -49,7 +49,7 @@ def test_train_split_starts_after_the_warm_up(model_settings: Settings) -> None:
     train = load_split(settings, "train")
     validation = load_split(settings, "validation")
 
-    assert train.features.shape[1] == validation.features.shape[1] == 43
+    assert train.features.shape[1] == validation.features.shape[1] == len(FEATURES)
     assert train.features.dtypes.astype(str).isin(["float64", "str", "object"]).all()
     with duckdb.connect(str(settings.duckdb_path), read_only=True) as con:
         (first,) = con.execute(
