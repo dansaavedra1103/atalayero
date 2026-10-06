@@ -4,7 +4,7 @@ SAMPLE_ENV := ATALAYERO_DATA_DIR=data/sample ATALAYERO_DUCKDB_PATH=data/sample/a
 # MLflow prints a hint for coding agents on import; it is noise in the logs.
 MLFLOW_ENV := MLFLOW_DISABLE_AGENT_HINT=1
 
-.PHONY: setup check test-integration ingest fixture fx-rates dbt dbt-sample up down stream rules evaluate features tune train mlflow-ui drift holdout pipeline
+.PHONY: setup check test-integration ingest fixture fx-rates dbt dbt-sample up down stream rules evaluate features tune train mlflow-ui drift holdout pipeline notebook
 
 # LightGBM needs the system OpenMP runtime: sudo apt-get install libgomp1 (ADR-0009).
 setup:
@@ -83,3 +83,7 @@ pipeline:
 	$(MAKE) train
 	$(MAKE) drift
 	$(MAKE) holdout
+
+# Executes the error analysis in place, outputs included (ADR-0014; needs `make holdout`).
+notebook:
+	uv run jupyter nbconvert --to notebook --execute --inplace notebooks/03_error_analysis.ipynb

@@ -46,6 +46,7 @@ All commands go through the Makefile. When you add a new command, add it to the 
 - `make train`    — fit the model families of `config/models.yaml`, compare them with the rules on validation, log to MLflow and promote the champion (needs `make features` and `make rules`)
 - `make drift`    — PSI of each feature per validation day against train (weekdays against weekdays) and daily rule-alert volume; report to `data/reports/` (needs `make features` and `make rules`)
 - `make holdout`  — the single test run (ADR-0014): rules-only baseline on test, every family refit on train + validation and compared with the rules on test, drift on test; reports and test scores to `data/reports/` (about 4 min, peak about 10 GB; needs `make features` and `make rules`)
+- `make notebook` — re-execute `notebooks/03_error_analysis.ipynb` in place, outputs included (needs `make holdout`)
 - `make mlflow-ui` — local MLflow UI on http://localhost:5000
 - `make test-integration` — tests that need running services (Redpanda); not run in CI
 - `make eval`     — run agent evals offline and write a dated report to evals/reports/
