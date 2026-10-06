@@ -249,13 +249,13 @@ Fechas tentativas a medio tiempo (8 semanas). Cada fase cierra con un tag (v0.1 
 
 ### Fase 2 — Reglas y modelos (19 de octubre de 2026 → 1 de noviembre de 2026)
 
-- [ ]  Motor de reglas YAML con validación de esquema (4 reglas iniciales; amplía el esquema mínimo de la Fase 1)
-- [ ]  Features tabulares y de grafo sin fuga temporal (ADR propio)
-- [ ]  Baselines: solo reglas, regresión logística, LightGBM, Isolation Forest
-- [ ]  Evaluación por presupuesto de alertas: detección, falsos positivos, PR-AUC
-- [ ]  Tracking y registro en MLflow
-- [ ]  Monitoreo de deriva con PSI
-- [ ]  `model_card.md` y notebook de análisis de errores
+- [x]  Motor de reglas YAML con validación de esquema (4 reglas iniciales; amplía el esquema mínimo de la Fase 1)
+- [x]  Features tabulares y de grafo sin fuga temporal (ADR propio)
+- [x]  Baselines: solo reglas, regresión logística, LightGBM, Isolation Forest
+- [x]  Evaluación por presupuesto de alertas: detección, falsos positivos, PR-AUC
+- [x]  Tracking y registro en MLflow
+- [x]  Monitoreo de deriva con PSI
+- [x]  `model_card.md` y notebook de análisis de errores
 - [ ]  Tag v0.2 y post con el resultado de detección vs. presupuesto de alertas
 
 ### Fase 3 — Agente y evals (2 de noviembre de 2026 → 15 de noviembre de 2026)
