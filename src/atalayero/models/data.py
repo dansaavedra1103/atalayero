@@ -25,6 +25,7 @@ class Dataset:
     transaction_ids: np.ndarray
     features: pd.DataFrame  # columns in FEATURES order
     labels: np.ndarray  # True for laundering
+    days: np.ndarray | None = None  # the day of each transaction (datetime64[D])
 
 
 def load_split(settings: Settings, split: Split) -> Dataset:
@@ -44,7 +45,8 @@ def load_split(settings: Settings, split: Split) -> Dataset:
         con.execute(f"ATTACH {sql_literal(str(settings.duckdb_path))} AS wh (READ_ONLY)")
         frame = con.execute(
             f"""
-            SELECT t.transaction_id, l.is_laundering, {", ".join(f"t.{n}" for n in TABULAR)},
+            SELECT t.transaction_id, t.transacted_at::date AS day, l.is_laundering,
+                {", ".join(f"t.{n}" for n in TABULAR)},
                 {", ".join(f"g.{n}" for n in GRAPH)}, {", ".join(f"m.{n}" for n in MOTIFS)}
             FROM read_parquet({sql_literal(str(tabular))}) AS t
             JOIN read_parquet({sql_literal(str(graph))}) AS g USING (transaction_id)
@@ -62,4 +64,5 @@ def load_split(settings: Settings, split: Split) -> Dataset:
         transaction_ids=frame["transaction_id"].to_numpy(),
         features=features,
         labels=frame["is_laundering"].to_numpy(dtype=bool),
+        days=frame["day"].to_numpy(dtype="datetime64[D]"),
     )

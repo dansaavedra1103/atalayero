@@ -77,6 +77,13 @@ class ModelSettings(BaseModel):
     tuning_trials: dict[str, int]  # family -> Optuna trials
 
 
+class DriftSettings(BaseModel):
+    bins: int = Field(ge=2)
+    moderate_psi: float = Field(gt=0)
+    significant_psi: float = Field(gt=0)
+    alert_volume_band: tuple[float, float]
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_prefix="ATALAYERO_",
@@ -94,6 +101,7 @@ class Settings(BaseSettings):
     splits: SplitSettings
     evaluation: EvaluationSettings
     models: ModelSettings
+    drift: DriftSettings
     dataset: DatasetSettings
     streaming: StreamingSettings
 
