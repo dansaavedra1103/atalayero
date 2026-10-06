@@ -58,6 +58,21 @@ agent_evals:
   seed: 0
   dir: evals  # case sets and reports, versioned
 
+# Local models (ADR-0017): Ollama runs as a Docker Compose service with the GPU (`make up`).
+# `make llm` pulls each model over HTTP and checks it against its pinned digest; a model pinned
+# to null is pulled and its digest logged, to be pinned here.
+ollama:
+  url: http://localhost:11434
+  models:
+    "qwen3-embedding:0.6b": ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d
+
+# Typology notes for the investigator (ADR-0017), indexed with FAISS by `make knowledge`.
+knowledge:
+  notes_dir: knowledge_base/typologies
+  index_dir: data/knowledge
+  embedding_model: "qwen3-embedding:0.6b"
+  top_k: 4  # sections `search_typologies` returns by default
+
 # IBM Transactions for Anti Money Laundering (AML), HI-Small variant. CDLA-Sharing-1.0.
 # Public Kaggle endpoint: anonymous HTTPS download, one file at a time, pinned to a dataset version.
 # Checksums pin the exact files: a changed or unavailable file fails the download loudly.

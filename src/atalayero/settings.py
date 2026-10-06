@@ -93,6 +93,18 @@ class AgentEvalSettings(BaseModel):
     dir: Path
 
 
+class OllamaSettings(BaseModel):
+    url: str
+    models: dict[str, str | None]  # model tag -> pinned digest (None: not pinned yet)
+
+
+class KnowledgeSettings(BaseModel):
+    notes_dir: Path
+    index_dir: Path
+    embedding_model: str
+    top_k: int = Field(ge=1)
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_prefix="ATALAYERO_",
@@ -112,6 +124,8 @@ class Settings(BaseSettings):
     models: ModelSettings
     drift: DriftSettings
     agent_evals: AgentEvalSettings
+    ollama: OllamaSettings
+    knowledge: KnowledgeSettings
     dataset: DatasetSettings
     streaming: StreamingSettings
 

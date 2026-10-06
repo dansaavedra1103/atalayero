@@ -174,6 +174,7 @@ def test_the_mcp_server_serves_the_tools(toolbox: ToolBox) -> None:
         "get_transactions",
         "get_graph_neighborhood",
         "explain_score",
+        "search_typologies",
     }
     assert ok.structured_content == toolbox.transactions(A.alert_id, days=7)
     assert bad.is_error and "unknown alert 'nope'" in bad.content[0].text

@@ -1,4 +1,5 @@
-# Local services. Phase 1: Redpanda (Kafka API) for the streaming replay.
+# Local services: Redpanda (Kafka API) for the streaming replay; Ollama for the local models of
+# the investigator agent, on the GPU (ADR-0017).
 services:
   redpanda:
     image: redpandadata/redpanda:v26.1.18
@@ -17,3 +18,26 @@ services:
       interval: 5s
       timeout: 10s
       retries: 20
+  ollama:
+    image: ollama/ollama:0.35.1
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama  # model weights survive `make down`
+    environment:
+      - OLLAMA_KEEP_ALIVE=30m  # keep models loaded between eval cases
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+
+volumes:
+  ollama:
