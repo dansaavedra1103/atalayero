@@ -2,28 +2,28 @@
 # Optuna and writes this file (ADR-0010); `make train` fits them. A change bumps
 # `version` and adds a `history` entry with the reason, as for the rules.
 # `negative_rate`: share of clean training rows kept; every laundering row is kept.
-version: '1.1'
+version: '1.2'
 families:
   logistic_regression:
     params:
-      C: 6.238155402018423
+      C: 7.8179288051723566
       class_weight: null
-      negative_rate: 0.08054641489830232
+      negative_rate: 0.1422119973969722
   lightgbm:
     params:
-      n_estimators: 500
-      learning_rate: 0.05
-      num_leaves: 31
-      min_child_samples: 100
-      subsample: 0.8
-      colsample_bytree: 0.8
-      reg_lambda: 1.0
-      negative_rate: 0.1
+      learning_rate: 0.012732945242475176
+      num_leaves: 9
+      min_child_samples: 11
+      subsample: 0.916309922773969
+      colsample_bytree: 0.8447097256648952
+      reg_lambda: 7.855066765994234
+      negative_rate: 0.9062263471261948
+      n_estimators: 2272
   isolation_forest:
     params:
-      n_estimators: 391
-      max_samples: 6265
-      max_features: 0.5806106015226714
+      n_estimators: 329
+      max_samples: 7567
+      max_features: 0.8105671936912345
 history:
 - version: '1.0'
   date: '2026-10-05'
@@ -34,3 +34,8 @@ history:
     0.2456, detection without hubs 7.8%; lightgbm kept: best PR-AUC trial detects
     17.0% without hubs against 17.8%; isolation_forest PR-AUC 0.0044, detection without
     hubs 1.1% (ADR-0010)'
+- version: '1.2'
+  date: '2026-10-05'
+  reason: 'make tune: Optuna TPE, 70 trials on validation. logistic_regression PR-AUC
+    0.3500, detection without hubs 13.2%; lightgbm PR-AUC 0.5950, detection without
+    hubs 18.0%; isolation_forest PR-AUC 0.0112, detection without hubs 4.4% (ADR-0010)'
