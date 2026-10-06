@@ -15,8 +15,6 @@ from atalayero.evals.golden import (
     queue_cases,
     sample_cases,
 )
-from atalayero.models.holdout import run_holdout
-from atalayero.models.train import train_and_evaluate
 from atalayero.schemas import CaseAlert
 from atalayero.settings import Settings
 
@@ -113,11 +111,11 @@ def test_sampling_is_deterministic_and_shuffles_the_groups() -> None:
 
 
 @pytest.fixture
-def case_settings(holdout_settings: Settings, tmp_path: Path) -> Settings:
+def case_settings(fitted_settings: Settings, tmp_path: Path) -> Settings:
     """Case sets from the model fixture: a champion for validation, holdout scores for test."""
-    settings = holdout_settings.model_copy(
+    return fitted_settings.model_copy(
         update={
-            "agent_evals": holdout_settings.agent_evals.model_copy(
+            "agent_evals": fitted_settings.agent_evals.model_copy(
                 update={
                     "queue_budget": 5,
                     "dev_cases": 2,
@@ -127,9 +125,6 @@ def case_settings(holdout_settings: Settings, tmp_path: Path) -> Settings:
             )
         }
     )
-    train_and_evaluate(settings)
-    run_holdout(settings)
-    return settings
 
 
 def test_case_sets_keep_answers_apart_and_rebuild_identically(case_settings: Settings) -> None:

@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 CHAMPION = "champion"
 PRIMARY = "validation_detection_without_hubs"  # model version tag that champions compete on
 FEATURES = "features"  # model version tag: a signature of the feature list the model takes
+HOLDOUT_RUN = "{family} on test"  # MLflow run of a family refit for the test run (ADR-0014)
 # What a logged model needs to load; listed, because inferring it spawns a slow subprocess.
 _REQUIREMENTS = ("scikit-learn", "lightgbm", "pandas", "numpy", "cloudpickle")
 
@@ -130,3 +131,17 @@ class Registry:
 
     def load_champion(self) -> Pipeline:
         return mlflow.sklearn.load_model(f"models:/{self.model_name}@{CHAMPION}")
+
+    def load_holdout_model(self, family: str) -> Pipeline:
+        """The latest model of `family` refit on train and validation by `make holdout`: the one
+        behind the test scores. It is logged, never registered (ADR-0014)."""
+        name = HOLDOUT_RUN.format(family=family)
+        runs = self.client.search_runs(
+            [self.experiment_id],
+            filter_string=f"attributes.run_name = '{name}'",
+            order_by=["attributes.start_time DESC"],
+            max_results=1,
+        )
+        if not runs:
+            raise LookupError(f"no MLflow run '{name}': run `make holdout` first")
+        return mlflow.sklearn.load_model(f"runs:/{runs[0].info.run_id}/model")

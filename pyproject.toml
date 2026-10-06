@@ -11,6 +11,7 @@ dependencies = [
     "dbt-duckdb>=1.11.0",
     "duckdb>=1.5.6",
     "lightgbm>=4.7.0",
+    "mcp>=2.3.0",
     "mlflow>=3.16.1",
     "networkx>=3.6.1",
     "optuna>=5.0.0",
