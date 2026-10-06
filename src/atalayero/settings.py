@@ -105,6 +105,11 @@ class KnowledgeSettings(BaseModel):
     top_k: int = Field(ge=1)
 
 
+class AgentSettings(BaseModel):
+    config_path: Path
+    investigations_dir: Path
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_prefix="ATALAYERO_",
@@ -126,6 +131,7 @@ class Settings(BaseSettings):
     agent_evals: AgentEvalSettings
     ollama: OllamaSettings
     knowledge: KnowledgeSettings
+    agent: AgentSettings
     dataset: DatasetSettings
     streaming: StreamingSettings
 

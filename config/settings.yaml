@@ -65,6 +65,13 @@ ollama:
   url: http://localhost:11434
   models:
     "qwen3-embedding:0.6b": ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d
+    "gpt-oss:20b": 17052f91a42e97930aa6e28a6c6c06a983e6a58dbb00434885a0cf5313e376f7  # the investigator's language model (config/agent.yaml)
+
+# The investigator agent (ADR-0018): its versioned config, and where `make investigate` writes
+# each investigation (report, verification, transcript).
+agent:
+  config_path: config/agent.yaml
+  investigations_dir: data/agent/investigations
 
 # Typology notes for the investigator (ADR-0017), indexed with FAISS by `make knowledge`.
 knowledge:

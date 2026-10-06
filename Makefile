@@ -4,7 +4,7 @@ SAMPLE_ENV := ATALAYERO_DATA_DIR=data/sample ATALAYERO_DUCKDB_PATH=data/sample/a
 # MLflow prints a hint for coding agents on import; it is noise in the logs.
 MLFLOW_ENV := MLFLOW_DISABLE_AGENT_HINT=1
 
-.PHONY: setup check test-integration ingest fixture fx-rates dbt dbt-sample up down stream rules evaluate features tune train mlflow-ui drift holdout pipeline notebook golden-set eval llm knowledge
+.PHONY: setup check test-integration ingest fixture fx-rates dbt dbt-sample up down stream rules evaluate features tune train mlflow-ui drift holdout pipeline notebook golden-set eval llm knowledge investigate
 
 # LightGBM needs the system OpenMP runtime: sudo apt-get install libgomp1 (ADR-0009).
 setup:
@@ -107,3 +107,7 @@ llm:
 # The FAISS index of the typology notes, embedded by Ollama (ADR-0017; needs `make llm`).
 knowledge:
 	uv run python -m atalayero.agent knowledge
+
+# One investigation by the agent, on an alert of the case sets (ADR-0018; needs `make knowledge`).
+investigate:
+	$(MLFLOW_ENV) uv run python -m atalayero.agent investigate --alert "$(ALERT)"
