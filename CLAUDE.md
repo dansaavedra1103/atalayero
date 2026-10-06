@@ -38,7 +38,7 @@ All commands go through the Makefile. When you add a new command, add it to the 
 - `make dbt`      — dbt build on the full dataset (needs `make ingest`)
 - `make dbt-sample` — load the test fixtures into `data/sample/` and dbt build on them (what CI runs)
 - `make pipeline` — everything from the download to the single test run on the dev target: ingest → dbt → rules → features → evaluate → train → drift → holdout (about 17 min; leaves out `tune` and `stream`)
-- `make up`       — docker compose up and wait until healthy (phase 1: redpanda; later api, mlflow, airflow, ollama)
+- `make up`       — docker compose up and wait until healthy: Redpanda, and Ollama on the GPU (ADR-0017); later api, mlflow, airflow
 - `make down`     — docker compose down
 - `make stream`   — replay the transactions through Redpanda and evaluate the YAML rules online; alerts to `data/stream/alerts/` (needs `make up` and `make dbt`)
 - `make rules`    — evaluate the YAML rules over the batch data (1–10 Sep, same engine as `make stream`); alerts to `data/rules/alerts/` (needs `make dbt`)
@@ -51,6 +51,8 @@ All commands go through the Makefile. When you add a new command, add it to the 
 - `make notebook` — re-execute `notebooks/03_error_analysis.ipynb` in place, outputs included (needs `make holdout`)
 - `make mlflow-ui` — local MLflow UI on http://localhost:5000
 - `make test-integration` — tests that need running services (Redpanda); not run in CI
+- `make llm`      — pull the local models of `config/settings.yaml` into Ollama over HTTP and check their pinned digests (needs `make up`)
+- `make knowledge` — embed the typology notes of `knowledge_base/typologies/` and build their FAISS index in `data/knowledge/` (needs `make llm`)
 - `make golden-set` — sample the agent's dev set (validation) and golden set (test) from the alert queues into `evals/` (ADR-0015; needs `make train` and `make holdout`)
 - `make eval`     — run a detector offline on a case set and write a dated report to `evals/reports/`: `DETECTOR=baseline` (score-only), `SET=dev` by default, `SET=golden` once per reported result
 

@@ -69,6 +69,15 @@ def build_server(toolbox: ToolBox) -> MCPServer:
         each with the features that pushed its score up (positive log-odds) or down the most."""
         return _call(toolbox.explain_score, alert_id)
 
+    @server.tool()
+    def search_typologies(query: str, k: int = 4) -> dict[str, Any]:
+        """Search the typology notes by meaning: describe what you see (for example "money
+        returns to the sender through two intermediaries within a day") and get the closest
+        sections, each with the typology it belongs to. Notes cover the eight typologies, laundering
+        without a clear typology (`unclassified`) and legitimate activity that looks suspicious
+        (`none`)."""
+        return _call(toolbox.search_typologies, query, k)
+
     return server
 
 

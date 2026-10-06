@@ -17,6 +17,7 @@ import duckdb
 import numpy as np
 from sklearn.pipeline import Pipeline
 
+from atalayero.agent.knowledge import Knowledge
 from atalayero.ingestion.source import sql_literal
 from atalayero.schemas import CaseAlert
 from atalayero.settings import Settings, Split
@@ -58,8 +59,14 @@ def _value(value: object) -> str | float | None:
 class ToolBox:
     """The tools of one investigation run, over the alerts it may be asked about."""
 
-    def __init__(self, settings: Settings, alerts: Iterable[CaseAlert]) -> None:
+    def __init__(
+        self,
+        settings: Settings,
+        alerts: Iterable[CaseAlert],
+        knowledge: Knowledge | None = None,
+    ) -> None:
         self.settings = settings
+        self._knowledge = knowledge  # loaded on first search
         self.alerts = {alert.alert_id: alert for alert in alerts}
         self.con = duckdb.connect()
         self.con.execute("SET enable_progress_bar = false")
@@ -365,3 +372,13 @@ class ToolBox:
             "transactions_that_day": len(ids),
             "explained": explained,
         }
+
+    def search_typologies(self, query: str, k: int | None = None) -> dict[str, Any]:
+        """The sections of the typology notes closest in meaning to `query`."""
+        if self._knowledge is None:
+            try:
+                self._knowledge = Knowledge(self.settings)
+            except FileNotFoundError as error:
+                raise ValueError(str(error)) from error
+        k = self.settings.knowledge.top_k if k is None else k
+        return {"query": query, "results": self._knowledge.search(query, k)}
