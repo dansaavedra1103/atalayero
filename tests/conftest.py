@@ -154,7 +154,7 @@ def synthetic() -> Callable[..., Dataset]:
             | {name: rng.choice(["ach", "wire", "cheque"], n) for name in CATEGORICAL}
         )
         features["amount_usd"] *= np.where(labels, 20, 1)
-        features["pair_count_before"] = np.where(labels, 0, features["pair_count_before"])
+        features["pair_count_24h"] = np.where(labels, 0, features["pair_count_24h"])
         features["hour"] = rng.integers(0, 24, n).astype(float)
         features.loc[rng.random(n) < 0.1, "sender_minutes_since_previous"] = np.nan
         return Dataset(np.arange(n), features[list(FEATURES)], labels)
