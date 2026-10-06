@@ -1,0 +1,2918 @@
+{
+  "detector": "score-only baseline",
+  "case_set": "golden",
+  "generated_at": "2026-10-06T17:39:33.494732Z",
+  "cases_sha256": "560ea26f11fb826ac062460d6839222e9d7fcad46f797770dfb6c7fd3ca1b935",
+  "config": {
+    "rank_threshold": 1133,
+    "fit_on": "dev"
+  },
+  "primary": 0.688888888888889,
+  "groups": {
+    "patterned": {
+      "cases": 60,
+      "decision_accuracy": 0.9166666666666666,
+      "typology_accuracy": 0.0,
+      "specific_typology_share": null
+    },
+    "untyped": {
+      "cases": 60,
+      "decision_accuracy": 0.43333333333333335,
+      "typology_accuracy": null,
+      "specific_typology_share": 0.0
+    },
+    "clean": {
+      "cases": 60,
+      "decision_accuracy": 0.7166666666666667,
+      "typology_accuracy": null,
+      "specific_typology_share": null
+    }
+  },
+  "failures": 0,
+  "grounded_share": null,
+  "hallucinated_ids_per_report": null,
+  "median_steps": null,
+  "median_seconds": null,
+  "results": [
+    {
+      "alert_id": "2022-09-10:0111433:8065C2380",
+      "report": {
+        "alert_id": "2022-09-10:0111433:8065C2380",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.11552332978642267,
+        "narrative": "Score-only baseline: rank 729 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:016418:80ECBC450",
+      "report": {
+        "alert_id": "2022-09-10:016418:80ECBC450",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.06383841921370924,
+        "narrative": "Score-only baseline: rank 1246 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0014387:807819A90",
+      "report": {
+        "alert_id": "2022-09-10:0014387:807819A90",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.051170576145198654,
+        "narrative": "Score-only baseline: rank 1595 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:01420:800331C60",
+      "report": {
+        "alert_id": "2022-09-09:01420:800331C60",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.0004218218988879187,
+        "narrative": "Score-only baseline: rank 101760 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:011:80022DF30",
+      "report": {
+        "alert_id": "2022-09-09:011:80022DF30",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.16378715359436846,
+        "narrative": "Score-only baseline: rank 1098 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:0210575:807AC97A0",
+      "report": {
+        "alert_id": "2022-09-09:0210575:807AC97A0",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.03591535704060419,
+        "narrative": "Score-only baseline: rank 5016 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:02843:80076C270",
+      "report": {
+        "alert_id": "2022-09-09:02843:80076C270",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.0002939490696548708,
+        "narrative": "Score-only baseline: rank 108528 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:003123:802A2B290",
+      "report": {
+        "alert_id": "2022-09-09:003123:802A2B290",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.3408621459391017,
+        "narrative": "Score-only baseline: rank 438 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:015180:8020B8D80",
+      "report": {
+        "alert_id": "2022-09-09:015180:8020B8D80",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.0028203057139890345,
+        "narrative": "Score-only baseline: rank 46772 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0016649:806238AD0",
+      "report": {
+        "alert_id": "2022-09-10:0016649:806238AD0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.39681048336675506,
+        "narrative": "Score-only baseline: rank 290 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0111425:80E74B230",
+      "report": {
+        "alert_id": "2022-09-10:0111425:80E74B230",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.054782805551236054,
+        "narrative": "Score-only baseline: rank 1462 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0148348:8129A84B0",
+      "report": {
+        "alert_id": "2022-09-10:0148348:8129A84B0",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.0679240363366132,
+        "narrative": "Score-only baseline: rank 1199 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:029992:80CAF6950",
+      "report": {
+        "alert_id": "2022-09-10:029992:80CAF6950",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.06715611088614622,
+        "narrative": "Score-only baseline: rank 1210 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:020:8144C22B0",
+      "report": {
+        "alert_id": "2022-09-10:020:8144C22B0",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.05617144748451282,
+        "narrative": "Score-only baseline: rank 1422 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:01362:801619F30",
+      "report": {
+        "alert_id": "2022-09-09:01362:801619F30",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.03708656032946674,
+        "narrative": "Score-only baseline: rank 4830 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:011:800259050",
+      "report": {
+        "alert_id": "2022-09-10:011:800259050",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.6203612427378637,
+        "narrative": "Score-only baseline: rank 200 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0119:811C4B1C0",
+      "report": {
+        "alert_id": "2022-09-10:0119:811C4B1C0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.8663046630967192,
+        "narrative": "Score-only baseline: rank 110 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:022345:801A42EC0",
+      "report": {
+        "alert_id": "2022-09-09:022345:801A42EC0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.21825208891989253,
+        "narrative": "Score-only baseline: rank 774 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:01601:800631890",
+      "report": {
+        "alert_id": "2022-09-09:01601:800631890",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.00006235011703862629,
+        "narrative": "Score-only baseline: rank 175707 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0035655:80D3B56B0",
+      "report": {
+        "alert_id": "2022-09-10:0035655:80D3B56B0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.9803433169708232,
+        "narrative": "Score-only baseline: rank 43 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:022:800060E60",
+      "report": {
+        "alert_id": "2022-09-09:022:800060E60",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.20659240730123873,
+        "narrative": "Score-only baseline: rank 807 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:0249176:81222BE20",
+      "report": {
+        "alert_id": "2022-09-09:0249176:81222BE20",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.10828433444400912,
+        "narrative": "Score-only baseline: rank 1724 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:001047:800EE7630",
+      "report": {
+        "alert_id": "2022-09-10:001047:800EE7630",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.06330303048260266,
+        "narrative": "Score-only baseline: rank 1258 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:0243805:812605C00",
+      "report": {
+        "alert_id": "2022-09-09:0243805:812605C00",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.07779451566767608,
+        "narrative": "Score-only baseline: rank 2341 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0121:8123D3660",
+      "report": {
+        "alert_id": "2022-09-10:0121:8123D3660",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.05735553041043788,
+        "narrative": "Score-only baseline: rank 1390 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0111326:807759540",
+      "report": {
+        "alert_id": "2022-09-10:0111326:807759540",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.5264783272207039,
+        "narrative": "Score-only baseline: rank 228 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:014:80E943800",
+      "report": {
+        "alert_id": "2022-09-10:014:80E943800",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.05561790048218494,
+        "narrative": "Score-only baseline: rank 1438 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0014254:80BA89570",
+      "report": {
+        "alert_id": "2022-09-10:0014254:80BA89570",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.04995351985654618,
+        "narrative": "Score-only baseline: rank 1633 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:020:8067B7670",
+      "report": {
+        "alert_id": "2022-09-09:020:8067B7670",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.02370223279624135,
+        "narrative": "Score-only baseline: rank 8029 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:02591:800AEAC00",
+      "report": {
+        "alert_id": "2022-09-10:02591:800AEAC00",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.21388686381078062,
+        "narrative": "Score-only baseline: rank 446 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:019:8096751E0",
+      "report": {
+        "alert_id": "2022-09-10:019:8096751E0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.6218188214268788,
+        "narrative": "Score-only baseline: rank 199 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0142836:8108587A0",
+      "report": {
+        "alert_id": "2022-09-10:0142836:8108587A0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.24870071441437772,
+        "narrative": "Score-only baseline: rank 400 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0118:811BCF2E0",
+      "report": {
+        "alert_id": "2022-09-10:0118:811BCF2E0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.22312009228364219,
+        "narrative": "Score-only baseline: rank 428 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:015:803B440E0",
+      "report": {
+        "alert_id": "2022-09-09:015:803B440E0",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.00004559762077396671,
+        "narrative": "Score-only baseline: rank 226282 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:0219805:814662BD0",
+      "report": {
+        "alert_id": "2022-09-09:0219805:814662BD0",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.024058851820471627,
+        "narrative": "Score-only baseline: rank 7883 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:0231744:80BE84A00",
+      "report": {
+        "alert_id": "2022-09-09:0231744:80BE84A00",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.9089843416846745,
+        "narrative": "Score-only baseline: rank 93 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:012:8001F7C90",
+      "report": {
+        "alert_id": "2022-09-09:012:8001F7C90",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.001970552647266726,
+        "narrative": "Score-only baseline: rank 61640 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:023525:801EF5820",
+      "report": {
+        "alert_id": "2022-09-10:023525:801EF5820",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.021091722257895067,
+        "narrative": "Score-only baseline: rank 4456 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0214100:807236FB0",
+      "report": {
+        "alert_id": "2022-09-10:0214100:807236FB0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.0874051635233722,
+        "narrative": "Score-only baseline: rank 921 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0120691:80BFD6670",
+      "report": {
+        "alert_id": "2022-09-10:0120691:80BFD6670",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.11183412687442175,
+        "narrative": "Score-only baseline: rank 743 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:001:800059C00",
+      "report": {
+        "alert_id": "2022-09-09:001:800059C00",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.33276267921431013,
+        "narrative": "Score-only baseline: rank 460 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:012797:802A31CF0",
+      "report": {
+        "alert_id": "2022-09-10:012797:802A31CF0",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.05244498991382302,
+        "narrative": "Score-only baseline: rank 1544 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0134920:80DB6C8C0",
+      "report": {
+        "alert_id": "2022-09-10:0134920:80DB6C8C0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.10855802318861306,
+        "narrative": "Score-only baseline: rank 766 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:007:81225DDF0",
+      "report": {
+        "alert_id": "2022-09-09:007:81225DDF0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.6117131237519583,
+        "narrative": "Score-only baseline: rank 202 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:0044565:810B8B580",
+      "report": {
+        "alert_id": "2022-09-09:0044565:810B8B580",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.2367151837988996,
+        "narrative": "Score-only baseline: rank 691 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:01688:801703570",
+      "report": {
+        "alert_id": "2022-09-10:01688:801703570",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.30150204123067614,
+        "narrative": "Score-only baseline: rank 350 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:011:800256EF0",
+      "report": {
+        "alert_id": "2022-09-10:011:800256EF0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.08358885831904848,
+        "narrative": "Score-only baseline: rank 968 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0013157:804CF5230",
+      "report": {
+        "alert_id": "2022-09-10:0013157:804CF5230",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.21351358226411393,
+        "narrative": "Score-only baseline: rank 447 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:006075:803601230",
+      "report": {
+        "alert_id": "2022-09-10:006075:803601230",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.7378241605476189,
+        "narrative": "Score-only baseline: rank 166 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:001:800059440",
+      "report": {
+        "alert_id": "2022-09-10:001:800059440",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.20414088443882208,
+        "narrative": "Score-only baseline: rank 460 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0224782:80B12BA80",
+      "report": {
+        "alert_id": "2022-09-10:0224782:80B12BA80",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.06398306282908411,
+        "narrative": "Score-only baseline: rank 1243 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:0014:81016E050",
+      "report": {
+        "alert_id": "2022-09-09:0014:81016E050",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.4050159987071962,
+        "narrative": "Score-only baseline: rank 350 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:021575:807D4AA60",
+      "report": {
+        "alert_id": "2022-09-10:021575:807D4AA60",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.13155389725805527,
+        "narrative": "Score-only baseline: rank 626 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:016031:8040DB7C0",
+      "report": {
+        "alert_id": "2022-09-10:016031:8040DB7C0",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.06582844279853743,
+        "narrative": "Score-only baseline: rank 1224 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:00410:80026C6B0",
+      "report": {
+        "alert_id": "2022-09-10:00410:80026C6B0",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.05316096192652287,
+        "narrative": "Score-only baseline: rank 1515 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:006052:80D133170",
+      "report": {
+        "alert_id": "2022-09-10:006052:80D133170",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.053520649042944166,
+        "narrative": "Score-only baseline: rank 1503 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:0148350:812D0C3C0",
+      "report": {
+        "alert_id": "2022-09-09:0148350:812D0C3C0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.8378948074138282,
+        "narrative": "Score-only baseline: rank 115 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0111121:80736F730",
+      "report": {
+        "alert_id": "2022-09-10:0111121:80736F730",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.07178205955551026,
+        "narrative": "Score-only baseline: rank 1143 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:006129:809327360",
+      "report": {
+        "alert_id": "2022-09-10:006129:809327360",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.08210383169350088,
+        "narrative": "Score-only baseline: rank 981 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:022828:804DC4E01",
+      "report": {
+        "alert_id": "2022-09-09:022828:804DC4E01",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.00018400071861205888,
+        "narrative": "Score-only baseline: rank 120157 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:026:80766EA40",
+      "report": {
+        "alert_id": "2022-09-09:026:80766EA40",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.00003925696982871321,
+        "narrative": "Score-only baseline: rank 240958 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:012:801E9B660",
+      "report": {
+        "alert_id": "2022-09-09:012:801E9B660",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.10673419497333564,
+        "narrative": "Score-only baseline: rank 1741 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:006179:80A4E67D0",
+      "report": {
+        "alert_id": "2022-09-10:006179:80A4E67D0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.20937991069663178,
+        "narrative": "Score-only baseline: rank 453 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:021611:808D6F2D0",
+      "report": {
+        "alert_id": "2022-09-09:021611:808D6F2D0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.9590779351797768,
+        "narrative": "Score-only baseline: rank 61 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0243614:8109BC7B0",
+      "report": {
+        "alert_id": "2022-09-10:0243614:8109BC7B0",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.049024976463000816,
+        "narrative": "Score-only baseline: rank 1680 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:009691:80E716410",
+      "report": {
+        "alert_id": "2022-09-09:009691:80E716410",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.14981621326106637,
+        "narrative": "Score-only baseline: rank 1221 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0249118:812D1A650",
+      "report": {
+        "alert_id": "2022-09-10:0249118:812D1A650",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.5796701319957591,
+        "narrative": "Score-only baseline: rank 214 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0116:80E446440",
+      "report": {
+        "alert_id": "2022-09-10:0116:80E446440",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.11385274274423138,
+        "narrative": "Score-only baseline: rank 737 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:004600:802E48210",
+      "report": {
+        "alert_id": "2022-09-09:004600:802E48210",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.16058854090224733,
+        "narrative": "Score-only baseline: rank 1131 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:016643:80296BAF0",
+      "report": {
+        "alert_id": "2022-09-10:016643:80296BAF0",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.056073467657485596,
+        "narrative": "Score-only baseline: rank 1428 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:00701:800A8E530",
+      "report": {
+        "alert_id": "2022-09-09:00701:800A8E530",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.8101684005362805,
+        "narrative": "Score-only baseline: rank 118 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:00410:80098DC70",
+      "report": {
+        "alert_id": "2022-09-09:00410:80098DC70",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.9262450868419367,
+        "narrative": "Score-only baseline: rank 75 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0220504:807EF4570",
+      "report": {
+        "alert_id": "2022-09-10:0220504:807EF4570",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.09194859557828466,
+        "narrative": "Score-only baseline: rank 888 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0213137:807237050",
+      "report": {
+        "alert_id": "2022-09-10:0213137:807237050",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.0874051635233722,
+        "narrative": "Score-only baseline: rank 920 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:001655:8010D1180",
+      "report": {
+        "alert_id": "2022-09-10:001655:8010D1180",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.29097251962118303,
+        "narrative": "Score-only baseline: rank 361 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:021745:801AF1BE0",
+      "report": {
+        "alert_id": "2022-09-10:021745:801AF1BE0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.2707923595380504,
+        "narrative": "Score-only baseline: rank 375 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:01420:805B2EB70",
+      "report": {
+        "alert_id": "2022-09-10:01420:805B2EB70",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.06980895330739333,
+        "narrative": "Score-only baseline: rank 1170 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:021550:8065C69E0",
+      "report": {
+        "alert_id": "2022-09-10:021550:8065C69E0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.11552332978642267,
+        "narrative": "Score-only baseline: rank 730 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:006:80A30B870",
+      "report": {
+        "alert_id": "2022-09-09:006:80A30B870",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.21825208891989253,
+        "narrative": "Score-only baseline: rank 773 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0142183:80FB0C5F0",
+      "report": {
+        "alert_id": "2022-09-10:0142183:80FB0C5F0",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.056982182496679655,
+        "narrative": "Score-only baseline: rank 1398 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:009482:8103CC810",
+      "report": {
+        "alert_id": "2022-09-10:009482:8103CC810",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.05361161760975598,
+        "narrative": "Score-only baseline: rank 1497 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:003335:802E490D0",
+      "report": {
+        "alert_id": "2022-09-09:003335:802E490D0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.16058854090224733,
+        "narrative": "Score-only baseline: rank 1130 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:0134939:80D5F4610",
+      "report": {
+        "alert_id": "2022-09-09:0134939:80D5F4610",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.12068859376203307,
+        "narrative": "Score-only baseline: rank 1565 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0131086:80CC58D80",
+      "report": {
+        "alert_id": "2022-09-10:0131086:80CC58D80",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.1221439979240286,
+        "narrative": "Score-only baseline: rank 680 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0235509:80DB6E850",
+      "report": {
+        "alert_id": "2022-09-10:0235509:80DB6E850",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.10855802318861306,
+        "narrative": "Score-only baseline: rank 767 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0228321:80D340ED0",
+      "report": {
+        "alert_id": "2022-09-10:0228321:80D340ED0",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.04782815056774706,
+        "narrative": "Score-only baseline: rank 1727 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:003514:801F08FB0",
+      "report": {
+        "alert_id": "2022-09-10:003514:801F08FB0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.7442223380772384,
+        "narrative": "Score-only baseline: rank 165 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:001686:8010D33A0",
+      "report": {
+        "alert_id": "2022-09-10:001686:8010D33A0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.1661815629859269,
+        "narrative": "Score-only baseline: rank 534 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:029788:812F3BB20",
+      "report": {
+        "alert_id": "2022-09-09:029788:812F3BB20",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.161917289477001,
+        "narrative": "Score-only baseline: rank 1121 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:01588:8006FC0B0",
+      "report": {
+        "alert_id": "2022-09-09:01588:8006FC0B0",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.14543277292880022,
+        "narrative": "Score-only baseline: rank 1270 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:0116425:806BA3280",
+      "report": {
+        "alert_id": "2022-09-09:0116425:806BA3280",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.11485781939475712,
+        "narrative": "Score-only baseline: rank 1637 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:018617:807D95610",
+      "report": {
+        "alert_id": "2022-09-10:018617:807D95610",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.20205497922558316,
+        "narrative": "Score-only baseline: rank 467 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:013858:801820540",
+      "report": {
+        "alert_id": "2022-09-09:013858:801820540",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.9656985517631138,
+        "narrative": "Score-only baseline: rank 55 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:0122352:81071EAA0",
+      "report": {
+        "alert_id": "2022-09-09:0122352:81071EAA0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.7998436840288363,
+        "narrative": "Score-only baseline: rank 120 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0117143:8064AAA20",
+      "report": {
+        "alert_id": "2022-09-10:0117143:8064AAA20",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.5808742998321875,
+        "narrative": "Score-only baseline: rank 213 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:003514:801F08FB0",
+      "report": {
+        "alert_id": "2022-09-09:003514:801F08FB0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.5375717163380075,
+        "narrative": "Score-only baseline: rank 245 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:012:8000F7C60",
+      "report": {
+        "alert_id": "2022-09-09:012:8000F7C60",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.032609340499581065,
+        "narrative": "Score-only baseline: rank 5628 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:010:800817040",
+      "report": {
+        "alert_id": "2022-09-10:010:800817040",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.03709119848245334,
+        "narrative": "Score-only baseline: rank 2359 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0115656:809F0E8B0",
+      "report": {
+        "alert_id": "2022-09-10:0115656:809F0E8B0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.07767318195561641,
+        "narrative": "Score-only baseline: rank 1035 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0110:80CE71F90",
+      "report": {
+        "alert_id": "2022-09-10:0110:80CE71F90",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.12421795833769493,
+        "narrative": "Score-only baseline: rank 659 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:021749:80154AAF0",
+      "report": {
+        "alert_id": "2022-09-10:021749:80154AAF0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.979996168464772,
+        "narrative": "Score-only baseline: rank 46 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:015980:80333DA80",
+      "report": {
+        "alert_id": "2022-09-10:015980:80333DA80",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.07871550826658684,
+        "narrative": "Score-only baseline: rank 1024 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:0024032:80C90D1D0",
+      "report": {
+        "alert_id": "2022-09-09:0024032:80C90D1D0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.9089843416846745,
+        "narrative": "Score-only baseline: rank 92 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:018067:80EF86180",
+      "report": {
+        "alert_id": "2022-09-10:018067:80EF86180",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.051063658231308734,
+        "narrative": "Score-only baseline: rank 1597 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:023:8000EC7E0",
+      "report": {
+        "alert_id": "2022-09-09:023:8000EC7E0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.37543538193824316,
+        "narrative": "Score-only baseline: rank 389 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:009679:803B65270",
+      "report": {
+        "alert_id": "2022-09-09:009679:803B65270",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.00006800016352721014,
+        "narrative": "Score-only baseline: rank 166227 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:021611:80B89ED40",
+      "report": {
+        "alert_id": "2022-09-09:021611:80B89ED40",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.9663458318500281,
+        "narrative": "Score-only baseline: rank 54 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:001068:800BC6F50",
+      "report": {
+        "alert_id": "2022-09-09:001068:800BC6F50",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.24751712312777538,
+        "narrative": "Score-only baseline: rank 659 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0017863:81198DE10",
+      "report": {
+        "alert_id": "2022-09-10:0017863:81198DE10",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.259862606073494,
+        "narrative": "Score-only baseline: rank 390 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0119:81132D840",
+      "report": {
+        "alert_id": "2022-09-10:0119:81132D840",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.05679545216373951,
+        "narrative": "Score-only baseline: rank 1402 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:011471:8009F8780",
+      "report": {
+        "alert_id": "2022-09-10:011471:8009F8780",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.0001289841995737593,
+        "narrative": "Score-only baseline: rank 39924 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:008888:80975AD60",
+      "report": {
+        "alert_id": "2022-09-10:008888:80975AD60",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.043564003439947346,
+        "narrative": "Score-only baseline: rank 1917 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:01522:80D9BF830",
+      "report": {
+        "alert_id": "2022-09-10:01522:80D9BF830",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.15642863116818673,
+        "narrative": "Score-only baseline: rank 563 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:020:8001B7DB0",
+      "report": {
+        "alert_id": "2022-09-09:020:8001B7DB0",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.10992667551004551,
+        "narrative": "Score-only baseline: rank 1702 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:01522:8002AE7E0",
+      "report": {
+        "alert_id": "2022-09-10:01522:8002AE7E0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.35006784880331,
+        "narrative": "Score-only baseline: rank 310 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0231212:80ED002D0",
+      "report": {
+        "alert_id": "2022-09-10:0231212:80ED002D0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.9407745459768045,
+        "narrative": "Score-only baseline: rank 71 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0013154:804CBAD30",
+      "report": {
+        "alert_id": "2022-09-10:0013154:804CBAD30",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.11679748809864175,
+        "narrative": "Score-only baseline: rank 719 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:0216645:80960AAF0",
+      "report": {
+        "alert_id": "2022-09-09:0216645:80960AAF0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.19850172091447815,
+        "narrative": "Score-only baseline: rank 868 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0013067:80B12DE00",
+      "report": {
+        "alert_id": "2022-09-10:0013067:80B12DE00",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.06398306282908411,
+        "narrative": "Score-only baseline: rank 1242 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:014011:806967B30",
+      "report": {
+        "alert_id": "2022-09-09:014011:806967B30",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.15108746864519743,
+        "narrative": "Score-only baseline: rank 1209 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:021575:800F1D640",
+      "report": {
+        "alert_id": "2022-09-10:021575:800F1D640",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.07040171515401478,
+        "narrative": "Score-only baseline: rank 1165 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:011056:8009D3520",
+      "report": {
+        "alert_id": "2022-09-09:011056:8009D3520",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.00008577503197822494,
+        "narrative": "Score-only baseline: rank 149386 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:013862:801F99F20",
+      "report": {
+        "alert_id": "2022-09-09:013862:801F99F20",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.6893088846943319,
+        "narrative": "Score-only baseline: rank 167 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:005466:802C94F70",
+      "report": {
+        "alert_id": "2022-09-10:005466:802C94F70",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.05462764089557565,
+        "narrative": "Score-only baseline: rank 1468 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:012797:802C82A40",
+      "report": {
+        "alert_id": "2022-09-10:012797:802C82A40",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.03714020816267956,
+        "narrative": "Score-only baseline: rank 2356 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0026592:8103DAF90",
+      "report": {
+        "alert_id": "2022-09-10:0026592:8103DAF90",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.07409505412018433,
+        "narrative": "Score-only baseline: rank 1103 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0121453:80D33CDA0",
+      "report": {
+        "alert_id": "2022-09-10:0121453:80D33CDA0",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.04782815056774706,
+        "narrative": "Score-only baseline: rank 1726 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:019925:803C37930",
+      "report": {
+        "alert_id": "2022-09-09:019925:803C37930",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.45624948498882173,
+        "narrative": "Score-only baseline: rank 299 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:029794:80D133120",
+      "report": {
+        "alert_id": "2022-09-10:029794:80D133120",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.053520649042944166,
+        "narrative": "Score-only baseline: rank 1504 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:001024:8006BF850",
+      "report": {
+        "alert_id": "2022-09-09:001024:8006BF850",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.7710338307328407,
+        "narrative": "Score-only baseline: rank 143 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:0014766:8058D9160",
+      "report": {
+        "alert_id": "2022-09-09:0014766:8058D9160",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.7866703372905175,
+        "narrative": "Score-only baseline: rank 135 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:01547:801C95950",
+      "report": {
+        "alert_id": "2022-09-10:01547:801C95950",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.852667518883347,
+        "narrative": "Score-only baseline: rank 117 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:018902:803F00790",
+      "report": {
+        "alert_id": "2022-09-09:018902:803F00790",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.035839325971811116,
+        "narrative": "Score-only baseline: rank 5043 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:0015040:8111CA220",
+      "report": {
+        "alert_id": "2022-09-09:0015040:8111CA220",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.48149523194558647,
+        "narrative": "Score-only baseline: rank 283 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:003698:80333C8E0",
+      "report": {
+        "alert_id": "2022-09-10:003698:80333C8E0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.07871550826658684,
+        "narrative": "Score-only baseline: rank 1023 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0223:811EDA940",
+      "report": {
+        "alert_id": "2022-09-10:0223:811EDA940",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.986382703660732,
+        "narrative": "Score-only baseline: rank 38 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:003:801582570",
+      "report": {
+        "alert_id": "2022-09-10:003:801582570",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.06842404970709444,
+        "narrative": "Score-only baseline: rank 1188 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0015695:8068929F0",
+      "report": {
+        "alert_id": "2022-09-10:0015695:8068929F0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.08400160997857721,
+        "narrative": "Score-only baseline: rank 959 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:011318:800BD4B50",
+      "report": {
+        "alert_id": "2022-09-09:011318:800BD4B50",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.003215085276013477,
+        "narrative": "Score-only baseline: rank 41288 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:018511:80604B780",
+      "report": {
+        "alert_id": "2022-09-09:018511:80604B780",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.40287253621949787,
+        "narrative": "Score-only baseline: rank 356 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0010:80639B830",
+      "report": {
+        "alert_id": "2022-09-10:0010:80639B830",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.13123338898989206,
+        "narrative": "Score-only baseline: rank 628 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:007548:8069770C0",
+      "report": {
+        "alert_id": "2022-09-09:007548:8069770C0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.17456601241986916,
+        "narrative": "Score-only baseline: rank 1017 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:006:804B41750",
+      "report": {
+        "alert_id": "2022-09-09:006:804B41750",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.3018653430007158,
+        "narrative": "Score-only baseline: rank 515 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:015916:80333CC00",
+      "report": {
+        "alert_id": "2022-09-10:015916:80333CC00",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.04968622888321065,
+        "narrative": "Score-only baseline: rank 1642 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:009371:807D95660",
+      "report": {
+        "alert_id": "2022-09-10:009371:807D95660",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.20205497922558316,
+        "narrative": "Score-only baseline: rank 466 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:0222363:808C53521",
+      "report": {
+        "alert_id": "2022-09-09:0222363:808C53521",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.0005927024247872503,
+        "narrative": "Score-only baseline: rank 94515 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:0221527:808788960",
+      "report": {
+        "alert_id": "2022-09-09:0221527:808788960",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.09702665716590404,
+        "narrative": "Score-only baseline: rank 1921 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:009129:8132CDF20",
+      "report": {
+        "alert_id": "2022-09-10:009129:8132CDF20",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.057011864872443856,
+        "narrative": "Score-only baseline: rank 1397 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:016:8047943E0",
+      "report": {
+        "alert_id": "2022-09-09:016:8047943E0",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.00005710619903255267,
+        "narrative": "Score-only baseline: rank 188035 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:019477:80EF861D0",
+      "report": {
+        "alert_id": "2022-09-10:019477:80EF861D0",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.051063658231308734,
+        "narrative": "Score-only baseline: rank 1598 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0138133:813E6B910",
+      "report": {
+        "alert_id": "2022-09-10:0138133:813E6B910",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.05126029709126751,
+        "narrative": "Score-only baseline: rank 1594 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0031961:80D3BD310",
+      "report": {
+        "alert_id": "2022-09-10:0031961:80D3BD310",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.06830657562325938,
+        "narrative": "Score-only baseline: rank 1194 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0048309:811C599A0",
+      "report": {
+        "alert_id": "2022-09-10:0048309:811C599A0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.963062438433961,
+        "narrative": "Score-only baseline: rank 61 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0033245:81317DF30",
+      "report": {
+        "alert_id": "2022-09-10:0033245:81317DF30",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.05344008957362897,
+        "narrative": "Score-only baseline: rank 1505 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0232073:80D9BFE70",
+      "report": {
+        "alert_id": "2022-09-10:0232073:80D9BFE70",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.15642863116818673,
+        "narrative": "Score-only baseline: rank 564 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:01588:8006FC320",
+      "report": {
+        "alert_id": "2022-09-09:01588:8006FC320",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.14543277292880022,
+        "narrative": "Score-only baseline: rank 1271 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:011813:800D0F970",
+      "report": {
+        "alert_id": "2022-09-10:011813:800D0F970",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.09659594441403833,
+        "narrative": "Score-only baseline: rank 846 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:023885:807049450",
+      "report": {
+        "alert_id": "2022-09-09:023885:807049450",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.1207693060051262,
+        "narrative": "Score-only baseline: rank 1564 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0120519:809FB9A30",
+      "report": {
+        "alert_id": "2022-09-10:0120519:809FB9A30",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.05618640719096734,
+        "narrative": "Score-only baseline: rank 1420 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:003335:8026E9C90",
+      "report": {
+        "alert_id": "2022-09-09:003335:8026E9C90",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.13771288914815383,
+        "narrative": "Score-only baseline: rank 1339 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:01601:80033AD80",
+      "report": {
+        "alert_id": "2022-09-09:01601:80033AD80",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.33247745337561463,
+        "narrative": "Score-only baseline: rank 462 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:028726:8070E01E0",
+      "report": {
+        "alert_id": "2022-09-09:028726:8070E01E0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.2931781338517493,
+        "narrative": "Score-only baseline: rank 541 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0242962:80FB0C5A0",
+      "report": {
+        "alert_id": "2022-09-10:0242962:80FB0C5A0",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.056982182496679655,
+        "narrative": "Score-only baseline: rank 1399 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:012004:8014EA0D0",
+      "report": {
+        "alert_id": "2022-09-10:012004:8014EA0D0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.6947159019396927,
+        "narrative": "Score-only baseline: rank 177 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:016643:805807C10",
+      "report": {
+        "alert_id": "2022-09-09:016643:805807C10",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.23692361811704976,
+        "narrative": "Score-only baseline: rank 688 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0214:80A43A210",
+      "report": {
+        "alert_id": "2022-09-10:0214:80A43A210",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.08932006685736464,
+        "narrative": "Score-only baseline: rank 902 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:016333:806892950",
+      "report": {
+        "alert_id": "2022-09-10:016333:806892950",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.08400160997857721,
+        "narrative": "Score-only baseline: rank 960 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:014011:802C95100",
+      "report": {
+        "alert_id": "2022-09-10:014011:802C95100",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.05462764089557565,
+        "narrative": "Score-only baseline: rank 1469 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0245093:8108587F0",
+      "report": {
+        "alert_id": "2022-09-10:0245093:8108587F0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.24870071441437772,
+        "narrative": "Score-only baseline: rank 401 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0238845:80E8666D0",
+      "report": {
+        "alert_id": "2022-09-10:0238845:80E8666D0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.9780748377543523,
+        "narrative": "Score-only baseline: rank 49 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:0238190:80EE158C0",
+      "report": {
+        "alert_id": "2022-09-09:0238190:80EE158C0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.18237067825729814,
+        "narrative": "Score-only baseline: rank 970 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0035670:80D17ED80",
+      "report": {
+        "alert_id": "2022-09-10:0035670:80D17ED80",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.045076806815149056,
+        "narrative": "Score-only baseline: rank 1847 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:019329:8103CC7C0",
+      "report": {
+        "alert_id": "2022-09-10:019329:8103CC7C0",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.05361161760975598,
+        "narrative": "Score-only baseline: rank 1498 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:0012461:80206DDF0",
+      "report": {
+        "alert_id": "2022-09-09:0012461:80206DDF0",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.09906175078343911,
+        "narrative": "Score-only baseline: rank 1896 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:016109:803E47E50",
+      "report": {
+        "alert_id": "2022-09-10:016109:803E47E50",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.9908282521189122,
+        "narrative": "Score-only baseline: rank 30 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0124290:80D183900",
+      "report": {
+        "alert_id": "2022-09-10:0124290:80D183900",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.045076806815149056,
+        "narrative": "Score-only baseline: rank 1848 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:026818:80355C180",
+      "report": {
+        "alert_id": "2022-09-09:026818:80355C180",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.11379315027417984,
+        "narrative": "Score-only baseline: rank 1653 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:004:80DB2EFC0",
+      "report": {
+        "alert_id": "2022-09-09:004:80DB2EFC0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.9957970395222193,
+        "narrative": "Score-only baseline: rank 7 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-10:0210404:8044FA580",
+      "report": {
+        "alert_id": "2022-09-10:0210404:8044FA580",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [],
+        "confidence": 0.4690307731193949,
+        "narrative": "Score-only baseline: rank 261 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-09:001457:800DD1FE0",
+      "report": {
+        "alert_id": "2022-09-09:001457:800DD1FE0",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.15767518980394168,
+        "narrative": "Score-only baseline: rank 1152 of its day, against a threshold of 1133."
+      },
+      "grounded": null,
+      "hallucinated_ids": null,
+      "steps": null,
+      "seconds": null,
+      "error": null
+    }
+  ]
+}
