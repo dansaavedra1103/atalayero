@@ -2,7 +2,8 @@
 
 The features of a transaction at time t use its own fields and the history strictly before t:
 transactions of the same minute, the transaction itself included, never count. History crosses
-split boundaries backward, never forward, and stops at the end of the test split.
+split boundaries backward, never forward, and stops at the end of the test split. Every look-back
+is bounded (at most 96 h), so no feature grows with the history available (ADR-0013).
 """
 
 import logging
@@ -30,9 +31,9 @@ _ACCOUNT_HISTORY = {
     "in_amount_24h": ("sum(amount_usd)", "in", "last_24h"),
     "in_counterparties_24h": ("count(DISTINCT counterparty)", "in", "last_24h"),
 }
-_ACCOUNT = (*_ACCOUNT_HISTORY, "minutes_since_previous")
+_ACCOUNT = (*_ACCOUNT_HISTORY, "minutes_since_previous")  # within 96 h, else NULL
 ACCOUNT = tuple(f"{side}_{name}" for side in ("sender", "receiver") for name in _ACCOUNT)
-PAIR = ("pair_count_before", "reverse_pair_count_before", "amount_to_sender_mean_24h")
+PAIR = ("pair_count_24h", "reverse_pair_count_24h", "amount_to_sender_mean_24h")
 
 FEATURES = (*CATEGORICAL, *OWN, *ACCOUNT, *PAIR)
 
@@ -66,18 +67,18 @@ def tabular_features_sql(source: str) -> str:
             transaction_id,
             direction,
             {history},
-            date_diff('minute', max(transacted_at) OVER earlier, transacted_at)
+            date_diff('minute', max(transacted_at) OVER last_96h, transacted_at)
                 AS minutes_since_previous
         FROM legs
         WINDOW
-            earlier AS (PARTITION BY account_key ORDER BY transacted_at
-                RANGE BETWEEN UNBOUNDED PRECEDING AND INTERVAL 1 MICROSECOND PRECEDING),
+            last_96h AS (PARTITION BY account_key ORDER BY transacted_at
+                RANGE BETWEEN INTERVAL 96 HOURS PRECEDING AND INTERVAL 1 MICROSECOND PRECEDING),
             last_1h AS (PARTITION BY account_key ORDER BY transacted_at
                 RANGE BETWEEN INTERVAL 1 HOUR PRECEDING AND INTERVAL 1 MICROSECOND PRECEDING),
             last_24h AS (PARTITION BY account_key ORDER BY transacted_at
                 RANGE BETWEEN INTERVAL 24 HOURS PRECEDING AND INTERVAL 1 MICROSECOND PRECEDING)
     ),
-    pairs AS (  -- earlier transactions from the same sender to the same receiver
+    pairs AS (  -- transactions from the same sender to the same receiver
         SELECT
             transaction_id,
             sender_account_key,
@@ -85,8 +86,8 @@ def tabular_features_sql(source: str) -> str:
             transacted_at,
             count(*) OVER (PARTITION BY sender_account_key, receiver_account_key
                 ORDER BY transacted_at
-                RANGE BETWEEN UNBOUNDED PRECEDING AND INTERVAL 1 MICROSECOND PRECEDING)
-                AS count_before,
+                RANGE BETWEEN INTERVAL 24 HOURS PRECEDING AND INTERVAL 1 MICROSECOND PRECEDING)
+                AS count_24h,
             count(*) OVER (PARTITION BY sender_account_key, receiver_account_key
                 ORDER BY transacted_at
                 RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS count_through
@@ -105,18 +106,24 @@ def tabular_features_sql(source: str) -> str:
             AS same_bank,
         hour(t.transacted_at) AS hour,
         {account},
-        p.count_before AS pair_count_before,
-        coalesce(reverse.count_through, 0) AS reverse_pair_count_before,
+        p.count_24h AS pair_count_24h,
+        coalesce(reverse.count_through, 0) - coalesce(reverse_old.count_through, 0)
+            AS reverse_pair_count_24h,
         t.amount_paid_usd / (s.out_amount_24h / nullif(s.out_count_24h, 0))
             AS amount_to_sender_mean_24h
     FROM {source} AS t
     JOIN account_history AS s ON s.transaction_id = t.transaction_id AND s.direction = 'out'
     JOIN account_history AS r ON r.transaction_id = t.transaction_id AND r.direction = 'in'
     JOIN pairs AS p ON p.transaction_id = t.transaction_id
-    ASOF LEFT JOIN pairs AS reverse  -- the latest earlier transaction the other way round
+    -- The other way round: how many before t, minus how many before t - 24 h.
+    ASOF LEFT JOIN pairs AS reverse
         ON reverse.sender_account_key = t.receiver_account_key
         AND reverse.receiver_account_key = t.sender_account_key
         AND t.transacted_at > reverse.transacted_at
+    ASOF LEFT JOIN pairs AS reverse_old
+        ON reverse_old.sender_account_key = t.receiver_account_key
+        AND reverse_old.receiver_account_key = t.sender_account_key
+        AND t.transacted_at - INTERVAL 24 HOURS > reverse_old.transacted_at
     """
 
 

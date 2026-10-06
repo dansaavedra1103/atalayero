@@ -54,14 +54,6 @@ def test_snapshot_features() -> None:
     assert sorted(accounts) == ["A", "B", "C", "X", "Y"]
     assert (f["out_degree"][a], f["in_degree"][a]) == (2, 1)
     assert (f["out_amount"][a], f["in_amount"][a]) == (150.0, 5.0)
-    assert f["pagerank"].mean() == pytest.approx(1.0)
-    assert dict(zip(accounts, f["community_size"], strict=True)) == {
-        "A": 3,
-        "B": 3,
-        "C": 3,
-        "X": 2,
-        "Y": 2,
-    }
     assert [bool(x) for x in f["in_short_cycle"]] == [a in "ABC" for a in accounts]
 
 

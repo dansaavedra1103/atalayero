@@ -23,21 +23,21 @@ from atalayero.settings import Settings
 logger = logging.getLogger(__name__)
 
 SNAPSHOT_DAYS = 3
-LOUVAIN_SEED = 0
+# PageRank and Louvain community sizes were dropped: they shift with each snapshot's size and
+# make-up, which no stable feature should do (ADR-0013).
 _ACCOUNT = (
     "in_degree",  # distinct senders to the account
     "out_degree",  # distinct receivers from the account
     "in_amount",  # US Dollar received
     "out_amount",  # US Dollar sent
-    "pagerank",  # by transaction count, times the number of accounts: 1 on average
-    "community_size",  # accounts in its Louvain community (undirected, unweighted)
     "in_short_cycle",  # on a directed cycle of two or three accounts
 )
 GRAPH = tuple(f"{side}_graph_{name}" for side in ("sender", "receiver") for name in _ACCOUNT)
-_DTYPES = {name: int for name in ("in_degree", "out_degree", "community_size")} | {
+_DTYPES = {
+    "in_degree": int,
+    "out_degree": int,
     "in_amount": float,
     "out_amount": float,
-    "pagerank": float,
     "in_short_cycle": bool,
 }
 
@@ -70,20 +70,12 @@ def snapshot_features(edges: Sequence[Edge]) -> tuple[list[str], dict[str, np.nd
     accounts = list(graph.nodes)
     if not accounts:
         return [], {name: np.zeros(0, dtype=_DTYPES[name]) for name in _ACCOUNT}
-    pagerank = nx.pagerank(graph, weight="count")
-    communities = nx.community.louvain_communities(
-        graph.to_undirected(), weight=None, seed=LOUVAIN_SEED
-    )
-    community_size = {a: len(c) for c in communities for a in c}
     cycles = short_cycle_accounts(graph)
-    n = len(accounts)
     values = {
         "in_degree": [graph.in_degree(a) for a in accounts],
         "out_degree": [graph.out_degree(a) for a in accounts],
         "in_amount": [graph.in_degree(a, weight="usd") for a in accounts],
         "out_amount": [graph.out_degree(a, weight="usd") for a in accounts],
-        "pagerank": [pagerank[a] * n for a in accounts],
-        "community_size": [community_size[a] for a in accounts],
         "in_short_cycle": [a in cycles for a in accounts],
     }
     return accounts, {name: np.array(v, dtype=_DTYPES[name]) for name, v in values.items()}

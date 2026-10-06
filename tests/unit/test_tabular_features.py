@@ -56,7 +56,7 @@ def test_history_ignores_the_same_minute(make_tx: MakeTx, features: Features) ->
 
     assert {g["sender_out_count_1h"] for g in f.values()} == {0}
     assert {g["receiver_in_count_1h"] for g in f.values()} == {0}
-    assert f[2]["pair_count_before"] == f[3]["reverse_pair_count_before"] == 0
+    assert f[2]["pair_count_24h"] == f[3]["reverse_pair_count_24h"] == 0
 
 
 @pytest.mark.parametrize(
@@ -102,8 +102,32 @@ def test_pairs_and_the_reverse_direction(make_tx: MakeTx, features: Features) ->
 
     f = features(txs)
 
-    assert [f[i]["pair_count_before"] for i in (1, 2, 3, 4)] == [0, 1, 0, 2]
-    assert [f[i]["reverse_pair_count_before"] for i in (1, 2, 3, 4)] == [0, 0, 1, 1]
+    assert [f[i]["pair_count_24h"] for i in (1, 2, 3, 4)] == [0, 1, 0, 2]
+    assert [f[i]["reverse_pair_count_24h"] for i in (1, 2, 3, 4)] == [0, 0, 1, 1]
+
+
+@pytest.mark.parametrize(("minutes", "seen"), [(DAY, 1), (DAY + 1, 0)])
+def test_pair_counts_look_back_24_hours(
+    make_tx: MakeTx, features: Features, minutes: int, seen: int
+) -> None:
+    f = features(
+        [
+            make_tx(1, 0, sender="001:A", receiver="001:B"),
+            make_tx(2, 0, sender="001:B", receiver="001:A"),
+            make_tx(3, minutes, sender="001:A", receiver="001:B"),
+        ]
+    )
+
+    assert (f[3]["pair_count_24h"], f[3]["reverse_pair_count_24h"]) == (seen, seen)
+
+
+@pytest.mark.parametrize(("minutes", "expected"), [(4 * DAY, 4 * DAY), (4 * DAY + 1, None)])
+def test_the_previous_transaction_counts_within_96_hours(
+    make_tx: MakeTx, features: Features, minutes: int, expected: int | None
+) -> None:
+    f = features([make_tx(1, 0), make_tx(2, minutes)])
+
+    assert f[2]["sender_minutes_since_previous"] == expected
 
 
 def test_amount_against_the_sender_mean(make_tx: MakeTx, features: Features) -> None:
