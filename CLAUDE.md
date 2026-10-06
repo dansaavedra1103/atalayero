@@ -35,7 +35,7 @@ All commands go through the Makefile. When you add a new command, add it to the 
 - `make fx-rates` — regenerate the exchange-rate seed `dbt/seeds/fx_rates_usd.csv` from the full dataset
 - `make dbt`      — dbt build on the full dataset (needs `make ingest`)
 - `make dbt-sample` — load the test fixtures into `data/sample/` and dbt build on them (what CI runs)
-- `make pipeline` — end-to-end batch run on the dev target
+- `make pipeline` — everything from the download to the single test run on the dev target: ingest → dbt → rules → features → evaluate → train → drift → holdout (about 17 min; leaves out `tune` and `stream`)
 - `make up`       — docker compose up and wait until healthy (phase 1: redpanda; later api, mlflow, airflow, ollama)
 - `make down`     — docker compose down
 - `make stream`   — replay the transactions through Redpanda and evaluate the YAML rules online; alerts to `data/stream/alerts/` (needs `make up` and `make dbt`)
@@ -45,6 +45,7 @@ All commands go through the Makefile. When you add a new command, add it to the 
 - `make tune`     — Optuna search of the hyperparameters on validation (PR-AUC); writes a new version of `config/models.yaml` (about 45 min; needs `make features` and `make rules`)
 - `make train`    — fit the model families of `config/models.yaml`, compare them with the rules on validation, log to MLflow and promote the champion (needs `make features` and `make rules`)
 - `make drift`    — PSI of each feature per validation day against train (weekdays against weekdays) and daily rule-alert volume; report to `data/reports/` (needs `make features` and `make rules`)
+- `make holdout`  — the single test run (ADR-0014): rules-only baseline on test, every family refit on train + validation and compared with the rules on test, drift on test; reports and test scores to `data/reports/` (about 4 min, peak about 10 GB; needs `make features` and `make rules`)
 - `make mlflow-ui` — local MLflow UI on http://localhost:5000
 - `make test-integration` — tests that need running services (Redpanda); not run in CI
 - `make eval`     — run agent evals offline and write a dated report to evals/reports/

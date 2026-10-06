@@ -4,7 +4,7 @@ SAMPLE_ENV := ATALAYERO_DATA_DIR=data/sample ATALAYERO_DUCKDB_PATH=data/sample/a
 # MLflow prints a hint for coding agents on import; it is noise in the logs.
 MLFLOW_ENV := MLFLOW_DISABLE_AGENT_HINT=1
 
-.PHONY: setup check test-integration ingest fixture fx-rates dbt dbt-sample up down stream rules evaluate features tune train mlflow-ui drift
+.PHONY: setup check test-integration ingest fixture fx-rates dbt dbt-sample up down stream rules evaluate features tune train mlflow-ui drift holdout pipeline
 
 # LightGBM needs the system OpenMP runtime: sudo apt-get install libgomp1 (ADR-0009).
 setup:
@@ -65,3 +65,21 @@ mlflow-ui:
 
 drift:
 	uv run python -m atalayero.monitoring drift --split validation
+
+# The single test run (ADR-0014): rules per rule, models refit on train + validation, drift.
+holdout:
+	uv run python -m atalayero.models evaluate --split test
+	$(MLFLOW_ENV) uv run python -m atalayero.models holdout
+	uv run python -m atalayero.monitoring drift --split test
+
+# Everything from the download to the test run. Leaves out `tune` (config/models.yaml is the
+# source of truth) and `stream` (needs Docker; `rules` gives the same alerts).
+pipeline:
+	$(MAKE) ingest
+	$(MAKE) dbt
+	$(MAKE) rules
+	$(MAKE) features
+	$(MAKE) evaluate
+	$(MAKE) train
+	$(MAKE) drift
+	$(MAKE) holdout
