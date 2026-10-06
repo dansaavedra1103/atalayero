@@ -18,6 +18,7 @@ from pathlib import Path
 
 import duckdb
 import numpy as np
+import pandas as pd
 from pydantic import BaseModel, computed_field
 from sklearn.metrics import average_precision_score
 
@@ -286,6 +287,43 @@ class SplitEvaluator:
             )
             for budget, alerts, false_positives, detected, without_hubs, laundering in rows
         ]
+
+    def detections(self) -> pd.DataFrame:
+        """The split's laundering transactions and whether the last evaluated detector caught
+        them, with what an error analysis looks at."""
+        return self.con.execute(
+            """
+            SELECT
+                d.transaction_id,
+                t.transacted_at,
+                t.sender_account_key,
+                t.receiver_account_key,
+                t.amount_paid_usd,
+                t.payment_format,
+                d.label_group,
+                d.attempt_id,
+                d.typology,
+                d.detected,
+                d.via_other_than_hub
+            FROM detected AS d
+            JOIN wh.marts.fct_transactions AS t USING (transaction_id)
+            ORDER BY d.transaction_id
+            """
+        ).df()
+
+    def alerts(self) -> pd.DataFrame:
+        """The account-days the last evaluated detector alerted, with their number of
+        transactions."""
+        return self.con.execute(
+            """
+            SELECT day, account_key, a.has_laundering, a.on_hub, count(*) AS transactions
+            FROM alerted
+            JOIN account_days AS a USING (day, account_key)
+            JOIN legs USING (day, account_key)
+            GROUP BY ALL
+            ORDER BY day, account_key
+            """
+        ).df()
 
     def _metrics(self, detector: str, budget: int | None) -> AlertMetrics:
         alerts, false_positives, on_hubs = self.con.execute(

@@ -1,6 +1,7 @@
 """Model inputs: the point-in-time features of a split's transactions, with their labels."""
 
 from dataclasses import dataclass
+from datetime import datetime
 
 import duckdb
 import numpy as np
@@ -34,6 +35,11 @@ def load_split(settings: Settings, split: Split) -> Dataset:
     start, end = settings.splits.bounds(split)
     if split == "train":
         start = settings.models.train_start
+    return load_period(settings, start, end)
+
+
+def load_period(settings: Settings, start: datetime, end: datetime) -> Dataset:
+    """The features and labels of the transactions in `[start, end)`."""
     tabular = settings.features_dir / "tabular.parquet"
     graph = settings.features_dir / "graph.parquet"
     motifs = settings.features_dir / "motifs.parquet"

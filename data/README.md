@@ -34,7 +34,8 @@ data/
 ├── features/tabular.parquet     # point-in-time features of make features, no labels
 ├── features/graph.parquet       # graph features of make features (daily snapshots), no labels
 ├── features/motifs.parquet      # motif features of make features (cycles, relays, fan paths)
-├── reports/                    # evaluation reports (JSON) of make evaluate and make train
+├── reports/                    # reports (JSON) of make evaluate, train, drift and holdout;
+│                               #   holdout_scores.parquet: test scores of every family
 └── mlflow/                     # MLflow tracking and registry (SQLite) and artifacts
 ```
 

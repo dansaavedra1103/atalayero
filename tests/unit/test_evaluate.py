@@ -237,3 +237,26 @@ def test_alerts_of_another_rule_version_are_rejected(
 
     with pytest.raises(ValueError, match="alerts from R01 v1.0 differ from config/rules"):
         SplitEvaluator(settings, "validation").evaluate_rules(settings.rule_alerts_dir, old)
+
+
+def test_detections_and_alerts_describe_the_last_evaluation(
+    settings: Settings, write_alerts: WriteAlerts
+) -> None:
+    write_alerts(settings.rule_alerts_dir, [("R01", "001:B", 5), ("R02", "001:0", 40)])
+    evaluator = SplitEvaluator(settings, "validation")
+    m = evaluator.evaluate_rules(settings.rule_alerts_dir, RULES)
+
+    detections = evaluator.detections()
+    alerts = evaluator.alerts()
+
+    assert detections["transaction_id"].tolist() == [1, 3, 4, 6]  # the laundering ones
+    assert detections["detected"].tolist() == [True, False, True, False]
+    assert detections["via_other_than_hub"].tolist() == [True, False, False, False]
+    assert detections["label_group"].tolist() == ["patterned", "untyped", "patterned", "patterned"]
+    assert (detections["payment_format"] == "ach").all()
+    assert detections["detected"].sum() == m.laundering.covered
+    assert alerts["account_key"].tolist() == ["001:0", "001:B"]
+    assert alerts["on_hub"].tolist() == [True, False]
+    assert alerts["has_laundering"].tolist() == [True, True]
+    assert alerts["transactions"].tolist() == [1, 1]  # the hub's history is on the day before
+    assert len(alerts) == m.alerts
