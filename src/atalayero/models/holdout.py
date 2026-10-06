@@ -18,7 +18,7 @@ import pandas as pd
 from atalayero.models.data import FEATURES, load_period, load_split
 from atalayero.models.evaluate import SplitEvaluator
 from atalayero.models.families import fit, load_models_config, transaction_scores
-from atalayero.models.registry import Registry
+from atalayero.models.registry import HOLDOUT_RUN, Registry
 from atalayero.models.train import (
     Evaluated,
     evaluate_detector,
@@ -91,7 +91,7 @@ def run_holdout(settings: Settings) -> Path:
         )
         log_detector(
             registry,
-            f"{name} on test",
+            HOLDOUT_RUN.format(family=name),
             {**common, "family": name, **family.params},
             result,
             model,

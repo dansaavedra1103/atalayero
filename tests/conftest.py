@@ -273,3 +273,15 @@ def holdout_settings(model_settings: Settings) -> Settings:
             )
         }
     )
+
+
+@pytest.fixture
+def fitted_settings(holdout_settings: Settings) -> Settings:
+    """The holdout fixture with its models fitted: a champion trained on train (6 Sep) and the
+    families refit for the test run, with their scores of 8 Sep."""
+    from atalayero.models.holdout import run_holdout
+    from atalayero.models.train import train_and_evaluate
+
+    train_and_evaluate(holdout_settings)
+    run_holdout(holdout_settings)
+    return holdout_settings
