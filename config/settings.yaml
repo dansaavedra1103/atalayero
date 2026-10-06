@@ -39,6 +39,14 @@ models:
     lightgbm: 40
     isolation_forest: 15
 
+# Drift monitoring: PSI of each feature against train, a day at a time, weekdays against train
+# weekdays and weekends against train weekends; and the daily volume of rule alerts.
+drift:
+  bins: 10  # quantile bins of the reference, plus one for missing values
+  moderate_psi: 0.1
+  significant_psi: 0.25  # a feature at or above it flags drift
+  alert_volume_band: [0.5, 2.0]  # daily rule alerts against the train mean for that kind of day
+
 # IBM Transactions for Anti Money Laundering (AML), HI-Small variant. CDLA-Sharing-1.0.
 # Public Kaggle endpoint: anonymous HTTPS download, one file at a time, pinned to a dataset version.
 # Checksums pin the exact files: a changed or unavailable file fails the download loudly.
