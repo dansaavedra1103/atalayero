@@ -260,3 +260,26 @@ def test_detections_and_alerts_describe_the_last_evaluation(
     assert alerts["has_laundering"].tolist() == [True, True]
     assert alerts["transactions"].tolist() == [1, 1]  # the hub's history is on the day before
     assert len(alerts) == m.alerts
+
+
+def test_rule_hits_and_ranking(settings: Settings, write_alerts: WriteAlerts) -> None:
+    write_alerts(settings.rule_alerts_dir, [("R01", "001:B", 5), ("R02", "001:B", 6)])
+    evaluator = SplitEvaluator(settings, "validation")
+    evaluator.evaluate_rules(settings.rule_alerts_dir, RULES)
+    evaluator.set_scores(np.arange(7), np.array([0, 0.1, 0.2, 0.9, 0.5, 0.3, 0.8]))
+
+    hits = evaluator.rule_hits()
+    ranking = evaluator.ranking(top=2)
+
+    assert hits[["rule_id", "account_key", "transaction_id"]].values.tolist() == [
+        ["R01", "001:B", 0],
+        ["R02", "001:B", 1],
+    ]
+    day_1 = ranking[ranking["day"].dt.date == DAY_1]
+    assert day_1["account_key"].tolist()[:2] == ["001:E", "001:F"]  # 0.9 via 3, tie by key
+    assert day_1["rank"].tolist() == list(range(1, len(day_1) + 1))
+    hub = day_1[day_1["account_key"] == "001:0"].iloc[0]
+    assert (hub["score"], bool(hub["on_hub"]), list(hub["top_transactions"])) == (0.5, True, [4])
+    day_2 = ranking[ranking["day"].dt.date == DAY_1 + timedelta(days=1)]
+    a = day_2[day_2["account_key"] == "001:A"].iloc[0]
+    assert list(a["top_transactions"]) == [6, 5]  # 0.8, then 0.3

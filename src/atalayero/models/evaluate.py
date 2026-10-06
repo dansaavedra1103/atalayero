@@ -149,7 +149,7 @@ class SplitEvaluator:
         self.con.execute(
             f"""
             CREATE OR REPLACE TEMP TABLE rule_alerts AS
-            SELECT rule_id, rule_version, triggered_at::date AS day, account_key
+            SELECT rule_id, rule_version, triggered_at::date AS day, account_key, transaction_id
             FROM read_parquet({sql_literal(str(alerts_dir / "part-*.parquet"))})
             WHERE triggered_at >= $start AND triggered_at < $end
                 AND list_contains($ids, rule_id)
@@ -180,6 +180,14 @@ class SplitEvaluator:
             "SELECT day, count(DISTINCT account_key) FROM rule_alerts GROUP BY day"
         ).fetchall()
         return dict(rows)
+
+    def rule_hits(self) -> pd.DataFrame:
+        """Each alert of the last `evaluate_rules`: the rule, the account-day and the transaction
+        that triggered it."""
+        return self.con.execute(
+            "SELECT rule_id, day, account_key, transaction_id FROM rule_alerts "
+            "ORDER BY day, account_key, rule_id, transaction_id"
+        ).df()
 
     def set_scores(self, transaction_ids: np.ndarray, scores: np.ndarray) -> None:
         """A model's scores, one per transaction of the split (others are ignored); ranks the
@@ -214,6 +222,29 @@ class SplitEvaluator:
             )
             """
         )
+
+    def ranking(self, top: int = 1) -> pd.DataFrame:
+        """Every account-day of the split by the scores set with `set_scores`: its highest
+        transaction score, its rank that day, whether it is a hub, and its `top` highest-scored
+        transactions (ties broken by transaction ID)."""
+        return self.con.execute(
+            """
+            SELECT r.day, r.account_key, r.score, r.rank, a.on_hub, t.top_transactions
+            FROM ranked AS r
+            JOIN account_days AS a USING (day, account_key)
+            JOIN (
+                SELECT
+                    day,
+                    account_key,
+                    list(transaction_id ORDER BY score DESC, transaction_id)[1:$top]
+                        AS top_transactions
+                FROM legs JOIN scores USING (transaction_id)
+                GROUP BY ALL
+            ) AS t USING (day, account_key)
+            ORDER BY r.day, r.rank
+            """,
+            {"top": top},
+        ).df()
 
     def evaluate_scores(self, detector: str, budget: int | Mapping[date, int]) -> AlertMetrics:
         """The top `budget` account-days of each day (or a budget per day) by the scores set

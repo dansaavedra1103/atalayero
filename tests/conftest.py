@@ -256,3 +256,20 @@ def model_settings(
     )
     sink.flush()
     return settings
+
+
+@pytest.fixture
+def holdout_settings(model_settings: Settings) -> Settings:
+    """The model fixture with every split a day earlier, so that test holds 8 Sep: train is
+    6 Sep, validation 7 Sep, and the rule alerts fall on test."""
+    return model_settings.model_copy(
+        update={
+            "splits": model_settings.splits.model_copy(
+                update={
+                    "train_end": datetime(2022, 9, 7),
+                    "validation_end": datetime(2022, 9, 8),
+                    "test_end": datetime(2022, 9, 9),
+                }
+            )
+        }
+    )

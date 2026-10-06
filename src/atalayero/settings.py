@@ -84,6 +84,15 @@ class DriftSettings(BaseModel):
     alert_volume_band: tuple[float, float]
 
 
+class AgentEvalSettings(BaseModel):
+    queue_budget: int = Field(ge=1)
+    dev_cases: int = Field(ge=1)
+    golden_cases: int = Field(ge=1)
+    top_transactions: int = Field(ge=1)
+    seed: int
+    dir: Path
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_prefix="ATALAYERO_",
@@ -102,6 +111,7 @@ class Settings(BaseSettings):
     evaluation: EvaluationSettings
     models: ModelSettings
     drift: DriftSettings
+    agent_evals: AgentEvalSettings
     dataset: DatasetSettings
     streaming: StreamingSettings
 
