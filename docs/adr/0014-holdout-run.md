@@ -72,8 +72,8 @@
   0.553 to 0.475. The ranking of account-days transfers better than the ranking of single
   transactions.
 - **Untyped laundering stays undetected** by every supervised family: 0 of 371 for LightGBM at
-  the rules' volume. All the untyped laundering the rules catch (112) comes through hubs. This is
-  the hardest group for the phase 3 agent.
+  the rules' volume. The rules catch 112 untyped transactions, 110 of them only through hubs.
+  This is the hardest group for the phase 3 agent.
 - **Typologies at the rules' volume, LightGBM on test:**
   - the strongest are gather-scatter (57/127), scatter-gather (56/110) and random (23/43);
   - cycles reach 21/55;
