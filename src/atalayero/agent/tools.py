@@ -373,6 +373,16 @@ class ToolBox:
             "explained": explained,
         }
 
+    def lookup(self, transaction_ids: Iterable[int]) -> dict[int, tuple[datetime, float]]:
+        """When each existing transaction happened and its USD amount as paid. Not a tool: the
+        grounding check uses it to verify what a report cites, past the cut-off too."""
+        rows = self.con.execute(
+            "SELECT transaction_id, transacted_at, amount_paid_usd FROM wh.marts.fct_transactions "
+            "WHERE list_contains($ids, transaction_id)",
+            {"ids": [int(i) for i in transaction_ids]},
+        ).fetchall()
+        return {tid: (at, float(usd)) for tid, at, usd in rows}
+
     def search_typologies(self, query: str, k: int | None = None) -> dict[str, Any]:
         """The sections of the typology notes closest in meaning to `query`."""
         if self._knowledge is None:

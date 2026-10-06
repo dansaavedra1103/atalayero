@@ -1,0 +1,18 @@
+# The investigator agent (ADR-0018). Versioned like the rules and the models: any change to the
+# model, its options, the limits or the prompts in src/atalayero/agent/prompts/ bumps `version`
+# and adds a `history` entry with the reason. The model's digest is pinned in
+# config/settings.yaml (`ollama.models`).
+version: "1.0"
+model: "gpt-oss:20b"
+think: low  # gpt-oss reasoning effort: low, medium or high
+options:  # Ollama options
+  temperature: 0
+  seed: 0
+  num_ctx: 16384
+max_steps: 12  # tool calls per investigation
+max_grounding_retries: 2  # times a report that fails verification goes back to investigation
+amount_tolerance: 0.01  # relative difference allowed between a cited and a real amount
+history:
+  - version: "1.0"
+    date: "2026-10-06"
+    reason: "First version, before any evaluation (ADR-0018)"

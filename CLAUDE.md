@@ -53,6 +53,7 @@ All commands go through the Makefile. When you add a new command, add it to the 
 - `make test-integration` — tests that need running services (Redpanda); not run in CI
 - `make llm`      — pull the local models of `config/settings.yaml` into Ollama over HTTP and check their pinned digests (needs `make up`)
 - `make knowledge` — embed the typology notes of `knowledge_base/typologies/` and build their FAISS index in `data/knowledge/` (needs `make llm`)
+- `make investigate ALERT=<id>` — run the investigator agent of `config/agent.yaml` on one alert of the case sets; report, verification and transcript to `data/agent/investigations/` (needs `make knowledge`)
 - `make golden-set` — sample the agent's dev set (validation) and golden set (test) from the alert queues into `evals/` (ADR-0015; needs `make train` and `make holdout`)
 - `make eval`     — run a detector offline on a case set and write a dated report to `evals/reports/`: `DETECTOR=baseline` (score-only), `SET=dev` by default, `SET=golden` once per reported result
 
