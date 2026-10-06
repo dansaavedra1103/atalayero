@@ -51,7 +51,8 @@ All commands go through the Makefile. When you add a new command, add it to the 
 - `make notebook` — re-execute `notebooks/03_error_analysis.ipynb` in place, outputs included (needs `make holdout`)
 - `make mlflow-ui` — local MLflow UI on http://localhost:5000
 - `make test-integration` — tests that need running services (Redpanda); not run in CI
-- `make eval`     — run agent evals offline and write a dated report to evals/reports/
+- `make golden-set` — sample the agent's dev set (validation) and golden set (test) from the alert queues into `evals/` (ADR-0015; needs `make train` and `make holdout`)
+- `make eval`     — run a detector offline on a case set and write a dated report to `evals/reports/`: `DETECTOR=baseline` (score-only), `SET=dev` by default, `SET=golden` once per reported result
 
 ## Repo map
 - `src/atalayero/` — ALL business logic: ingestion, streaming, features, rules, models, monitoring, agent, knowledge, api

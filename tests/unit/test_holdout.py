@@ -1,5 +1,4 @@
 import json
-from datetime import datetime
 
 import duckdb
 import numpy as np
@@ -12,23 +11,6 @@ from atalayero.models.families import FAMILIES
 from atalayero.models.holdout import run_holdout
 from atalayero.models.registry import Registry
 from atalayero.settings import Settings
-
-
-@pytest.fixture
-def holdout_settings(model_settings: Settings) -> Settings:
-    """The model fixture with every split a day earlier, so that test holds 8 Sep: train is
-    6 Sep, validation 7 Sep, and the rule alerts fall on test."""
-    return model_settings.model_copy(
-        update={
-            "splits": model_settings.splits.model_copy(
-                update={
-                    "train_end": datetime(2022, 9, 7),
-                    "validation_end": datetime(2022, 9, 8),
-                    "test_end": datetime(2022, 9, 9),
-                }
-            )
-        }
-    )
 
 
 def test_holdout_fits_on_train_and_validation(

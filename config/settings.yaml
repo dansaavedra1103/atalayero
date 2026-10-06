@@ -47,6 +47,17 @@ drift:
   significant_psi: 0.25  # a feature at or above it flags drift
   alert_volume_band: [0.5, 2.0]  # daily rule alerts against the train mean for that kind of day
 
+# Agent evaluation (ADR-0015). Cases are account-days of the alert queue: the rules' alerts and
+# the model's top `queue_budget` account-days a day, hubs left out. The dev set (validation) is
+# for choosing the model and the prompts; the golden set (test) is read once per reported result.
+agent_evals:
+  queue_budget: 2000  # model alerts a day in the queue
+  dev_cases: 30  # per group (patterned, untyped, clean), from validation
+  golden_cases: 60  # per group, from test
+  top_transactions: 3  # the account-day's top-scored transactions an alert carries
+  seed: 0
+  dir: evals  # case sets and reports, versioned
+
 # IBM Transactions for Anti Money Laundering (AML), HI-Small variant. CDLA-Sharing-1.0.
 # Public Kaggle endpoint: anonymous HTTPS download, one file at a time, pinned to a dataset version.
 # Checksums pin the exact files: a changed or unavailable file fails the download loudly.

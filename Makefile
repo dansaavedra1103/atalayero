@@ -4,7 +4,7 @@ SAMPLE_ENV := ATALAYERO_DATA_DIR=data/sample ATALAYERO_DUCKDB_PATH=data/sample/a
 # MLflow prints a hint for coding agents on import; it is noise in the logs.
 MLFLOW_ENV := MLFLOW_DISABLE_AGENT_HINT=1
 
-.PHONY: setup check test-integration ingest fixture fx-rates dbt dbt-sample up down stream rules evaluate features tune train mlflow-ui drift holdout pipeline notebook
+.PHONY: setup check test-integration ingest fixture fx-rates dbt dbt-sample up down stream rules evaluate features tune train mlflow-ui drift holdout pipeline notebook golden-set eval
 
 # LightGBM needs the system OpenMP runtime: sudo apt-get install libgomp1 (ADR-0009).
 setup:
@@ -87,3 +87,14 @@ pipeline:
 # Executes the error analysis in place, outputs included (ADR-0014; needs `make holdout`).
 notebook:
 	uv run jupyter nbconvert --to notebook --execute --inplace notebooks/03_error_analysis.ipynb
+
+# The case sets of the agent evals, sampled from the alert queues (ADR-0015; needs `make train`
+# and `make holdout`). The golden set reads the test split.
+golden-set:
+	$(MLFLOW_ENV) uv run python -m atalayero.evals build
+
+# A detector on a case set; the golden set is read once per reported result (ADR-0015).
+DETECTOR ?= baseline
+SET ?= dev
+eval:
+	$(MLFLOW_ENV) uv run python -m atalayero.evals run --detector $(DETECTOR) --set $(SET)

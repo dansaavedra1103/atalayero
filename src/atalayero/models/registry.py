@@ -84,6 +84,11 @@ class Registry:
             return None
         return float(champion.tags[PRIMARY]), champion.tags.get(FEATURES)
 
+    def champion_family(self) -> str:
+        """The model family of the current champion (the `family` parameter of its run)."""
+        champion = self.client.get_model_version_by_alias(self.model_name, CHAMPION)
+        return self.client.get_run(champion.run_id).data.params["family"]
+
     def champion_value(self) -> float | None:
         current = self.champion()
         return None if current is None else current[0]
