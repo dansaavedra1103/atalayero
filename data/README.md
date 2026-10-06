@@ -33,6 +33,7 @@ data/
 ├── rules/alerts/               # part-*.parquet: alerts of the last make rules
 ├── features/tabular.parquet     # point-in-time features of make features, no labels
 ├── features/graph.parquet       # graph features of make features (daily snapshots), no labels
+├── features/motifs.parquet      # motif features of make features (cycles, relays, fan paths)
 ├── reports/                    # evaluation reports (JSON) of make evaluate and make train
 └── mlflow/                     # MLflow tracking and registry (SQLite) and artifacts
 ```

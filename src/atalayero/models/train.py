@@ -119,7 +119,7 @@ def train_and_evaluate(settings: Settings) -> Path:
 
     primary, _, best, model_uri = max(candidates)
     logger.info("Best family on validation: %s", best)
-    registry.promote(model_uri, primary)
+    registry.promote(model_uri, primary, FEATURES)
 
     report = EvaluationReport(
         split="validation",

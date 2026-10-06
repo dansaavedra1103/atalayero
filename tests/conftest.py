@@ -173,6 +173,7 @@ def model_settings(
     """Four days of random transactions where large amounts are laundering: 5 Sep is warm-up,
     6-7 Sep train, 8 Sep validation. Features, rule alerts and a small model config are ready."""
     from atalayero.features.graph import build_graph_features
+    from atalayero.features.motifs import build_motif_features
     from atalayero.features.tabular import build_tabular_features
     from atalayero.models.families import FAMILIES
     from atalayero.rules.schema import load_rules
@@ -238,6 +239,7 @@ def model_settings(
     )
     build_tabular_features(settings)
     build_graph_features(settings)
+    build_motif_features(settings)
     sink = AlertSink(settings.rule_alerts_dir)
     sink.extend(
         Alert(
