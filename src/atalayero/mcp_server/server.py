@@ -58,9 +58,11 @@ def build_server(toolbox: ToolBox) -> MCPServer:
         alert_id: str, account_key: str | None = None, hops: int = 1, days: int = 3
     ) -> dict[str, Any]:
         """An account's counterparties in the last `days`, with the money sent to and received
-        from each; with hops=2, also the accounts those counterparties deal with. Lists cycles
-        that bring money back to the account in time order (A→B→A, A→B→C→A), with their
-        transaction IDs. Defaults to the alerted account."""
+        from each, and how many accounts each counterparty pays and is paid by in that time (a
+        counterparty that pays many accounts is the hub of a fan-out); with hops=2, also the
+        accounts those counterparties deal with. Lists cycles that bring money back to the
+        account in time order (A→B→A, A→B→C→A), with their transaction IDs. Defaults to the
+        alerted account."""
         return _call(toolbox.neighbourhood, alert_id, account_key, hops, days)
 
     @server.tool()

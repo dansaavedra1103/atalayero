@@ -210,9 +210,10 @@ class ToolBox:
     def neighbourhood(
         self, alert_id: str, account_key: str | None = None, hops: int = 1, days: int = 3
     ) -> dict[str, Any]:
-        """An account's counterparties in the last `days`, with the money each way; with
-        `hops=2`, the accounts its counterparties deal with too. Lists cycles that bring money
-        back to the account in time order: A→B→A and A→B→C→A."""
+        """An account's counterparties in the last `days`, with the money each way and how many
+        accounts each of them pays and is paid by in that time; with `hops=2`, the accounts its
+        counterparties deal with too. Lists cycles that bring money back to the account in time
+        order: A→B→A and A→B→C→A."""
         alert = self.alert(alert_id)
         account = account_key or alert.account_key
         start, cutoff = self._window(alert, days)
@@ -227,16 +228,35 @@ class ToolBox:
             "WHERE NOT is_self_transfer",
             params,
         ).fetchone()
+        # Each counterparty's own reach in the window: a pattern around a hub shows at the hub,
+        # so an account that is one leaf of it sees one ordinary payment.
         neighbours = self.con.execute(
             f"""
-            WITH legs AS ({_LEGS})
-            SELECT counterparty,
-                count(*) FILTER (WHERE direction = 'out'),
-                sum(amount_usd) FILTER (WHERE direction = 'out'),
-                count(*) FILTER (WHERE direction = 'in'),
-                sum(amount_usd) FILTER (WHERE direction = 'in')
-            FROM legs WHERE NOT is_self_transfer
-            GROUP BY counterparty ORDER BY sum(amount_usd) DESC, counterparty LIMIT $n
+            WITH legs AS ({_LEGS}),
+            top AS (
+                SELECT counterparty,
+                    count(*) FILTER (WHERE direction = 'out') AS sent,
+                    sum(amount_usd) FILTER (WHERE direction = 'out') AS sent_usd,
+                    count(*) FILTER (WHERE direction = 'in') AS received,
+                    sum(amount_usd) FILTER (WHERE direction = 'in') AS received_usd
+                FROM legs WHERE NOT is_self_transfer
+                GROUP BY counterparty ORDER BY sum(amount_usd) DESC, counterparty LIMIT $n
+            ),
+            e AS ({edges}),
+            pays AS (
+                SELECT s AS k, count(DISTINCT r) AS n FROM e
+                WHERE s IN (SELECT counterparty FROM top) GROUP BY s
+            ),
+            paid_by AS (
+                SELECT r AS k, count(DISTINCT s) AS n FROM e
+                WHERE r IN (SELECT counterparty FROM top) GROUP BY r
+            )
+            SELECT counterparty, sent, sent_usd, received, received_usd,
+                coalesce(pays.n, 0), coalesce(paid_by.n, 0)
+            FROM top
+            LEFT JOIN pays ON pays.k = counterparty
+            LEFT JOIN paid_by ON paid_by.k = counterparty
+            ORDER BY coalesce(sent_usd, 0) + coalesce(received_usd, 0) DESC, counterparty
             """,
             {**params, "n": MAX_NEIGHBOURS},
         ).fetchall()
@@ -268,8 +288,10 @@ class ToolBox:
                     "account_key": key,
                     "sent_to": {"count": sent, "usd": _usd(sent_usd)},
                     "received_from": {"count": received, "usd": _usd(received_usd)},
+                    "accounts_it_pays": pays,
+                    "accounts_paying_it": paid_by,
                 }
-                for key, sent, sent_usd, received, received_usd in neighbours
+                for key, sent, sent_usd, received, received_usd, pays, paid_by in neighbours
             ],
             "cycles": [
                 {"path": path, "transaction_ids": ids, "usd": [_usd(u) for u in usd]}

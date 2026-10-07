@@ -41,7 +41,7 @@ def _alert(account: str, day: date = DAY) -> CaseAlert:
     )
 
 
-A, H = _alert("001:A"), _alert("001:H")
+A, H, L = _alert("001:A"), _alert("001:H"), _alert("002:0")  # L is one of H's 80 receivers
 
 
 @pytest.fixture
@@ -64,7 +64,7 @@ def toolbox(make_tx: MakeTx, fct_transactions_db: WriteDb, tmp_path: Path) -> To
         ),
     ]
     db = fct_transactions_db(transactions)
-    return ToolBox(Settings().model_copy(update={"duckdb_path": db}), [A, H])
+    return ToolBox(Settings().model_copy(update={"duckdb_path": db}), [A, H, L])
 
 
 def _outputs(toolbox: ToolBox) -> dict[str, Any]:
@@ -96,7 +96,7 @@ def test_removing_everything_after_the_cut_off_changes_nothing(toolbox: ToolBox)
     with duckdb.connect(str(db)) as con:
         con.execute("DELETE FROM marts.fct_transactions WHERE transacted_at >= ?", [CUTOFF])
 
-    after = _outputs(ToolBox(toolbox.settings, [A, H]))
+    after = _outputs(ToolBox(toolbox.settings, [A, H, L]))
 
     assert after == before
 
@@ -115,7 +115,23 @@ def test_neighbourhood_lists_cycles_in_time_order(toolbox: ToolBox) -> None:
     top = {c["account_key"]: c for c in result["top_counterparties"]}
     assert top["001:B"]["sent_to"] == {"count": 1, "usd": 6000.0}
     assert top["001:B"]["received_from"] == {"count": 1, "usd": 300.0}
+    # B pays C and A and is paid by A on 5 Sep; A's payment on 4 Sep is out of the window
+    assert (top["001:B"]["accounts_it_pays"], top["001:B"]["accounts_paying_it"]) == (2, 1)
     assert {s["account_key"] for s in result["second_hop"]} == {"001:B", "001:C"}  # via 2
+
+
+def test_a_leaf_sees_the_hub_behind_its_one_payment(toolbox: ToolBox) -> None:
+    graph = toolbox.neighbourhood(L.alert_id, days=1)
+
+    assert graph["top_counterparties"] == [
+        {
+            "account_key": "001:H",
+            "sent_to": {"count": 0, "usd": 0.0},
+            "received_from": {"count": 1, "usd": 100.0},
+            "accounts_it_pays": 80,
+            "accounts_paying_it": 0,
+        }
+    ]
 
 
 def test_outputs_are_capped_for_busy_accounts(toolbox: ToolBox) -> None:
