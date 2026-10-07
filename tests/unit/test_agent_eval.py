@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from atalayero.agent.config import load_agent_config
 from atalayero.agent.graph import Investigation
 from atalayero.agent.grounding import Grounding
 from atalayero.evals.golden import CaseAnswer
@@ -12,6 +13,8 @@ from atalayero.evals.metrics import AgentEvalReport
 from atalayero.evals.run import run_eval
 from atalayero.schemas import CaseAlert, CaseReport, Evidence
 from atalayero.settings import Settings
+
+CONFIG = load_agent_config(Settings().agent.config_path)  # the live config/agent.yaml
 
 CASES = {  # alert ID -> (group, expected decision, what the fake agent concludes)
     "2022-09-07:001:P": ("patterned", "escalate", ("escalate", "fan_in")),
@@ -75,7 +78,7 @@ def _investigation(alert: CaseAlert) -> Investigation:
         retries=0,
         tokens=100,
         seconds=2.0,
-        config_version="1.0",
+        config_version=CONFIG.version,
         prompts_sha256="x",
         transcript=[],
     )
@@ -109,8 +112,10 @@ def test_an_agent_run_resumes_and_is_scored(
 
     assert len(first) == 1 and set(first + again) == set(CASES) and not set(first) & set(again)
     report = AgentEvalReport.model_validate_json(path.read_text())
-    assert path.name.endswith("-dev-agent-v1.0.json")
-    assert report.config["agent_config"] == "1.0" and report.config["model"] == "gpt-oss:20b"
+    assert path.name.endswith(f"-dev-agent-v{CONFIG.version}.json")
+    assert (
+        report.config["agent_config"] == CONFIG.version and report.config["model"] == CONFIG.model
+    )
     assert report.primary == pytest.approx(2 / 3)  # patterned and clean right, untyped wrong
     assert report.groups["patterned"].typology_accuracy == 1.0
     assert (report.grounded_share, report.median_steps) == (1.0, 3)
@@ -121,8 +126,8 @@ def test_a_version_runs_with_one_set_of_prompts(
 ) -> None:
     reports = settings.agent_evals.dir / "reports"
     reports.mkdir()
-    (reports / "2026-10-06-dev-agent-v1.0.json").write_text(
-        json.dumps({"config": {"agent_config": "1.0", "prompts_sha256": "other"}})
+    (reports / f"2026-10-06-dev-agent-v{CONFIG.version}.json").write_text(
+        json.dumps({"config": {"agent_config": CONFIG.version, "prompts_sha256": "other"}})
     )
     monkeypatch.setattr("atalayero.agent.run.investigate_alerts", fake_agent([]))
 

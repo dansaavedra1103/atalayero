@@ -2,7 +2,7 @@
 # model, its options, the limits or the prompts in src/atalayero/agent/prompts/ bumps `version`
 # and adds a `history` entry with the reason. The model's digest is pinned in
 # config/settings.yaml (`ollama.models`).
-version: "1.0"
+version: "1.1"
 model: "gpt-oss:20b"
 think: low  # gpt-oss reasoning effort: low, medium or high
 options:  # Ollama options
@@ -16,3 +16,10 @@ history:
   - version: "1.0"
     date: "2026-10-06"
     reason: "First version, before any evaluation (ADR-0018)"
+  - version: "1.1"
+    date: "2026-10-07"
+    reason: >-
+      v1.0 closed 87 of 90 dev cases (primary 34.4% vs 81.1% for score-only): it looked at the
+      graph in 10 cases and anchored on low scores. The investigation prompt now requires the
+      graph and the score explanation before concluding, says a score is no evidence either way,
+      asks for a stated ordinary explanation to close, and lists money-flow red flags
