@@ -1,5 +1,5 @@
 Write the case report now, as JSON with these fields:
-- `decision`: "escalate" or "close".
+- `decision`: {decision}
 - `typology`: one of fan_out, fan_in, cycle, bipartite, stack, random, scatter_gather,
   gather_scatter or unclassified when you escalate; "none" when you close.
 - `evidence`: the transactions your decision rests on, at most 8, each as
