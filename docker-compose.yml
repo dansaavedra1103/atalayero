@@ -26,6 +26,9 @@ services:
       - ollama:/root/.ollama  # model weights survive `make down`
     environment:
       - OLLAMA_KEEP_ALIVE=30m  # keep models loaded between eval cases
+      # llama-server keeps up to 8 GiB of past prompts in RAM by default; each eval case is a new
+      # conversation, so that cache only takes RAM away from the WSL VM.
+      - LLAMA_ARG_CACHE_RAM=0
     deploy:
       resources:
         reservations:
