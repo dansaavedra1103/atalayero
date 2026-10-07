@@ -134,6 +134,19 @@ def test_a_grounded_investigation(toolbox: ToolBox) -> None:
     assert "R03 (short_cycle)" in result.transcript[0]["content"]  # rules come from config
 
 
+@pytest.mark.parametrize(("model_call_rank", "model_call"), [(12, "escalate"), (11, "close")])
+def test_the_investigation_starts_from_the_models_call(
+    toolbox: ToolBox, model_call_rank: int, model_call: str
+) -> None:
+    script = Script([say("plan"), call("get_transactions", days=1), say("enough"), report()])
+
+    result = investigate(toolbox, script, model_call_rank=model_call_rank)
+
+    triage = result.transcript[1]["content"]
+    assert f"The model's call on it: {model_call} (rank 12," in triage  # A is ranked 12th
+    assert f"top {model_call_rank} of their day" in result.transcript[0]["content"]
+
+
 def test_tools_are_shown_without_the_alert_id_and_the_draft_follows_a_schema(
     toolbox: ToolBox,
 ) -> None:

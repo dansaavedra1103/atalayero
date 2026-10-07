@@ -20,6 +20,7 @@ class AgentConfig(BaseModel):
     model: str
     think: bool | Literal["low", "medium", "high"] | None = None
     options: dict[str, float | int]
+    model_call_rank: int = Field(ge=1)  # the model escalates ranks up to this (ADR-0019)
     max_steps: int = Field(ge=1)
     max_grounding_retries: int = Field(ge=0)
     amount_tolerance: float = Field(ge=0)

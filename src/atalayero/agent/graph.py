@@ -122,6 +122,7 @@ class Investigator:
             prompts["investigate"]
             .replace("{rules}", described)
             .replace("{max_steps}", str(config.max_steps))
+            .replace("{model_call_rank}", str(config.model_call_rank))
         )
         self.triage_prompt = prompts["triage"]
         self.draft_prompt = prompts["draft"]
@@ -148,7 +149,15 @@ class Investigator:
 
         async def triage(state: State) -> State:
             state = State(**state)
-            prompt = self.triage_prompt.replace("{alert}", alert.model_dump_json(indent=1))
+            threshold = config.model_call_rank
+            model_call = (
+                f"escalate (rank {alert.rank}, within the top {threshold} of its day)"
+                if alert.rank <= threshold
+                else f"close (rank {alert.rank}, below the top {threshold} of its day)"
+            )
+            prompt = self.triage_prompt.replace("{alert}", alert.model_dump_json(indent=1)).replace(
+                "{model_call}", model_call
+            )
             messages = [*state["messages"], {"role": "user", "content": prompt}]
             reply = self._ask(state, messages)
             messages += [
