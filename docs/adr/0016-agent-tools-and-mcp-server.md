@@ -1,6 +1,6 @@
 # ADR-0016: The investigator's tools and their MCP server
 
-- Status: accepted
+- Status: accepted; `get_graph_neighborhood` extended by ADR-0019 (each counterparty's reach)
 - Date: 2026-10-06
 
 ## Context

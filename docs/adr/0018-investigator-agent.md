@@ -1,6 +1,6 @@
 # ADR-0018: The investigator agent
 
-- Status: accepted
+- Status: accepted; the rule that no prompt states the baseline's threshold (decision 6) superseded by ADR-0019
 - Date: 2026-10-06
 
 ## Context
