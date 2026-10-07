@@ -91,6 +91,7 @@ class AgentEvalSettings(BaseModel):
     top_transactions: int = Field(ge=1)
     seed: int
     dir: Path
+    runs_dir: Path
 
 
 class OllamaSettings(BaseModel):

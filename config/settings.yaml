@@ -57,6 +57,7 @@ agent_evals:
   top_transactions: 3  # the account-day's top-scored transactions an alert carries
   seed: 0
   dir: evals  # case sets and reports, versioned
+  runs_dir: data/evals/runs  # each agent run's cases, so that a run can be resumed
 
 # Local models (ADR-0017): Ollama runs as a Docker Compose service with the GPU (`make up`).
 # `make llm` pulls each model over HTTP and checks it against its pinned digest; a model pinned

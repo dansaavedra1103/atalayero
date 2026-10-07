@@ -1,4 +1,4 @@
-"""CLI: python -m atalayero.evals build [--set dev|golden|all] | run --detector baseline
+"""CLI: python -m atalayero.evals build [--set dev|golden|all] | run --detector baseline|agent
 --set dev|golden."""
 
 import argparse
@@ -17,11 +17,13 @@ def main() -> None:
         help="build the case sets from the alert queues; or run a detector on a case set",
     )
     parser.add_argument("--set", choices=["dev", "golden", "all"], default="all")
-    parser.add_argument("--detector", choices=["baseline"], default="baseline")
+    parser.add_argument("--detector", choices=["baseline", "agent"], default="baseline")
     args = parser.parse_args()
     logging.basicConfig(
         level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s"
     )
+    for noisy in ("httpx", "faiss.loader", "mcp"):
+        logging.getLogger(noisy).setLevel(logging.WARNING)
     settings = Settings()
     sets = ["dev", "golden"] if args.set == "all" else [args.set]
     if args.command == "build":
