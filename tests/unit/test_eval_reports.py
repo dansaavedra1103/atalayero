@@ -5,9 +5,12 @@ from pathlib import Path
 
 import pytest
 
-from atalayero.evals.golden import CaseAnswer
+from atalayero.agent.config import load_agent_config
+from atalayero.evals.golden import CaseAnswer, load_alerts, load_answers
 from atalayero.evals.metrics import AgentEvalReport
+from atalayero.evals.run import fit_rank_threshold
 from atalayero.schemas import CaseAlert
+from atalayero.settings import Settings
 
 EVALS = Path(__file__).parents[2] / "evals"
 REPORTS = sorted((EVALS / "reports").glob("*.json"))
@@ -38,3 +41,11 @@ def test_case_sets_pair_alerts_with_answers(case_set: str) -> None:
 
     assert [a.alert_id for a in alerts] == [a.alert_id for a in answers]
     assert all(set(json.loads(line)) == set(CaseAlert.model_fields) for line in lines)
+
+
+def test_the_agent_starts_from_the_baselines_call() -> None:
+    """ADR-0019: the agent's starting point is the score-only baseline's threshold on dev."""
+    settings = Settings()
+    threshold = fit_rank_threshold(load_alerts(settings, "dev"), load_answers(settings, "dev"))
+
+    assert load_agent_config(settings.agent.config_path).model_call_rank == threshold
