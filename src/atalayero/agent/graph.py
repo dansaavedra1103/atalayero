@@ -7,7 +7,8 @@
 - **triage** reads the alert and writes a plan, without tools.
 - **investigate** calls tools through the MCP server, until the model stops or spends its
   `max_steps`.
-- **draft** writes a `CaseReport` as JSON that follows its schema.
+- **draft** writes a `CaseReport` as JSON that follows its schema. When the model escalates the
+  alert, the schema only lets it escalate (ADR-0019).
 - **ground** verifies it, without a language model (`grounding.py`). A report that fails goes
   back to investigation with the problems found.
 
@@ -32,6 +33,11 @@ from atalayero.rules.schema import Rule
 from atalayero.schemas import CaseAlert, CaseReport
 
 DRAFT_FIELDS = ("decision", "typology", "evidence", "confidence", "narrative")
+# What the drafting prompt says about the decision, by the model's call (ADR-0019).
+DECISION_RULES = {
+    "escalate": '"escalate": the model\'s call to escalate stands.',
+    "close": '"escalate" when you found a red flag; otherwise "close", the model\'s call.',
+}
 
 
 def _inline(schema: dict[str, Any], defs: dict[str, Any]) -> Any:  # noqa: ANN401
@@ -45,13 +51,18 @@ def _inline(schema: dict[str, Any], defs: dict[str, Any]) -> Any:  # noqa: ANN40
     return schema
 
 
-def draft_schema() -> dict[str, Any]:
+def draft_schema(escalation_stands: bool = False) -> dict[str, Any]:
     """The JSON schema a draft follows: a `CaseReport` without its alert ID, which the agent
-    adds itself."""
+    adds itself. When the model's call to escalate stands (ADR-0019), the draft can only
+    escalate."""
     schema = CaseReport.model_json_schema()
     schema = _inline(schema, schema.get("$defs", {}))
     schema["properties"].pop("alert_id")
     schema["required"] = [f for f in schema["required"] if f != "alert_id"]
+    if escalation_stands:
+        properties = schema["properties"]
+        properties["decision"]["enum"] = ["escalate"]
+        properties["typology"]["enum"] = [t for t in properties["typology"]["enum"] if t != "none"]
     return schema
 
 
@@ -126,7 +137,6 @@ class Investigator:
         )
         self.triage_prompt = prompts["triage"]
         self.draft_prompt = prompts["draft"]
-        self.schema = draft_schema()
         self.prompts_sha256 = prompts_sha256()
 
     async def _call_tool(self, alert: CaseAlert, call: ToolCall) -> tuple[object, str]:
@@ -146,17 +156,18 @@ class Investigator:
 
     def _graph(self, alert: CaseAlert, tools: list[dict[str, Any]]) -> Any:  # noqa: ANN401
         config = self.config
+        threshold = config.model_call_rank
+        model_call = "escalate" if alert.rank <= threshold else "close"
 
         async def triage(state: State) -> State:
             state = State(**state)
-            threshold = config.model_call_rank
-            model_call = (
+            call = (
                 f"escalate (rank {alert.rank}, within the top {threshold} of its day)"
-                if alert.rank <= threshold
+                if model_call == "escalate"
                 else f"close (rank {alert.rank}, below the top {threshold} of its day)"
             )
             prompt = self.triage_prompt.replace("{alert}", alert.model_dump_json(indent=1)).replace(
-                "{model_call}", model_call
+                "{model_call}", call
             )
             messages = [*state["messages"], {"role": "user", "content": prompt}]
             reply = self._ask(state, messages)
@@ -198,8 +209,10 @@ class Investigator:
 
         async def draft(state: State) -> State:
             state = State(**state)
-            messages = [*state["messages"], {"role": "user", "content": self.draft_prompt}]
-            reply = self._ask(state, messages, schema=self.schema)
+            prompt = self.draft_prompt.replace("{decision}", DECISION_RULES[model_call])
+            messages = [*state["messages"], {"role": "user", "content": prompt}]
+            schema = draft_schema(escalation_stands=model_call == "escalate")
+            reply = self._ask(state, messages, schema=schema)
             messages.append({"role": "assistant", "content": reply.content})
             report, error = None, None
             try:
@@ -209,6 +222,8 @@ class Investigator:
                 )
             except (ValueError, ValidationError, TypeError, AttributeError) as exc:
                 error = f"the report is not valid: {exc}"
+            if report is not None and model_call == "escalate" and report.decision == "close":
+                report, error = None, "the report is not valid: the model's call to escalate stands"
             return {**state, "messages": messages, "report": report, "draft_error": error}
 
         async def ground(state: State) -> State:

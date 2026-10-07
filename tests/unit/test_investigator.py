@@ -145,6 +145,34 @@ def test_the_investigation_starts_from_the_models_call(
     triage = result.transcript[1]["content"]
     assert f"The model's call on it: {model_call} (rank 12," in triage  # A is ranked 12th
     assert f"top {model_call_rank} of their day" in result.transcript[0]["content"]
+    escalation_stands = model_call == "escalate"
+    assert script.calls[-1]["schema"] == draft_schema(escalation_stands=escalation_stands)
+    draft = script.calls[-1]["messages"][-1]["content"]
+    assert ("the model's call to escalate stands" in draft) == escalation_stands
+
+
+def test_the_draft_can_only_escalate_when_the_model_escalates() -> None:
+    schema = draft_schema(escalation_stands=True)["properties"]
+
+    assert schema["decision"]["enum"] == ["escalate"]
+    assert "none" not in schema["typology"]["enum"] and "unclassified" in schema["typology"]["enum"]
+    assert draft_schema()["properties"]["decision"]["enum"] == ["escalate", "close"]
+
+
+def test_a_close_against_the_models_escalation_goes_back_to_investigation(
+    toolbox: ToolBox,
+) -> None:
+    close = report(evidence=[], decision="close", typology="none", narrative="Normal activity.")
+    script = Script(
+        [say("plan"), say("done"), close, call("get_transactions", days=1), say("ok"), report()]
+    )
+
+    result = investigate(toolbox, script)  # A is ranked 12th, within the configured threshold
+
+    assert result.report is not None and result.report.decision == "escalate"
+    assert result.retries == 1
+    feedback = [m["content"] for m in result.transcript if "did not pass" in m["content"]]
+    assert len(feedback) == 1 and "the model's call to escalate stands" in feedback[0]
 
 
 def test_tools_are_shown_without_the_alert_id_and_the_draft_follows_a_schema(
@@ -154,7 +182,7 @@ def test_tools_are_shown_without_the_alert_id_and_the_draft_follows_a_schema(
         [say("plan"), say("enough"), report(evidence=[], decision="close", typology="none")]
     )
 
-    investigate(toolbox, script)
+    investigate(toolbox, script, model_call_rank=11)  # the model closes A
 
     tools = script.calls[1]["tools"]
     assert {t["function"]["name"] for t in tools} == {

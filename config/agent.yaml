@@ -2,15 +2,16 @@
 # model, its options, the limits or the prompts in src/atalayero/agent/prompts/ bumps `version`
 # and adds a `history` entry with the reason. The model's digest is pinned in
 # config/settings.yaml (`ollama.models`).
-version: "1.2"
+version: "1.3"
 model: "gpt-oss:20b"
 think: low  # gpt-oss reasoning effort: low, medium or high
 options:  # Ollama options
   temperature: 0
   seed: 0
   num_ctx: 16384
-# The model's call, the agent's starting point (ADR-0019): escalate the account-days ranked within
-# this many of their day, close the rest. The score-only baseline's threshold, fit on the dev set.
+# The model's call (ADR-0019): it escalates the account-days ranked within this many of their day,
+# and the agent cannot close them; the rest the agent escalates on a red flag. The score-only
+# baseline's threshold, fit on the dev set.
 model_call_rank: 1133
 max_steps: 12  # tool calls per investigation
 max_grounding_retries: 2  # times a report that fails verification goes back to investigation
@@ -33,3 +34,10 @@ history:
       shows, and the prompt told the agent to ignore the rank, which alone gets 81.1% on dev. The
       agent now starts from the model's call (ADR-0019) and changes it only on concrete evidence;
       the neighbourhood shows how many accounts each counterparty pays and is paid by
+  - version: "1.3"
+    date: "2026-10-07"
+    reason: >-
+      v1.2 closed all 11 dev cases it reached before the run stopped, overriding the model's call
+      to escalate in 7 of 7, all of them laundering, with "no pattern, normal activity". The
+      model's call to escalate now stands, enforced by the draft's schema; the agent names its
+      typology and evidence, and escalates an alert the model would close on a red flag
