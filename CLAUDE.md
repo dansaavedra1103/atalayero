@@ -55,7 +55,7 @@ All commands go through the Makefile. When you add a new command, add it to the 
 - `make knowledge` — embed the typology notes of `knowledge_base/typologies/` and build their FAISS index in `data/knowledge/` (needs `make llm`)
 - `make investigate ALERT=<id>` — run the investigator agent of `config/agent.yaml` on one alert of the case sets; report, verification and transcript to `data/agent/investigations/` (needs `make knowledge`)
 - `make golden-set` — sample the agent's dev set (validation) and golden set (test) from the alert queues into `evals/` (ADR-0015; needs `make train` and `make holdout`)
-- `make eval`     — run a detector offline on a case set and write a dated report to `evals/reports/`: `DETECTOR=baseline` (score-only), `SET=dev` by default, `SET=golden` once per reported result
+- `make eval`     — run a detector offline on a case set and write a dated report to `evals/reports/`: `DETECTOR=baseline` (score-only) or `DETECTOR=agent` (resumable, cases cached in `data/evals/runs/`; needs `make knowledge`), `SET=dev` by default, `SET=golden` once per reported result
 
 ## Repo map
 - `src/atalayero/` — ALL business logic: ingestion, streaming, features, rules, models, monitoring, agent, knowledge, api
