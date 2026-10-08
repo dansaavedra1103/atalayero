@@ -60,7 +60,7 @@ def _feature_query(settings: Settings) -> str:
     """
 
 
-def _model_inputs(frame: pd.DataFrame) -> pd.DataFrame:
+def model_inputs(frame: pd.DataFrame) -> pd.DataFrame:
     features = frame[list(FEATURES)].copy()
     # Floats with NaN for what is undefined (nullable integers would carry pd.NA); 0/1 for flags.
     features[list(NUMERIC + BOOLEAN)] = features[list(NUMERIC + BOOLEAN)].astype(float)
@@ -84,7 +84,7 @@ def load_period(settings: Settings, start: datetime, end: datetime) -> Dataset:
         ).df()
     return Dataset(
         transaction_ids=frame["transaction_id"].to_numpy(),
-        features=_model_inputs(frame),
+        features=model_inputs(frame),
         labels=frame["is_laundering"].to_numpy(dtype=bool),
         days=frame["day"].to_numpy(dtype="datetime64[D]"),
     )
@@ -104,4 +104,4 @@ def load_features(settings: Settings, transaction_ids: Sequence[int]) -> pd.Data
             """,
             {"ids": [int(i) for i in transaction_ids]},
         ).df()
-    return _model_inputs(frame).set_index(frame["transaction_id"].rename(None))
+    return model_inputs(frame).set_index(frame["transaction_id"].rename(None))

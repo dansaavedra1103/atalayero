@@ -13,6 +13,7 @@ small share so the logarithm stays finite.
 """
 
 import logging
+from collections.abc import Mapping
 from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Literal
@@ -25,7 +26,7 @@ from pydantic import BaseModel
 from atalayero.features.tabular import CATEGORICAL
 from atalayero.ingestion.source import sql_literal
 from atalayero.models.data import BOOLEAN, FEATURES, Dataset, load_split
-from atalayero.settings import Settings, Split
+from atalayero.settings import DriftSettings, Settings, Split
 
 logger = logging.getLogger(__name__)
 
@@ -73,7 +74,7 @@ class FeatureDrift(BaseModel):
 
 class DayDrift(BaseModel):
     day: date
-    compared_with: DayKind
+    compared_with: DayKind | Literal["all"]
     features: list[FeatureDrift]  # most drifted first
     moderate: int  # features at or above the moderate PSI
     significant: int  # features at or above the significant PSI
@@ -123,56 +124,71 @@ def _by_day(data: Dataset) -> dict[date, pd.DataFrame]:
     return {day: data.features[days == day] for day in sorted(set(days))}
 
 
-def detect_drift(settings: Settings, split: Split = "validation") -> DriftReport:
-    """Compare each day of `split` with train; writes `<reports_dir>/drift_<split>.json`."""
-    if split == "test":
-        logger.warning("Reading the test split: once per reported result (ADR-0005)")
-    config = settings.drift
-    reference_days = _by_day(load_split(settings, "train"))
-    alerts = _rule_alerts_per_day(settings)
+Reference = tuple[DayKind | Literal["all"], pd.DataFrame, float]  # kind used, features, alerts
 
-    def reference(kind: DayKind) -> tuple[DayKind, pd.DataFrame, float]:
-        """The train days of that kind, or every train day if there is none."""
+
+def drift_references(
+    reference_days: Mapping[date, pd.DataFrame], alerts: Mapping[date, int]
+) -> dict[DayKind, Reference]:
+    """For weekdays and weekends: the train days of that kind (or every train day if there is
+    none), their features, and their mean of rule-alerted account-days."""
+
+    def reference(kind: DayKind) -> Reference:
         days = [day for day in reference_days if day_kind(day) == kind]
-        used: DayKind = kind if days else "all"
+        used: DayKind | Literal["all"] = kind if days else "all"
         days = days or list(reference_days)
         features = pd.concat([reference_days[day] for day in days])
         return used, features, float(np.mean([alerts.get(day, 0) for day in days]))
 
-    references = {kind: reference(kind) for kind in ("weekday", "weekend")}
+    return {kind: reference(kind) for kind in ("weekday", "weekend")}
+
+
+def day_drift(
+    day: date,
+    current: pd.DataFrame,
+    rule_alerts: int,
+    references: Mapping[DayKind, Reference],
+    config: DriftSettings,
+) -> DayDrift:
+    """One day's features and rule-alert volume against the train reference of its kind."""
+    compared_with, ref, expected = references[day_kind(day)]
+    drifts = sorted(
+        (
+            FeatureDrift(feature=name, psi=psi(ref[name], current[name], config.bins))
+            for name in FEATURES
+        ),
+        key=lambda d: -d.psi,
+    )
+    significant = [d.feature for d in drifts if d.psi >= config.significant_psi]
+    reasons = [f"PSI >= {config.significant_psi}: {', '.join(significant)}"] if significant else []
     low, high = config.alert_volume_band
-    days = []
-    for day, current in _by_day(load_split(settings, split)).items():
-        compared_with, ref, expected = references[day_kind(day)]
-        drifts = sorted(
-            (
-                FeatureDrift(feature=name, psi=psi(ref[name], current[name], config.bins))
-                for name in FEATURES
-            ),
-            key=lambda d: -d.psi,
+    if expected and not low <= rule_alerts / expected <= high:
+        reasons.append(
+            f"rule alerts {rule_alerts} against {expected:.0f} on train ({compared_with})"
         )
-        significant = [d.feature for d in drifts if d.psi >= config.significant_psi]
-        volume = alerts.get(day, 0)
-        reasons = (
-            [f"PSI >= {config.significant_psi}: {', '.join(significant)}"] if significant else []
-        )
-        if expected and not low <= volume / expected <= high:
-            reasons.append(
-                f"rule alerts {volume} against {expected:.0f} on train ({compared_with})"
-            )
-        days.append(
-            DayDrift(
-                day=day,
-                compared_with=compared_with,
-                features=drifts,
-                moderate=sum(d.psi >= config.moderate_psi for d in drifts),
-                significant=len(significant),
-                rule_alerts=volume,
-                rule_alerts_reference=expected,
-                drift_detected=bool(reasons),
-                reasons=reasons,
-            )
-        )
+    return DayDrift(
+        day=day,
+        compared_with=compared_with,
+        features=drifts,
+        moderate=sum(d.psi >= config.moderate_psi for d in drifts),
+        significant=len(significant),
+        rule_alerts=rule_alerts,
+        rule_alerts_reference=expected,
+        drift_detected=bool(reasons),
+        reasons=reasons,
+    )
+
+
+def detect_drift(settings: Settings, split: Split = "validation") -> DriftReport:
+    """Compare each day of `split` with train; writes `<reports_dir>/drift_<split>.json`."""
+    if split == "test":
+        logger.warning("Reading the test split: once per reported result (ADR-0005)")
+    alerts = _rule_alerts_per_day(settings)
+    references = drift_references(_by_day(load_split(settings, "train")), alerts)
+    days = [
+        day_drift(day, current, alerts.get(day, 0), references, settings.drift)
+        for day, current in _by_day(load_split(settings, split)).items()
+    ]
     report = DriftReport(
         split=split,
         generated_at=datetime.now(UTC),

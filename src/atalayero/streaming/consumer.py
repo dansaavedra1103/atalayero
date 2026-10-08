@@ -2,7 +2,7 @@
 
 import logging
 import time
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, Sequence
 from pathlib import Path
 from uuid import uuid4
 
@@ -16,6 +16,25 @@ from atalayero.schemas import Alert, Transaction
 from atalayero.settings import Settings
 
 logger = logging.getLogger(__name__)
+
+# The columns of an alerts file.
+ALERT_COLUMNS = (
+    "alert_id VARCHAR, rule_id VARCHAR, rule_version VARCHAR, account_key VARCHAR, "
+    "triggered_at TIMESTAMP, transaction_id BIGINT, value DOUBLE, evidence BIGINT[]"
+)
+
+
+def write_alerts(alerts: Sequence[Alert], path: Path) -> None:
+    """Write alerts to a Parquet file, one column per `Alert` field, with the same column types
+    whatever the alerts (or none)."""
+    columns = {name: [getattr(a, name) for a in alerts] for name in Alert.model_fields}
+    columns["evidence"] = [list(e) for e in columns["evidence"]]
+    with duckdb.connect() as con:
+        con.execute(f"CREATE TABLE alerts ({ALERT_COLUMNS})")
+        if alerts:
+            select = ", ".join(f"unnest(${name})" for name in columns)
+            con.execute(f"INSERT INTO alerts SELECT {select}", columns)
+        con.execute(f"COPY alerts TO {sql_literal(path)} (FORMAT parquet)")
 
 
 class AlertSink:
@@ -38,13 +57,7 @@ class AlertSink:
     def flush(self) -> None:
         if not self._buffer:
             return
-        columns = {name: [getattr(a, name) for a in self._buffer] for name in Alert.model_fields}
-        columns["evidence"] = [list(e) for e in columns["evidence"]]
-        select = ", ".join(f"unnest(${name}) AS {name}" for name in columns)
-        path = self._dir / f"part-{self._parts:05d}.parquet"
-        with duckdb.connect() as con:
-            con.execute(f"CREATE TABLE alerts AS SELECT {select}", columns)
-            con.execute(f"COPY alerts TO {sql_literal(path)} (FORMAT parquet)")
+        write_alerts(self._buffer, self._dir / f"part-{self._parts:05d}.parquet")
         self._parts += 1
         self.written += len(self._buffer)
         self._buffer.clear()

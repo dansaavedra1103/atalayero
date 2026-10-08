@@ -20,19 +20,24 @@ FIELDS = tuple(Transaction.model_fields)
 
 
 def iter_transactions(
-    duckdb_path: Path, limit: int | None = None, until: datetime | None = None
+    duckdb_path: Path,
+    limit: int | None = None,
+    until: datetime | None = None,
+    since: datetime | None = None,
 ) -> Iterator[Transaction]:
-    """Yield transactions (no labels) by event time, before `until` if given; same-minute ties
-    by transaction_id."""
+    """Yield transactions (no labels) by event time, from `since` and before `until` if given;
+    same-minute ties by transaction_id."""
+    params = {k: v for k, v in (("since", since), ("until", until)) if v is not None}
     query = f"SELECT {', '.join(FIELDS)} FROM marts.fct_transactions"
-    if until is not None:
-        query += " WHERE transacted_at < $until"
+    conditions = [f"transacted_at {'>=' if k == 'since' else '<'} ${k}" for k in params]
+    if conditions:
+        query += " WHERE " + " AND ".join(conditions)
     query += " ORDER BY transacted_at, transaction_id"
     if limit is not None:
         query += f" LIMIT {int(limit)}"
     with duckdb.connect(str(duckdb_path), read_only=True) as con:
         con.execute("SET enable_progress_bar = false")
-        cursor = con.execute(query, {"until": until} if until is not None else None)
+        cursor = con.execute(query, params or None)
         while rows := cursor.fetchmany(10_000):
             for row in rows:
                 yield Transaction(**dict(zip(FIELDS, row, strict=True)))
