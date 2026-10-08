@@ -1,0 +1,2505 @@
+{
+  "detector": "agent v1.4 (gpt-oss:20b)",
+  "case_set": "dev",
+  "generated_at": "2026-10-08T05:54:18.371404Z",
+  "cases_sha256": "7b202424c60c5165bb6271caf6c8c68448f7b33d7bab942529427298e3b7e9f8",
+  "config": {
+    "agent_config": "1.4",
+    "model": "gpt-oss:20b",
+    "model_digest": "17052f91a42e",
+    "prompts_sha256": "bec96c3f9b1f",
+    "think": "low",
+    "max_steps": 12,
+    "max_grounding_retries": 2
+  },
+  "primary": 0.811111111111111,
+  "groups": {
+    "patterned": {
+      "cases": 30,
+      "decision_accuracy": 0.9666666666666667,
+      "typology_accuracy": 0.03333333333333333,
+      "specific_typology_share": null
+    },
+    "untyped": {
+      "cases": 30,
+      "decision_accuracy": 0.7,
+      "typology_accuracy": null,
+      "specific_typology_share": 0.2
+    },
+    "clean": {
+      "cases": 30,
+      "decision_accuracy": 0.7666666666666667,
+      "typology_accuracy": null,
+      "specific_typology_share": null
+    }
+  },
+  "failures": 0,
+  "grounded_share": 0.9777777777777777,
+  "hallucinated_ids_per_report": 0.0,
+  "median_steps": 5.0,
+  "median_seconds": 47.340701200999774,
+  "results": [
+    {
+      "alert_id": "2022-09-08:020:800195070",
+      "report": {
+        "alert_id": "2022-09-08:020:800195070",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 4102736,
+            "amount_usd": 16041.77
+          },
+          {
+            "transaction_id": 3965375,
+            "amount_usd": 3967.4
+          },
+          {
+            "transaction_id": 3965373,
+            "amount_usd": 7490.9
+          }
+        ],
+        "confidence": 0.85,
+        "narrative": "The model flagged the account due to a large ACH payment (#4102736). The other two inbound payments (#3965375, #3965373) are modest and typical. No clear fan‑out, fan‑in, cycle, or hub pattern emerges, but the model’s high score suggests a potential laundering structure that is not obvious from the day’s data alone. Escalation is warranted to investigate the broader network and confirm whether the account is part of a hidden typology."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 52.465786854999806,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:0225:813436851",
+      "report": {
+        "alert_id": "2022-09-07:0225:813436851",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [
+          {
+            "transaction_id": 3440357,
+            "amount_usd": 19026.42
+          },
+          {
+            "transaction_id": 3440358,
+            "amount_usd": 6653.34
+          },
+          {
+            "transaction_id": 3440359,
+            "amount_usd": 18031.94
+          },
+          {
+            "transaction_id": 3440356,
+            "amount_usd": 86238.71
+          }
+        ],
+        "confidence": 0.95,
+        "narrative": "The account received four Bitcoin payments from a single counterparty on 2022‑09‑07 and made no outbound transfers that day. No money returned to the account, no new counterparties, and no hub activity were observed. The short‑cycle rule was triggered by a broader graph cycle, but the day‑level activity shows no red‑flag patterns. The model’s low score and lack of multiple suspicious signals support closing the alert."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 43.54126145200007,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:021611:808D6F2D0",
+      "report": {
+        "alert_id": "2022-09-08:021611:808D6F2D0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 3635775,
+            "amount_usd": 14919.76
+          }
+        ],
+        "confidence": 0.85,
+        "narrative": "The account sent a single ACH payment of $14,919.76 (#3635775) on 2022‑09‑08 and received nothing that day. No inbound funds, no other outgoing transactions, no cycles, and no hub or relay activity were found. The model’s score was driven only by payment format and amount. With fewer than two red flags present, the alert is closed, but the model’s escalation stands, so we report it as unclassified."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 34.96000756400008,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:0123288:80C3B54A0",
+      "report": {
+        "alert_id": "2022-09-07:0123288:80C3B54A0",
+        "decision": "escalate",
+        "typology": "fan_out",
+        "evidence": [
+          {
+            "transaction_id": 3342050,
+            "amount_usd": 14764.45
+          },
+          {
+            "transaction_id": 3393967,
+            "amount_usd": 11101851.4
+          }
+        ],
+        "confidence": 0.92,
+        "narrative": "The account sent a single ACH payment (#3342050) to 02843:80FBDD530, a hub that paid three other accounts that day. It also received a large cheque (#3393967) from 001412:800D6E7E0, a hub that paid five accounts. These two transactions show the account as one of many recipients of a single hub’s outflows, a classic fan‑out pattern. The model’s high score and the presence of two hub counterparties justify escalation."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 48.70348650100004,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:023:800230480",
+      "report": {
+        "alert_id": "2022-09-07:023:800230480",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [
+          {
+            "transaction_id": 3463429,
+            "amount_usd": 10958.33
+          },
+          {
+            "transaction_id": 3463430,
+            "amount_usd": 13477.08
+          },
+          {
+            "transaction_id": 3463431,
+            "amount_usd": 1691.56
+          }
+        ],
+        "confidence": 0.92,
+        "narrative": "The account sent five payments on 2022‑09‑07, all outbound, with no receipts. The only red flag is that one counterparty, 022:800241D60, is a hub that pays many other accounts on the same day. No round‑trip, split‑gather, or inbound‑outbound symmetry is present. With only one red flag and a low model score, the alert is closed."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 43.752041913000085,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:0115159:80F8D3C60",
+      "report": {
+        "alert_id": "2022-09-07:0115159:80F8D3C60",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [
+          {
+            "transaction_id": 3364629,
+            "amount_usd": 1954.3
+          }
+        ],
+        "confidence": 0.95,
+        "narrative": "The account received a single ACH payment of $1,954.30 (#3364629) and sent nothing that day. No same‑day inflow/outflow, no multiple counterparties, no cycles, and no relay chain were detected. The model’s low score and the absence of at least two red‑flag patterns justify closure."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 33.59808089799981,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:008798:805E134D0",
+      "report": {
+        "alert_id": "2022-09-08:008798:805E134D0",
+        "decision": "escalate",
+        "typology": "fan_out",
+        "evidence": [
+          {
+            "transaction_id": 4031070,
+            "amount_usd": 6034.34
+          }
+        ],
+        "confidence": 0.92,
+        "narrative": "The account sent a single ACH payment of $6,034.34 (#4031070) to counterparty 024515:805E13B40. That counterparty is a hub that paid five distinct accounts on the same day, forming a fan‑out structure. The model’s score was driven by the payment format and amount, and the hub’s activity matches a known laundering typology. No other red‑flag patterns were observed, but the fan‑out at the hub warrants full investigation."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 65.41039126000032,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:0016678:80621A290",
+      "report": {
+        "alert_id": "2022-09-08:0016678:80621A290",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 3851262,
+            "amount_usd": 14225.94
+          },
+          {
+            "transaction_id": 3832248,
+            "amount_usd": 3100.88
+          },
+          {
+            "transaction_id": 4105763,
+            "amount_usd": 100.79
+          }
+        ],
+        "confidence": 0.92,
+        "narrative": "The account received a single large payment (#3851262) from a hub and sent three smaller payments (#3832248, #4105763, #4105762) to distinct counterparties. No rapid dispersion, no cycles, and no fan‑out/in pattern were observed. The model flagged the day, but the transaction pattern shows no red flags. Therefore the alert is closed with typology ‘none’."
+      },
+      "grounded": false,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 66.4929841170001,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:012:8001BFCF0",
+      "report": {
+        "alert_id": "2022-09-07:012:8001BFCF0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 3395878,
+            "amount_usd": 8362.15
+          },
+          {
+            "transaction_id": 3620051,
+            "amount_usd": 47757.42
+          },
+          {
+            "transaction_id": 3620050,
+            "amount_usd": 126361.32
+          },
+          {
+            "transaction_id": 3620049,
+            "amount_usd": 6885.08
+          },
+          {
+            "transaction_id": 3620048,
+            "amount_usd": 46079.45
+          }
+        ],
+        "confidence": 0.85,
+        "narrative": "The account sent four large payments to a single counterparty and received one smaller payment. No cycles, no fan‑out to multiple receivers, and no hub activity were observed. The model’s score is driven by a single ACH receipt, but the overall pattern is typical for a business transaction. No red‑flag criteria are met, so the alert is closed."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 48.98057031899998,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:0046479:811645E20",
+      "report": {
+        "alert_id": "2022-09-08:0046479:811645E20",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 4065032,
+            "amount_usd": 16090.43
+          },
+          {
+            "transaction_id": 4104141,
+            "amount_usd": 2622.84
+          },
+          {
+            "transaction_id": 4104142,
+            "amount_usd": 2626.05
+          }
+        ],
+        "confidence": 0.85,
+        "narrative": "The account sent a single large payment (#4065032) and received two smaller payments (#4104141, #4104142) from the same counterparty on the same day. No round‑trip, fan‑out, or hub pattern is visible. The model flagged the day, but the transaction pattern does not match known typologies. Therefore we keep the model’s escalation but classify it as unclassified."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 67.46056225899974,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:015980:802AD4390",
+      "report": {
+        "alert_id": "2022-09-07:015980:802AD4390",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [
+          {
+            "transaction_id": 3548261,
+            "amount_usd": 4665.95
+          }
+        ],
+        "confidence": 0.98,
+        "narrative": "The account received a single ACH payment of $4,665.95 (transaction #3548261) on 2022‑09‑07 and made no outgoing transfers that day. No same‑day inflow/outflow, no cycles, and no hub activity were detected. The model’s low score and the absence of any red‑flag patterns confirm the transaction is routine. Therefore the alert is closed."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 33.21722753699987,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:0012278:80B1F13F0",
+      "report": {
+        "alert_id": "2022-09-08:0012278:80B1F13F0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 4172916,
+            "amount_usd": 6355.01
+          },
+          {
+            "transaction_id": 3821483,
+            "amount_usd": 200663.5
+          }
+        ],
+        "confidence": 0.85,
+        "narrative": "The model flagged the account‑day, and the only suspicious activity is the large ACH inbound payment #4172916 and the two outgoing ACH payments #3821483 and #3821482. No cycles, fan‑out, fan‑in, or bipartite patterns appear in the graph neighborhood. The account’s activity is limited to a single counterparty and a few inbound transfers, with no evidence of layering or relay. Because the model escalated but no known typology is present, we classify the case as unclassified."
+      },
+      "grounded": false,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 89.44944657799988,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:0222:800051110",
+      "report": {
+        "alert_id": "2022-09-07:0222:800051110",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 3664343,
+            "amount_usd": 6065.81
+          },
+          {
+            "transaction_id": 3478808,
+            "amount_usd": 12986.66
+          }
+        ],
+        "confidence": 0.92,
+        "narrative": "The account received a single ACH payment of $6,065.81 (transaction #3664343) and then sent a large ACH payment of $12,986.66 (transaction #3478808) to a different counterparty. No round‑trip, split, or hub activity is present. The model’s score is driven by the ACH format and the large inbound amount, not by a suspicious graph pattern. Thus the alert is closed with no typology."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 28.221343007000087,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:011157:801658CE0",
+      "report": {
+        "alert_id": "2022-09-08:011157:801658CE0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 4042168,
+            "amount_usd": 18753.59
+          },
+          {
+            "transaction_id": 4042170,
+            "amount_usd": 40235.93
+          },
+          {
+            "transaction_id": 4042171,
+            "amount_usd": 30502.77
+          },
+          {
+            "transaction_id": 4042169,
+            "amount_usd": 153700.5
+          },
+          {
+            "transaction_id": 4042167,
+            "amount_usd": 111207.67
+          },
+          {
+            "transaction_id": 4157034,
+            "amount_usd": 14339.94
+          }
+        ],
+        "confidence": 0.95,
+        "narrative": "The account sent five payments to a single counterparty and received one small ACH payment. No cycles, fan‑out, or hub activity were detected. The model’s low score and lack of multiple red flags support closing the alert. No typology matches the observed pattern, so the case is unclassified."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 31.733679645000393,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:0010:80CE8FDA0",
+      "report": {
+        "alert_id": "2022-09-08:0010:80CE8FDA0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 2928624,
+            "amount_usd": 17904.38
+          },
+          {
+            "transaction_id": 2928623,
+            "amount_usd": 17904.38
+          }
+        ],
+        "confidence": 0.95,
+        "narrative": "The model flagged the account for a large ACH transfer (#2928624) and a matching self‑transfer (#2928623). No fan‑out, fan‑in, cycle, or relay pattern is present; the day’s activity is limited to a single outgoing payment and a self‑transfer. The evidence shows ordinary behavior, so the alert is closed with typology \"none\"."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 24.784287363000203,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:0148586:81241DD80",
+      "report": {
+        "alert_id": "2022-09-07:0148586:81241DD80",
+        "decision": "escalate",
+        "typology": "random",
+        "evidence": [
+          {
+            "transaction_id": 3391385,
+            "amount_usd": 3280.63
+          },
+          {
+            "transaction_id": 3517923,
+            "amount_usd": 541.0
+          }
+        ],
+        "confidence": 0.85,
+        "narrative": "The account performed only two transactions on 2022‑09‑07: an ACH payment of $3,280.63 to a single counterparty (#3391385) and a cheque receipt of $541.00 from a single counterparty (#3517923). The graph neighborhood shows no cycles, no fan‑out or fan‑in patterns, and no relay chain. The model’s low score was driven by the ACH format, but the overall pattern is consistent with a random, isolated transaction. Therefore the alert is escalated as a random typology."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 64.4656553650002,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:011:800D60B70",
+      "report": {
+        "alert_id": "2022-09-08:011:800D60B70",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 3906443,
+            "amount_usd": 7358.33
+          }
+        ],
+        "confidence": 0.95,
+        "narrative": "The account received a single ACH payment of $7,358.33 from 011657:800D60A80 on 2022‑09‑08. No other activity, no cycles, no fan‑out or fan‑in patterns were observed. The model’s score was driven by the payment format and amount, but the transaction graph shows no laundering‑typical structure. Therefore the alert is closed with no typology."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 25.68133324099972,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:0218438:8094C64E0",
+      "report": {
+        "alert_id": "2022-09-07:0218438:8094C64E0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 3016185,
+            "amount_usd": 16182.27
+          },
+          {
+            "transaction_id": 3589227,
+            "amount_usd": 7.63
+          },
+          {
+            "transaction_id": 3589228,
+            "amount_usd": 2.33
+          }
+        ],
+        "confidence": 0.92,
+        "narrative": "The account made a single large ACH payment (#3016185) of $16,182.27, the only transaction that day with a substantial amount. Two small outgoing payments (#3589227, #3589228) to the same counterparty are negligible. No cycles, fan‑out, fan‑in, or relay patterns appear in the graph. The model’s score is driven by the ACH amount, but no typology is evident. Therefore the alert is escalated as unclassified."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 44.43960463500025,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:0010232:808FADF50",
+      "report": {
+        "alert_id": "2022-09-07:0010232:808FADF50",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 2192350,
+            "amount_usd": 10162.68
+          },
+          {
+            "transaction_id": 2192349,
+            "amount_usd": 720.26
+          }
+        ],
+        "confidence": 0.95,
+        "narrative": "The account sent two ACH payments on 2022‑09‑07: #2192350 ($10,162.68) and #2192349 ($720.26) to the same counterparty. No receipts, no cycles, and no evidence of a relay or split pattern. The model’s high score is driven by the large ACH amount and the counterparty’s network role, but the account’s own activity is ordinary. Therefore the alert is closed with typology `none`."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 51.27885067499983,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:0116845:809F92490",
+      "report": {
+        "alert_id": "2022-09-08:0116845:809F92490",
+        "decision": "escalate",
+        "typology": "cycle",
+        "evidence": [
+          {
+            "transaction_id": 2908923,
+            "amount_usd": 2532.9
+          }
+        ],
+        "confidence": 0.95,
+        "narrative": "The account received USD 2,532.90 from counterparty 028:80A4203B0 at 12:33 h and immediately sent the same amount back to that counterparty (transaction #2908923). This one‑to‑one round‑trip within the same day satisfies the short‑cycle typology. No other transactions on the day form a cycle, and the model’s explanation highlighted relay depth and relay‑in‑96h for this transaction. Therefore the alert is escalated as a cycle."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 33.02202231799993,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:003420:802CD4790",
+      "report": {
+        "alert_id": "2022-09-07:003420:802CD4790",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 3694718,
+            "amount_usd": 2960.48
+          },
+          {
+            "transaction_id": 3694719,
+            "amount_usd": 1708.18
+          },
+          {
+            "transaction_id": 3694720,
+            "amount_usd": 2059.21
+          },
+          {
+            "transaction_id": 3694721,
+            "amount_usd": 2378.46
+          }
+        ],
+        "confidence": 0.85,
+        "narrative": "The account received four ACH payments on 2022‑09‑07 with no outgoing activity. Counterparties are isolated and no money returns or splits among many new counterparties. The model flagged the day (score 0.063) and no clear red‑flag pattern emerged, so the case is escalated as unclassified."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 38.79592385800015,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:021174:80E6C6DF0",
+      "report": {
+        "alert_id": "2022-09-08:021174:80E6C6DF0",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [
+          {
+            "transaction_id": 4159934,
+            "amount_usd": 21796495.05
+          }
+        ],
+        "confidence": 0.95,
+        "narrative": "The account received 27 inbound ACH payments totaling about $24 M on 2022‑09‑08, with no outbound activity that day. The only red flag is the high inbound concentration (R01). No evidence of money returning, splitting, or relaying was found. With only one red flag, the model’s decision to close the alert stands."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 58.46675482499995,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:0014329:806DF1F70",
+      "report": {
+        "alert_id": "2022-09-07:0014329:806DF1F70",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 812699,
+            "amount_usd": 17901.72
+          },
+          {
+            "transaction_id": 3698463,
+            "amount_usd": 836.41
+          },
+          {
+            "transaction_id": 3698466,
+            "amount_usd": 37.64
+          },
+          {
+            "transaction_id": 3698465,
+            "amount_usd": 442.81
+          },
+          {
+            "transaction_id": 3698464,
+            "amount_usd": 455.12
+          }
+        ],
+        "confidence": 0.95,
+        "narrative": "The account received five inbound payments on 2022‑09‑07, including a single large ACH payment (#812699) and four smaller Euro payments from the same counterparty (#3698463, #3698465, #3698464, #3698466). No outbound or cyclic activity is present. The model’s high score is driven by the large ACH payment, but no other red‑flag patterns (fan‑out, fan‑in, cycle, etc.) are evident. Therefore, the alert is escalated as unclassified, reflecting the model’s assessment without a clear typology."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 29.564088113999787,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:029404:80DB94CB0",
+      "report": {
+        "alert_id": "2022-09-07:029404:80DB94CB0",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [
+          {
+            "transaction_id": 3725441,
+            "amount_usd": 250.4
+          },
+          {
+            "transaction_id": 3725442,
+            "amount_usd": 280.14
+          },
+          {
+            "transaction_id": 3657804,
+            "amount_usd": 457.35
+          },
+          {
+            "transaction_id": 3657805,
+            "amount_usd": 181.4
+          }
+        ],
+        "confidence": 0.95,
+        "narrative": "The account received four small payments on 2022‑09‑07 from only two counterparties and made no outbound transfers. No money returned to the account, no fan‑out/fan‑in, no cycles, and no relay chain were observed. The graph neighborhood shows only the two counterparties with no further connections. With fewer than two red flags and the model’s decision to close, the alert is closed."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 40.350321813999926,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:0214:80BE87020",
+      "report": {
+        "alert_id": "2022-09-07:0214:80BE87020",
+        "decision": "escalate",
+        "typology": "fan_out",
+        "evidence": [
+          {
+            "transaction_id": 2184309,
+            "amount_usd": 5472.94
+          }
+        ],
+        "confidence": 0.95,
+        "narrative": "The account sent a single $5,472.94 ACH payment to counterparty 00701:8013F0350, which is a hub that paid three accounts and received from six on the same day. The model’s explanation highlighted a high fan_paths score and a receiver graph in‑degree of 7, indicating that the money is routed through a highly connected node. This pattern matches the fan‑out typology, where one account bursts out funds to a new or rarely‑used counterparty that then forwards the money to many others."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 58.08226437200028,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:0048681:81241E4F0",
+      "report": {
+        "alert_id": "2022-09-07:0048681:81241E4F0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 3391385,
+            "amount_usd": 3280.6324
+          },
+          {
+            "transaction_id": 3391387,
+            "amount_usd": 4875.5432
+          },
+          {
+            "transaction_id": 3391386,
+            "amount_usd": 2315.2942
+          }
+        ],
+        "confidence": 0.85,
+        "narrative": "The account received three ACH inflows (#3391385, #3391386, #3391387) totaling $10,471 on 2022‑09‑07, and sent two ACH outflows to the same counterparty. No cycle, fan‑out, or relay pattern is evident. The model’s score (0.0616) and the presence of multiple inbound ACHs on the same day justify escalation. No clear typology fits, so the case is marked unclassified."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 41.76324666900018,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:010:8004652C0",
+      "report": {
+        "alert_id": "2022-09-07:010:8004652C0",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [
+          {
+            "transaction_id": 3646131,
+            "amount_usd": 113.14
+          },
+          {
+            "transaction_id": 3646816,
+            "amount_usd": 72.48
+          },
+          {
+            "transaction_id": 3658064,
+            "amount_usd": 71119.9
+          }
+        ],
+        "confidence": 0.98,
+        "narrative": "The account sent 13 payments in a short burst, all outbound, with only three small inbound payments. No inflow‑outflow balance, no split or gathering of funds, no hub counterparty, and no cycle or relay chain. The only trigger was the high‑velocity rule (R04). With fewer than two red flags, the model’s low score and the lack of suspicious patterns justify closing the alert."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 3,
+      "seconds": 70.6192212840001,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:0136823:812971420",
+      "report": {
+        "alert_id": "2022-09-08:0136823:812971420",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [
+          {
+            "transaction_id": 3886455,
+            "amount_usd": 24416.26
+          },
+          {
+            "transaction_id": 3886449,
+            "amount_usd": 41932.77
+          },
+          {
+            "transaction_id": 3886448,
+            "amount_usd": 10262.12
+          },
+          {
+            "transaction_id": 3886451,
+            "amount_usd": 33151.62
+          },
+          {
+            "transaction_id": 3886446,
+            "amount_usd": 15811.77
+          },
+          {
+            "transaction_id": 3886453,
+            "amount_usd": 30828.96
+          },
+          {
+            "transaction_id": 3886450,
+            "amount_usd": 5322.14
+          },
+          {
+            "transaction_id": 3886452,
+            "amount_usd": 39403.57
+          }
+        ],
+        "confidence": 0.92,
+        "narrative": "The account received 10 distinct payments on 2022‑09‑08, all above $5 k, triggering R01. No outflows, cycles, or hub/relay activity were found. Only one red‑flag pattern (many distinct counterparties) is present, and no second red‑flag is observed. The model’s low score and lack of additional suspicious features support closing the alert."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 48.286711080999794,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:0235509:80D869250",
+      "report": {
+        "alert_id": "2022-09-08:0235509:80D869250",
+        "decision": "escalate",
+        "typology": "fan_in",
+        "evidence": [
+          {
+            "transaction_id": 4009314,
+            "amount_usd": 15460.94
+          },
+          {
+            "transaction_id": 4009313,
+            "amount_usd": 172749.57
+          },
+          {
+            "transaction_id": 4058157,
+            "amount_usd": 405.57
+          },
+          {
+            "transaction_id": 4058158,
+            "amount_usd": 326.65
+          }
+        ],
+        "confidence": 0.92,
+        "narrative": "On 2022‑09‑08 the account received four inbound payments: two large ACH/cheque transfers from 0115:80D672F40 (#4009314, #4009313) and two small cash/cheque payments from 0110:80CE3D700 (#4058157, #4058158). No outgoing transactions occurred that day. This burst of incoming funds from a few distinct counterparties with no immediate outflow matches the fan‑in laundering pattern, warranting escalation."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 74.4371111219998,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:0214322:80DE46A70",
+      "report": {
+        "alert_id": "2022-09-08:0214322:80DE46A70",
+        "decision": "escalate",
+        "typology": "cycle",
+        "evidence": [
+          {
+            "transaction_id": 3898002,
+            "amount_usd": 3036.51
+          },
+          {
+            "transaction_id": 4094072,
+            "amount_usd": 3608.45
+          }
+        ],
+        "confidence": 0.92,
+        "narrative": "The account sent €2,591.36 (US $3,036.51) to counterparty 013265:80DE46550 at 07:39 h (#3898002) and received €3,079.45 (US $3,608.45) from the same counterparty at 17:47 h (#4094072). The graph neighborhood shows a two‑transaction cycle returning money to the original account on the same day. This pattern matches the cycle typology, and the model’s score is driven by the cycle feature. Therefore the alert is escalated as a cycle case."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 39.17173502300011,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:0212789:805CA3750",
+      "report": {
+        "alert_id": "2022-09-07:0212789:805CA3750",
+        "decision": "escalate",
+        "typology": "random",
+        "evidence": [
+          {
+            "transaction_id": 2192358,
+            "amount_usd": 10828.52
+          },
+          {
+            "transaction_id": 2192361,
+            "amount_usd": 10828.52
+          },
+          {
+            "transaction_id": 2192360,
+            "amount_usd": 947.87
+          }
+        ],
+        "confidence": 0.85,
+        "narrative": "The account received a large ACH payment of $10,828.52 from 028255:804D7E820 (#2192358) and immediately sent the same amount to 0214615:80E9CE540 (#2192361), with a small additional payment (#2192360). This one‑to‑one transfer pattern, without branching or a return cycle, matches the random typology described in the typology notes. No fan‑out, fan‑in, or cycle is present, so the model’s escalation stands."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 73.65053423399968,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:0223:8119F8E80",
+      "report": {
+        "alert_id": "2022-09-07:0223:8119F8E80",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 3645109,
+            "amount_usd": 9859.84
+          }
+        ],
+        "confidence": 0.9,
+        "narrative": "The account sent a single ACH payment of $9,859.84 (#3645109) to counterparty 0222:811A00670. The model flagged this account‑day, and the transaction’s amount and ACH format contributed to the score. No clear laundering pattern (fan‑out, fan‑in, cycle, etc.) was observed, but the model’s escalation warrants a full investigation. The evidence rests on transaction #3645109."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 31.231713258000127,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:005329:801444A00",
+      "report": {
+        "alert_id": "2022-09-08:005329:801444A00",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [
+          {
+            "transaction_id": 4102876,
+            "amount_usd": 409.74
+          },
+          {
+            "transaction_id": 4102877,
+            "amount_usd": 391.74
+          }
+        ],
+        "confidence": 0.92,
+        "narrative": "The account sent six payments to only two counterparties and received two small payments from a single counterparty. No round‑trip or relay pattern is present. The only red flag is that the inbound counterparty is a hub, but this alone does not meet the two‑red‑flag threshold. The model’s low score and the account’s normal daily activity support closure."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 43.354108361999806,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:023691:8052B1860",
+      "report": {
+        "alert_id": "2022-09-07:023691:8052B1860",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 3659534,
+            "amount_usd": 4488.7
+          }
+        ],
+        "confidence": 0.9,
+        "narrative": "The model escalated the account‑day, and the only transaction on 2022‑09‑07 is a single ACH payment of $4,488.70 (transaction #3659534). No other activity or pattern is evident, so the case is escalated as unclassified."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 54.811378528000205,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:001047:802877150",
+      "report": {
+        "alert_id": "2022-09-08:001047:802877150",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [
+          {
+            "transaction_id": 4020791,
+            "amount_usd": 1930.62
+          }
+        ],
+        "confidence": 0.95,
+        "narrative": "The account received a single ACH payment of $1,930.62 (transaction #4020791) and made no outgoing transfers that day. No cycles, fan‑out, fan‑in, or relay patterns were detected in the 1‑day neighborhood. With only one transaction and no red‑flag criteria, the alert remains closed as per the model’s decision."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 38.400989246000336,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:01688:8008A0060",
+      "report": {
+        "alert_id": "2022-09-07:01688:8008A0060",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.95,
+        "narrative": "The account made 20 outbound payments on 2022‑09‑07, including several large ACH and wire transfers, and exceeded 10 transactions within one hour (R04). No inbound funds of comparable size were received, and there was no round‑trip or return of money on the same day. Only a single red‑flag pattern (high‑velocity) is present, which does not meet the escalation threshold. Therefore the alert is closed as per the model’s decision."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 1,
+      "seconds": 26.70997910999995,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:022:8001A6870",
+      "report": {
+        "alert_id": "2022-09-07:022:8001A6870",
+        "decision": "escalate",
+        "typology": "stack",
+        "evidence": [
+          {
+            "transaction_id": 2150332,
+            "amount_usd": 15297.9
+          },
+          {
+            "transaction_id": 2150331,
+            "amount_usd": 16022.64
+          }
+        ],
+        "confidence": 0.95,
+        "narrative": "The account sent two large ACH payments (#2150332 and #2150331) that the model flagged for high relay depth (10–11 hops). The explanation shows these transactions as the primary drivers of the score, indicating a long chain of intermediaries typical of a stack (relay) laundering pattern. No short cycle or return of funds is observed, but the depth and ACH format strongly suggest a relay structure. Therefore the alert is escalated under the stack typology."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 55.842039957,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:0235580:80D827B10",
+      "report": {
+        "alert_id": "2022-09-07:0235580:80D827B10",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 3380134,
+            "amount_usd": 1228.23
+          }
+        ],
+        "confidence": 0.85,
+        "narrative": "The account received a single ACH payment of $1,228.23 (#3380134) and made no outgoing transfers that day. No cycles, fan‑out, or relay patterns were detected. The account’s history is modest and the day’s activity is not anomalous. The model’s low score and lack of additional red flags support closing the alert, but because the model escalated, we keep the escalation with an unclassified typology."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 34.21581567999965,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:0243614:81023EC70",
+      "report": {
+        "alert_id": "2022-09-07:0243614:81023EC70",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.9,
+        "narrative": "The account received 27 inbound payments on 2022‑09‑07 with no outbound activity, no cycles, and no relay pattern. The only red flag is the large number of inbound counterparties, but the second required red flag is absent. The account’s history shows it is a busy, high‑volume entity that routinely receives many payments, consistent with legitimate activity. Therefore the alert is closed in line with the model’s decision."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 58.441262342999835,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:0214609:81051CE50",
+      "report": {
+        "alert_id": "2022-09-08:0214609:81051CE50",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 4169884,
+            "amount_usd": 2659.59
+          }
+        ],
+        "confidence": 0.95,
+        "narrative": "The account sent a single ACH payment of $2,659.59 to counterparty 004523:8105202B0 on 2022‑09‑08. No inbound funds, no other counterparties, and no cycles or fan‑out/fan‑in patterns were observed. The transaction alone does not match any known laundering typology, so the alert is closed with no further action."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 23.470206164000047,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:022:8001BD460",
+      "report": {
+        "alert_id": "2022-09-07:022:8001BD460",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 3395879,
+            "amount_usd": 12968.03
+          },
+          {
+            "transaction_id": 3541152,
+            "amount_usd": 2047.77
+          }
+        ],
+        "confidence": 0.8,
+        "narrative": "The account executed a large ACH transfer of $12,968.03 to a new counterparty (#3395879) and a smaller credit‑card payment of $2,047.77 from the same counterparty (#3541152). These outflows are atypical for the account’s usual activity, which is dominated by smaller, frequent payments. The model’s score is driven by the payment format and amount, but no clear laundering typology (fan‑out, cycle, etc.) is evident. The large, isolated ACH outflow to a new counterparty warrants a full investigation, so the alert is escalated as unclassified."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 36.11987630800013,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:0231744:80BEB87E0",
+      "report": {
+        "alert_id": "2022-09-08:0231744:80BEB87E0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 3123397,
+            "amount_usd": 2601.17
+          },
+          {
+            "transaction_id": 3123396,
+            "amount_usd": 2601.17
+          }
+        ],
+        "confidence": 0.92,
+        "narrative": "The model flagged the day with a high score (0.8238).  The only transactions that day were two ACH payments of $2,601.17 each (3123397 and 3123396).  These are small, self‑transfer‑like, and do not form a cycle, fan‑out, or fan‑in pattern.  No other red‑flag activity is present.  Because the model’s signal is strong but no known typology matches, we must still investigate.  Thus we escalated with an unclassified typology."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 73.29594763800014,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:001853:802AD27C0",
+      "report": {
+        "alert_id": "2022-09-07:001853:802AD27C0",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [
+          {
+            "transaction_id": 3392399,
+            "amount_usd": 733.94
+          },
+          {
+            "transaction_id": 3392400,
+            "amount_usd": 596.5
+          },
+          {
+            "transaction_id": 3548261,
+            "amount_usd": 4665.95
+          }
+        ],
+        "confidence": 0.92,
+        "narrative": "The account received two small payments from the same counterparty (#3392399, #3392400) and sent one larger ACH payment (#3548261). No money returned, no split among many new counterparties, and no hub activity were observed. The pattern shows no red‑flag criteria, so the alert is closed with typology ‘none’."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 41.30639465600052,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:01420:8015B7740",
+      "report": {
+        "alert_id": "2022-09-07:01420:8015B7740",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [
+          {
+            "transaction_id": 3372072,
+            "amount_usd": 3900.44
+          },
+          {
+            "transaction_id": 3372074,
+            "amount_usd": 3345.22
+          },
+          {
+            "transaction_id": 3372073,
+            "amount_usd": 405.47
+          },
+          {
+            "transaction_id": 3723958,
+            "amount_usd": 2186.15
+          },
+          {
+            "transaction_id": 3723957,
+            "amount_usd": 365.42
+          }
+        ],
+        "confidence": 0.95,
+        "narrative": "The account received three ACH payments (#3372072, #3372074, #3372073) totalling $7,651.13 and sent two cheques (#3723958, #3723957) totalling $2,551.57 to a single counterparty. No money returned, no cycles, and no fan‑out or fan‑in pattern. The model’s low score (0.056) and the absence of two red flags mean the alert is closed with confidence."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 72.57869522400051,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:0071:80563D160",
+      "report": {
+        "alert_id": "2022-09-07:0071:80563D160",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 2358581,
+            "amount_usd": 19830.26
+          },
+          {
+            "transaction_id": 2358580,
+            "amount_usd": 19830.25
+          },
+          {
+            "transaction_id": 3690963,
+            "amount_usd": 259.59
+          }
+        ],
+        "confidence": 0.92,
+        "narrative": "The model flagged the account‑day with a score of 0.99, ranking 10th. The day’s activity consists of two large ACH payments (outbound #2358581 and a self‑transfer #2358580) and a small cheque inbound #3690963. No fan‑out, fan‑in, cycle, or relay pattern is visible in the graph neighbourhood. Because the model’s high score remains unexplained by known typologies, the escalation stands as unclassified."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 46.553711320999355,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:01362:800493070",
+      "report": {
+        "alert_id": "2022-09-08:01362:800493070",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 3732936,
+            "amount_usd": 5919.02
+          },
+          {
+            "transaction_id": 4157380,
+            "amount_usd": 1420.74
+          }
+        ],
+        "confidence": 0.9,
+        "narrative": "The account sent two ACH payments on 2022‑09‑08 to the same counterparty (#3732936 and #4157380). No inbound funds were received that day, and the graph shows no cycles or additional counterparties. The activity is a single, one‑off transfer with no layering or relay. The model escalated the alert, so the escalation stands with typology ‘unclassified’."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 57.2312561939998,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:0231744:80C1898B0",
+      "report": {
+        "alert_id": "2022-09-08:0231744:80C1898B0",
+        "decision": "escalate",
+        "typology": "bipartite",
+        "evidence": [
+          {
+            "transaction_id": 3989044,
+            "amount_usd": 41090.57
+          },
+          {
+            "transaction_id": 3970856,
+            "amount_usd": 17709.76
+          }
+        ],
+        "confidence": 0.9,
+        "narrative": "The account received a large payment (#3989044) from a hub that paid 504 accounts that day, and then forwarded a portion (#3970856) to a new counterparty. This one‑to‑many pattern with a high‑volume hub fits a bipartite typology, supporting the model’s escalation."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 38.05504488400038,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:0025309:80BF494C0",
+      "report": {
+        "alert_id": "2022-09-07:0025309:80BF494C0",
+        "decision": "escalate",
+        "typology": "fan_in",
+        "evidence": [
+          {
+            "transaction_id": 3640909,
+            "amount_usd": 8049.64
+          },
+          {
+            "transaction_id": 3640925,
+            "amount_usd": 35480.61
+          },
+          {
+            "transaction_id": 3640928,
+            "amount_usd": 20256.2
+          },
+          {
+            "transaction_id": 3640915,
+            "amount_usd": 36928.02
+          },
+          {
+            "transaction_id": 3640931,
+            "amount_usd": 43061.14
+          },
+          {
+            "transaction_id": 3640932,
+            "amount_usd": 21280.45
+          },
+          {
+            "transaction_id": 3640912,
+            "amount_usd": 14745.14
+          },
+          {
+            "transaction_id": 3640924,
+            "amount_usd": 7707.55
+          }
+        ],
+        "confidence": 0.92,
+        "narrative": "The account received 25 distinct counterparties on 2022‑09‑07, all via ACH or cheque, with no outgoing payments that day. The graph neighborhood shows a classic many‑to‑one fan‑in pattern: each sender transmits a single large payment to the account. No cycles or return flows are present. The model’s explanation highlights the high number of incoming counterparties and ACH format as key risk factors. Therefore the alert is escalated as a fan_in typology."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 28.99025079600051,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:0240304:80F1F8550",
+      "report": {
+        "alert_id": "2022-09-08:0240304:80F1F8550",
+        "decision": "escalate",
+        "typology": "stack",
+        "evidence": [
+          {
+            "transaction_id": 3055210,
+            "amount_usd": 26952097.52
+          },
+          {
+            "transaction_id": 3055209,
+            "amount_usd": 133584.02
+          }
+        ],
+        "confidence": 0.92,
+        "narrative": "The account received a single large ACH payment (#3055210) of $26,952,097.52 from counterparty 014663:80848BBA0, which itself received the same amount from 0024224:80A150B90 on the same day. This three‑step transfer is a classic stack (layering) pattern. The second small ACH (#3055209) is a minor side payment and does not alter the pattern. The model’s high score is driven by the large amount and the relay structure. Thus the alert is escalated as a stack typology."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 77.98243375899983,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:006625:80BD7BB30",
+      "report": {
+        "alert_id": "2022-09-08:006625:80BD7BB30",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 3917527,
+            "amount_usd": 18353.93
+          },
+          {
+            "transaction_id": 3917528,
+            "amount_usd": 5293.68
+          },
+          {
+            "transaction_id": 4064587,
+            "amount_usd": 65.49
+          },
+          {
+            "transaction_id": 4064588,
+            "amount_usd": 93.06
+          }
+        ],
+        "confidence": 0.85,
+        "narrative": "The account received a single large ACH payment of $18,353.93 (#3917527) from a new counterparty, with no outflows that day. The other three inbound payments are small and from a counterparty that has previously sent only €158.55. No cycles, fan‑out, or fan‑in activity is present. The model’s score is driven mainly by the large ACH, but the pattern does not match a known typology. Therefore the alert is escalated as unclassified."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 71.32841276999989,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:018475:803892CF0",
+      "report": {
+        "alert_id": "2022-09-07:018475:803892CF0",
+        "decision": "escalate",
+        "typology": "fan_in",
+        "evidence": [
+          {
+            "transaction_id": 3485354,
+            "amount_usd": 2412.04
+          },
+          {
+            "transaction_id": 3485355,
+            "amount_usd": 3278.82
+          }
+        ],
+        "confidence": 0.92,
+        "narrative": "On 2022‑09‑07 the account received two large ACH payments (#3485354 and #3485355) from distinct counterparties, each new to the account. The combined inbound amount exceeds $5,000, and there were no outgoing transfers that day. This pattern matches a fan‑in typology, where a single account aggregates funds from multiple new sources. The model’s score and the typology notes confirm the escalation."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 38.6639585009998,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:0027535:810DD37F0",
+      "report": {
+        "alert_id": "2022-09-08:0027535:810DD37F0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 3957210,
+            "amount_usd": 11521.21
+          },
+          {
+            "transaction_id": 3957211,
+            "amount_usd": 10386.29
+          },
+          {
+            "transaction_id": 3772225,
+            "amount_usd": 3413.82
+          },
+          {
+            "transaction_id": 3772226,
+            "amount_usd": 3877.21
+          },
+          {
+            "transaction_id": 4064923,
+            "amount_usd": 3977.43
+          }
+        ],
+        "confidence": 0.85,
+        "narrative": "The account received two large payments from the same counterparty (#3957210, #3957211) and sent two payments to a different counterparty (#3772225, #3772226). A single outbound payment (#4064923) goes to a third party. No cycles or fan‑out/fan‑in patterns are evident, but the model’s score (0.127) and the presence of multiple large inbound and outbound legs suggest a potential layering or relay chain that is not captured by the simple rules. Therefore the alert is escalated for full investigation."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 73.7138288469996,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:0018324:80D2DC7D0",
+      "report": {
+        "alert_id": "2022-09-08:0018324:80D2DC7D0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 2611988,
+            "amount_usd": 1661.3
+          },
+          {
+            "transaction_id": 2611987,
+            "amount_usd": 1661.29
+          },
+          {
+            "transaction_id": 4053201,
+            "amount_usd": 7972.35
+          }
+        ],
+        "confidence": 0.85,
+        "narrative": "The account performed a self‑transfer of €1,661 (USD 1,661.3) and two large outgoing payments to the same counterparty (USD 7,972.35 and USD 24,769.82). No fan‑out, fan‑in, cycle or relay pattern is evident. The model flagged the day, and the self‑transfer is a red flag, but no clear typology emerges. Therefore the alert is escalated for full investigation under the unclassified category."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 42.76611220999985,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:0020226:80857D940",
+      "report": {
+        "alert_id": "2022-09-08:0020226:80857D940",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 2860257,
+            "amount_usd": 17858.6243
+          },
+          {
+            "transaction_id": 2860256,
+            "amount_usd": 527.13
+          },
+          {
+            "transaction_id": 2860255,
+            "amount_usd": 18385.76
+          }
+        ],
+        "confidence": 0.92,
+        "narrative": "The account made three ACH payments on 2022‑09‑08: a large €15,240.55 transfer (#2860257), a small €449.85 transfer (#2860256), and a self‑transfer of $18,385.76 (#2860255). The model flagged the day due to the large ACH amount and the relay feature, but the transaction pattern shows a single burst to one counterparty with no fan‑out, cycle, or hub activity. No red‑flag patterns are present, so the alert is closed with typology ‘none’."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 55.46215760799987,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:021940:80255DA40",
+      "report": {
+        "alert_id": "2022-09-08:021940:80255DA40",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [
+          {
+            "transaction_id": 3805116,
+            "amount_usd": 18169.54
+          },
+          {
+            "transaction_id": 3796203,
+            "amount_usd": 3043.04
+          },
+          {
+            "transaction_id": 4198781,
+            "amount_usd": 320.55
+          }
+        ],
+        "confidence": 0.92,
+        "narrative": "The account had only five transactions on 2022‑09‑08: two outbound totaling $1,705.09 and three inbound totaling $179,764.57. No round‑trip or cycle was detected, and the inbound/outbound amounts are not comparable. Counterparties are few and not new, and no hub activity is present. With no two red flags and a low model score, the alert is closed."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 45.99802799600002,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:02915:802077CB0",
+      "report": {
+        "alert_id": "2022-09-07:02915:802077CB0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 2651099,
+            "amount_usd": 10079.41
+          },
+          {
+            "transaction_id": 3561322,
+            "amount_usd": 0.71
+          },
+          {
+            "transaction_id": 3639848,
+            "amount_usd": 2692.22
+          }
+        ],
+        "confidence": 0.85,
+        "narrative": "The model flagged the day because of a large ACH inbound payment (#2651099). The account sent 10 payments and received 4, with no round‑trip or cycle. Counterparties are limited and not hubs. No fan‑out, fan‑in, cycle, bipartite, stack, random, scatter_gather, or gather_scatter pattern is evident. The evidence shows no clear laundering pattern, so the alert is closed."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 74.34065432100033,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:0030697:81249E1C0",
+      "report": {
+        "alert_id": "2022-09-08:0030697:81249E1C0",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.95,
+        "narrative": "On 2022‑09‑08 the account received two payments totaling $8,267 and sent a single payment of $422. No inbound and outbound amounts matched, no cycles or hub‑based patterns were present, and the account’s activity was typical of its history. Therefore the alert is closed with no red flags."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 3,
+      "seconds": 24.63627382300001,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:008248:803719A60",
+      "report": {
+        "alert_id": "2022-09-08:008248:803719A60",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [
+          {
+            "transaction_id": 4153519,
+            "amount_usd": 2392.77
+          },
+          {
+            "transaction_id": 3898733,
+            "amount_usd": 6771.24
+          },
+          {
+            "transaction_id": 3898734,
+            "amount_usd": 734.02
+          }
+        ],
+        "confidence": 0.92,
+        "narrative": "The account received five inbound payments on 2022‑09‑08, with no outgoing activity. The largest inbound (#4153519) came from a hub counterparty that pays many accounts, but the account is only one of many recipients. No money returned, no split/merge, and no cycle or relay pattern is present. With fewer than two red‑flag patterns and a low model score, the alert is closed."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 3,
+      "seconds": 40.844202674999906,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:0211:808E44B10",
+      "report": {
+        "alert_id": "2022-09-07:0211:808E44B10",
+        "decision": "escalate",
+        "typology": "cycle",
+        "evidence": [
+          {
+            "transaction_id": 695465,
+            "amount_usd": 18533.55
+          },
+          {
+            "transaction_id": 695464,
+            "amount_usd": 18533.54
+          },
+          {
+            "transaction_id": 695471,
+            "amount_usd": 8298.19
+          },
+          {
+            "transaction_id": 695470,
+            "amount_usd": 8298.19
+          },
+          {
+            "transaction_id": 695469,
+            "amount_usd": 933.63
+          },
+          {
+            "transaction_id": 695468,
+            "amount_usd": 933.63
+          }
+        ],
+        "confidence": 0.92,
+        "narrative": "The account sent and received the same amounts on the same day to the same counterparties, forming a round‑trip cycle. Transactions #695465/#695464 (18533 USD), #695471/#695470 (8298 USD), and #695469/#695468 (933 USD) show the money leaving and returning, a classic laundering pattern."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 62.41172984399964,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:00701:8013F0350",
+      "report": {
+        "alert_id": "2022-09-07:00701:8013F0350",
+        "decision": "escalate",
+        "typology": "fan_in",
+        "evidence": [
+          {
+            "transaction_id": 2184301,
+            "amount_usd": 16971.29
+          },
+          {
+            "transaction_id": 2184294,
+            "amount_usd": 13430.77
+          },
+          {
+            "transaction_id": 2184309,
+            "amount_usd": 5472.94
+          }
+        ],
+        "confidence": 0.95,
+        "narrative": "On 2022‑09‑07 account 00701 received three large ACH payments (#2184301, #2184294, #2184309) from distinct, new counterparties. The total inflow (~$36.9k) was largely retained, with a net gain of ~$12k. The model flagged these as high‑risk due to ACH inbound, large amounts, and fan‑paths. The pattern matches a fan‑in typology: a burst of inbound transfers from multiple new senders followed by a large outbound payment to a hub account (015723). This structure is typical of layering and money‑laundering schemes, warranting escalation."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 47.695791899999676,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:010:802B2E950",
+      "report": {
+        "alert_id": "2022-09-08:010:802B2E950",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [
+          {
+            "transaction_id": 3786700,
+            "amount_usd": 1814.15
+          },
+          {
+            "transaction_id": 3786699,
+            "amount_usd": 3226.28
+          },
+          {
+            "transaction_id": 4079723,
+            "amount_usd": 149.93
+          },
+          {
+            "transaction_id": 4079940,
+            "amount_usd": 393.41
+          }
+        ],
+        "confidence": 0.95,
+        "narrative": "The account sent 10 payments in a one‑hour burst (R04) but only received two smaller payments earlier that day. The inflows (transactions #3786700 and #3786699) are not in the same amount or time as the outflows, and no money returns to the account. No cycles, hubs, or relay patterns are present. With only one red flag and a negligible model score, the alert meets the criteria for closure."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 77.34270045199992,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:00220:801A63900",
+      "report": {
+        "alert_id": "2022-09-07:00220:801A63900",
+        "decision": "escalate",
+        "typology": "stack",
+        "evidence": [
+          {
+            "transaction_id": 3274646,
+            "amount_usd": 46158989.93
+          },
+          {
+            "transaction_id": 3274645,
+            "amount_usd": 1544.28
+          },
+          {
+            "transaction_id": 3421632,
+            "amount_usd": 236.78
+          }
+        ],
+        "confidence": 0.92,
+        "narrative": "The account received a single, massive ACH payment of $46,158,989.93 (#3274646) from a new counterparty, then immediately sent a tiny ACH payment of $236.78 (#3421632) to the same counterparty, with a prior ACH inbound of $1,544.28 (#3274645). This one‑to‑many‑to‑one pattern with a large inbound and a small outbound is the classic stack typology. The model’s score is driven by the large amount and ACH format, and the evidence shows a clear layering of funds. Therefore the alert is escalated under the stack pattern."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 75.17001840099965,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:015:80442C490",
+      "report": {
+        "alert_id": "2022-09-08:015:80442C490",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [
+          {
+            "transaction_id": 4114706,
+            "amount_usd": 2064.56
+          },
+          {
+            "transaction_id": 4114707,
+            "amount_usd": 4755.49
+          },
+          {
+            "transaction_id": 4036351,
+            "amount_usd": 2498.23
+          }
+        ],
+        "confidence": 0.95,
+        "narrative": "The account received two large ACH payments (#4114706, #4114707) and sent a smaller payment (#4036351) to the same counterparty. No money returned, no branching to many counterparties, and no cycle or relay pattern emerged. The inbound and outbound amounts differ markedly, and the graph shows only a single outgoing counterparty. With no red‑flag patterns present, the alert is closed as non‑suspicious."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 58.58566169900041,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:0243614:8105EE4E0",
+      "report": {
+        "alert_id": "2022-09-07:0243614:8105EE4E0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 3322438,
+            "amount_usd": 8790.62
+          }
+        ],
+        "confidence": 0.85,
+        "narrative": "The account sent a single ACH payment of $8,790.62 (transaction #3322438) on 2022‑09‑07 and received nothing that day. No inbound funds, no outbound splits, no cycles, and no relay pattern were found in the graph neighborhood. The model’s score was driven by the payment format and amount, but the transaction graph shows no recognizable laundering structure. Therefore the model’s escalation stands, but the case is unclassified because no specific typology is evident."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 61.690631874000246,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:015643:809772D80",
+      "report": {
+        "alert_id": "2022-09-07:015643:809772D80",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.95,
+        "narrative": "The account received 14 large ACH payments on 2022‑09‑07 but sent none. No same‑day outflow, no relay or cycle, and no hub counterparty activity were observed. The alert was triggered solely by the rapid‑concentration rule, which the model already considered when deciding to close. Therefore the case is closed with no typology."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 27.858132579000085,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:029788:803892CA0",
+      "report": {
+        "alert_id": "2022-09-07:029788:803892CA0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 3387794,
+            "amount_usd": 919.14
+          },
+          {
+            "transaction_id": 3387793,
+            "amount_usd": 3224.83
+          },
+          {
+            "transaction_id": 3485355,
+            "amount_usd": 3278.82
+          },
+          {
+            "transaction_id": 3622307,
+            "amount_usd": 249.13
+          },
+          {
+            "transaction_id": 3622308,
+            "amount_usd": 1316.3
+          }
+        ],
+        "confidence": 0.85,
+        "narrative": "The account sent three payments on 2022‑09‑07, two to the same counterparty (#3387794, #3387793) and one to a different one (#3485355). It received two payments from a single counterparty (#3622307, #3622308). No money returned, no fan‑out or fan‑in, and no cycles were detected. The graph neighborhood shows only three counterparties, none acting as a hub. The model’s low score (0.066) and the absence of two red‑flag patterns justify closing the alert."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 74.43225059100041,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:001:8001A8060",
+      "report": {
+        "alert_id": "2022-09-08:001:8001A8060",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.95,
+        "narrative": "The account sent 16 payments totaling $45,717.07 but received only two payments of $7,821.30 on 2022‑09‑08. No inflow matched the outflow, no round‑trip or hub activity was detected, and the model score was very low. With no two red flags present, the alert is closed as per the model’s decision."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 35.67278567299945,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:01292:8004203B0",
+      "report": {
+        "alert_id": "2022-09-07:01292:8004203B0",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [
+          {
+            "transaction_id": 3411348,
+            "amount_usd": 263226.85
+          }
+        ],
+        "confidence": 0.92,
+        "narrative": "The account sent a single large payment (#3411348) to a new counterparty, but no other red flags were observed. The day’s activity shows high velocity, yet the model’s low score and lack of inbound‑outbound balance matching, cycles, or relay chains support a non‑suspicious pattern. Therefore the alert is closed."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 3,
+      "seconds": 65.85551388499971,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:018902:80B4B0B90",
+      "report": {
+        "alert_id": "2022-09-07:018902:80B4B0B90",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 3598813,
+            "amount_usd": 7238.3
+          }
+        ],
+        "confidence": 0.9,
+        "narrative": "The account sent a single ACH payment of $7,238.30 (transaction #3598813) on 2022‑09‑07 and received no funds that day. No other counterparties, cycles, or relay chains were present in the one‑day neighborhood. The model’s score was driven by payment format and amount, but the transaction graph shows no red‑flag pattern. Therefore the alert is escalated as unclassified."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 36.78034312299951,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:0221891:810B24C80",
+      "report": {
+        "alert_id": "2022-09-08:0221891:810B24C80",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [
+          {
+            "transaction_id": 4198953,
+            "amount_usd": 1749.14
+          },
+          {
+            "transaction_id": 4198952,
+            "amount_usd": 3174.78
+          },
+          {
+            "transaction_id": 3983869,
+            "amount_usd": 248.86
+          },
+          {
+            "transaction_id": 3983868,
+            "amount_usd": 50.09
+          },
+          {
+            "transaction_id": 3740702,
+            "amount_usd": 962.88
+          }
+        ],
+        "confidence": 0.92,
+        "narrative": "The account received five inbound payments totaling $6,185.75 on 2022‑09‑08 and sent none. No money left the account that day, no split or gather pattern, no cycle or relay chain, and no highly active counterparty. Only one potential red‑flag (receiving from a hub‑like counterparty) is present, insufficient to override the model’s closure. Therefore the alert is closed with typology ‘none’."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 3,
+      "seconds": 78.5604175010003,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:002454:806E8ADD0",
+      "report": {
+        "alert_id": "2022-09-08:002454:806E8ADD0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 3596553,
+            "amount_usd": 14546.79
+          },
+          {
+            "transaction_id": 3596555,
+            "amount_usd": 4062.85
+          },
+          {
+            "transaction_id": 3596556,
+            "amount_usd": 14546.7928
+          }
+        ],
+        "confidence": 0.9,
+        "narrative": "The account received $14,546.79 from 018200:803118000 and sent $14,546.79 to 0217125:8073CD950 on the same day, with a self‑transfer of $18,609.64. The only red flag is the near‑equal inbound and outbound amounts. No fan‑out, fan‑in, cycle, bipartite, stack, random, scatter_gather, or gather_scatter patterns are evident. The model’s high score and the single round‑trip justify escalation, but the evidence does not match a known typology, so it is classified as unclassified."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 36.5803091050002,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:0123102:80B86E690",
+      "report": {
+        "alert_id": "2022-09-08:0123102:80B86E690",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [
+          {
+            "transaction_id": 3817212,
+            "amount_usd": 3746.36
+          },
+          {
+            "transaction_id": 3953849,
+            "amount_usd": 3678.05
+          },
+          {
+            "transaction_id": 3953850,
+            "amount_usd": 7677.71
+          }
+        ],
+        "confidence": 0.95,
+        "narrative": "The account received two payments from the same counterparty and sent one payment to a different counterparty. No money‑in‑money‑out pattern, no split or gather among many new counterparties, no cycle, and no relay role were observed. The model’s low score and the absence of two red flags justify closing the alert."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 78.2701589039998,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:0023731:808B564F0",
+      "report": {
+        "alert_id": "2022-09-07:0023731:808B564F0",
+        "decision": "escalate",
+        "typology": "stack",
+        "evidence": [
+          {
+            "transaction_id": 2485824,
+            "amount_usd": 5827.33
+          },
+          {
+            "transaction_id": 2485823,
+            "amount_usd": 558.2
+          },
+          {
+            "transaction_id": 3672137,
+            "amount_usd": 121.83
+          }
+        ],
+        "confidence": 0.92,
+        "narrative": "The account received a single large ACH transfer of $5,827.33 (#2485824) from 0122545:8087B1360, a typical source in a stack pattern. It then forwarded a small amount ($121.83, #3672137) to 0023497:808E67710, acting as a relay between two layers. The model’s high score is driven by the ACH format and relay depth. No return cycle or high‑velocity activity is present, but the bipartite relay structure matches the stack typology."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 47.00865077099934,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:0223:811FDB870",
+      "report": {
+        "alert_id": "2022-09-08:0223:811FDB870",
+        "decision": "escalate",
+        "typology": "fan_in",
+        "evidence": [
+          {
+            "transaction_id": 4029472,
+            "amount_usd": 21000144.84
+          },
+          {
+            "transaction_id": 4029469,
+            "amount_usd": 37251.81
+          },
+          {
+            "transaction_id": 4029467,
+            "amount_usd": 34340.74
+          },
+          {
+            "transaction_id": 4029468,
+            "amount_usd": 19354.81
+          },
+          {
+            "transaction_id": 4029471,
+            "amount_usd": 42068.9
+          },
+          {
+            "transaction_id": 4029465,
+            "amount_usd": 9766857.77
+          },
+          {
+            "transaction_id": 4029474,
+            "amount_usd": 74481.54
+          },
+          {
+            "transaction_id": 4029473,
+            "amount_usd": 6223.68
+          }
+        ],
+        "confidence": 0.92,
+        "narrative": "On 2022‑09‑08 the account received 11 inbound payments, including a single $21 M ACH transfer (#4029472) and ten smaller ACH/cheque payments from distinct counterparties. No outbound activity occurred that day. This classic fan‑in pattern—many distinct senders converging on one account—matches the model’s high score and the typology notes. The evidence from the eight cited transactions confirms the inbound burst, so the alert is escalated as a fan_in case."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 81.54884257199956,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:0049142:813363AB0",
+      "report": {
+        "alert_id": "2022-09-08:0049142:813363AB0",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [
+          {
+            "transaction_id": 3925676,
+            "amount_usd": 16280.09
+          }
+        ],
+        "confidence": 0.95,
+        "narrative": "The account received 40 inbound payments and sent none on 2022‑09‑08. Only one red‑flag criterion is met: many new counterparties sent money. No outbound activity, no cycles, and no hub behaviour. The model’s low score and the lack of a second red‑flag support a non‑laundering explanation. Therefore the alert is closed with typology ‘none’."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 60.89097043299989,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:0016649:806108320",
+      "report": {
+        "alert_id": "2022-09-08:0016649:806108320",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [
+          {
+            "transaction_id": 3958774,
+            "amount_usd": 2506.25
+          },
+          {
+            "transaction_id": 4144895,
+            "amount_usd": 8912.15
+          },
+          {
+            "transaction_id": 4144894,
+            "amount_usd": 2969.63
+          },
+          {
+            "transaction_id": 4164439,
+            "amount_usd": 1168.05
+          }
+        ],
+        "confidence": 0.92,
+        "narrative": "The account sent four payments on 2022‑09‑08 and received none. No money returned, no split or gather pattern, and no counterparty was active with many others that day. The model score is low and the explanation shows only minor positive factors. With fewer than two red flags present, the alert is closed."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 39.30083231200024,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:0118:811A67510",
+      "report": {
+        "alert_id": "2022-09-07:0118:811A67510",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 2132662,
+            "amount_usd": 10384749.59
+          },
+          {
+            "transaction_id": 3654846,
+            "amount_usd": 662.5
+          },
+          {
+            "transaction_id": 3654848,
+            "amount_usd": 68.05
+          }
+        ],
+        "confidence": 0.92,
+        "narrative": "The account received a single ACH payment of $10.3 million (#2132662) and sent only a few small payments that day. No cycle, fan‑out, or fan‑in pattern is evident. The model’s high score is driven by the large inbound transfer, and the lack of other red‑flag patterns means the alert cannot be closed. Therefore the model’s escalation stands, and the case is escalated for full investigation as unclassified."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 70.11718132900023,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:0241704:811AA3930",
+      "report": {
+        "alert_id": "2022-09-08:0241704:811AA3930",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [
+          {
+            "transaction_id": 3772244,
+            "amount_usd": 1678.78
+          },
+          {
+            "transaction_id": 3772245,
+            "amount_usd": 2574.62
+          },
+          {
+            "transaction_id": 4025652,
+            "amount_usd": 3084.86
+          }
+        ],
+        "confidence": 0.92,
+        "narrative": "The account received two payments from the same counterparty (#3772244, #3772245) totaling €4,253 and sent one payment (#4025652) of €3,085 on the same day. No cycles, fan‑out, fan‑in, or relay patterns are present. Only one red flag (in‑out on the same day) is observed, insufficient to override the model’s close. Therefore the alert is closed with typology ‘none’."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 40.6809914079995,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:0048211:811BD01A0",
+      "report": {
+        "alert_id": "2022-09-07:0048211:811BD01A0",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [
+          {
+            "transaction_id": 3293599,
+            "amount_usd": 22843.98
+          },
+          {
+            "transaction_id": 3616095,
+            "amount_usd": 1874.07
+          },
+          {
+            "transaction_id": 3616094,
+            "amount_usd": 1404.41
+          }
+        ],
+        "confidence": 0.95,
+        "narrative": "The account received a single large ACH payment (#3293599) and sent two smaller payments (#3616095, #3616094) to the same counterparty. No round‑trip or fan‑out pattern is present, and the inbound and outbound amounts differ markedly. The graph shows no cycles and the counterparty is a typical one‑to‑many payer. With no two red flags, the model’s low score and the lack of suspicious structure justify closing the alert."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 68.3594809719998,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:00220:80DDDBAC0",
+      "report": {
+        "alert_id": "2022-09-08:00220:80DDDBAC0",
+        "decision": "escalate",
+        "typology": "fan_out",
+        "evidence": [
+          {
+            "transaction_id": 3837500,
+            "amount_usd": 112328.45
+          },
+          {
+            "transaction_id": 3837502,
+            "amount_usd": 92944.48
+          },
+          {
+            "transaction_id": 3837501,
+            "amount_usd": 24643.57
+          }
+        ],
+        "confidence": 0.92,
+        "narrative": "On 2022‑09‑08 the account sent three large payments—#3837500 ($112,328.45), #3837502 ($92,944.48), and #3837501 ($24,643.57)—to the same counterparty (007042:80E3E2030) within minutes. This one‑to‑many burst of outbound funds is a classic fan‑out pattern used to layer money. No inbound funds of comparable size were received, and the account’s activity is otherwise typical. The model’s score and the transaction pattern confirm a high‑risk laundering scenario, warranting escalation."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 47.67275163100021,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:0022732:80EC539C0",
+      "report": {
+        "alert_id": "2022-09-07:0022732:80EC539C0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 3472145,
+            "amount_usd": 2774.41
+          },
+          {
+            "transaction_id": 3472146,
+            "amount_usd": 1364.99
+          },
+          {
+            "transaction_id": 3472148,
+            "amount_usd": 3413.62
+          }
+        ],
+        "confidence": 0.92,
+        "narrative": "The account received three ACH payments (#3472145, #3472146, #3472148) totaling $7,552.92 on 2022‑09‑07, with no outbound activity that day. No cycles or relay patterns were found in the 1‑hop or 2‑hop neighborhood, and none of the counterparties act as hubs. The model flagged the day, but the transaction graph shows no recognizable laundering typology. Therefore the alert is escalated as unclassified."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 71.29937886799962,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:0223:811A4DBD0",
+      "report": {
+        "alert_id": "2022-09-07:0223:811A4DBD0",
+        "decision": "escalate",
+        "typology": "fan_out",
+        "evidence": [
+          {
+            "transaction_id": 3273078,
+            "amount_usd": 28544.59
+          },
+          {
+            "transaction_id": 3273077,
+            "amount_usd": 9015.13
+          },
+          {
+            "transaction_id": 3664343,
+            "amount_usd": 6065.81
+          },
+          {
+            "transaction_id": 3625619,
+            "amount_usd": 2397.25
+          },
+          {
+            "transaction_id": 3625618,
+            "amount_usd": 1437.92
+          }
+        ],
+        "confidence": 0.92,
+        "narrative": "On 2022‑09‑07 the account received a single large payment of $28,544.59 (and a smaller $9,015) from counterparty 0119:8000E0380, a hub that pays many accounts that day. Within the same day the account sent $6,065.81 to 0222:800051110, $2,397.25 to 0119:811A4F330, and $1,437.92 to the same counterparty, spreading the inbound sum to three distinct receivers in a short period. This one‑to‑many “fan‑out” pattern is a classic layering technique, confirming the model’s escalation. The evidence is clear and the pattern matches the fan_out typology."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 36.98805713399997,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:0017174:812DAA970",
+      "report": {
+        "alert_id": "2022-09-08:0017174:812DAA970",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [
+          {
+            "transaction_id": 4143540,
+            "amount_usd": 47049.07
+          },
+          {
+            "transaction_id": 4143542,
+            "amount_usd": 41883.76
+          },
+          {
+            "transaction_id": 4143537,
+            "amount_usd": 17416.82
+          },
+          {
+            "transaction_id": 4143538,
+            "amount_usd": 49623.18
+          }
+        ],
+        "confidence": 0.95,
+        "narrative": "The account received 12 inbound payments on 2022‑09‑08, all from distinct counterparties, with no outgoing transfers that day. No money returned to the account, no hub or fan‑out activity, and no split or gather pattern. The only trigger was R01 (rapid concentration), and the model’s score is very low (0.02). Thus, no red flags are present, and the alert is closed."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 74.48528830299983,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:014325:80AC182B0",
+      "report": {
+        "alert_id": "2022-09-08:014325:80AC182B0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 3982890,
+            "amount_usd": 574.02
+          },
+          {
+            "transaction_id": 3982891,
+            "amount_usd": 2877.01
+          },
+          {
+            "transaction_id": 4031854,
+            "amount_usd": 3917.49
+          }
+        ],
+        "confidence": 0.92,
+        "narrative": "The account performed a single ACH payment of $3,917 and received two payments from the same counterparty ($2,877 cash and $574 cheque). No cycles, no money returned, and no relay or hub activity were detected. The graph shows only one inbound source and one outbound payment, with no split or fan‑out patterns. The model’s low score is due to the payment format, not to suspicious structure. Thus the alert is escalated as unclassified."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 39.554478410999764,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:002991:8012DE8D0",
+      "report": {
+        "alert_id": "2022-09-08:002991:8012DE8D0",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 3117684,
+            "amount_usd": 19401.24
+          }
+        ],
+        "confidence": 0.95,
+        "narrative": "The model flagged account 002991:8012DE8D0 for a single large ACH inflow (#3117684) of $19,401.24. The account had no outgoing activity that day and no other red‑flag patterns. The high score is driven by the payment format and amount, not by a typical laundering typology. Therefore the alert is escalated for a full investigation under the unclassified typology."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 26.196792321999965,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:0221282:809467AB0",
+      "report": {
+        "alert_id": "2022-09-08:0221282:809467AB0",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [
+          {
+            "transaction_id": 3846212,
+            "amount_usd": 2231.11
+          }
+        ],
+        "confidence": 0.98,
+        "narrative": "The account received a single ACH payment of $2,231.11 (transaction #3846212) on 2022‑09‑08 and had no outgoing transfers that day. No same‑day inflow/outflow, split/gather, hub, cycle, or relay activity was detected. The model’s low score and the absence of any red‑flag patterns confirm routine behavior. Therefore the alert is closed with typology ‘none’."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 65.53548404400044,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:022828:804DC4E01",
+      "report": {
+        "alert_id": "2022-09-07:022828:804DC4E01",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.99,
+        "narrative": "The account sent 10 outbound payments on 2022‑09‑07, all to only two counterparties, with no inbound or returned funds. Its daily activity matches its normal pattern and the model’s score is essentially zero. No red flags such as round‑trip, scatter‑gather, or hub activity were found. Therefore the alert is closed with no typology."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 26.01861719000044,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:001501:8014BD750",
+      "report": {
+        "alert_id": "2022-09-08:001501:8014BD750",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.98,
+        "narrative": "The account’s 12 outgoing and 4 incoming transactions on 2022‑09‑08 are typical for its history, with no red‑flag patterns such as rapid dispersion, round‑trip cycles, or hub activity. The graph neighborhood shows only a few counterparties, none of which are hubs or part of a cycle. The model’s score is very low and the explanation confirms no suspicious features. Therefore the alert is closed with no typology."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 30.504273689999536,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-07:0287:8066609F0",
+      "report": {
+        "alert_id": "2022-09-07:0287:8066609F0",
+        "decision": "close",
+        "typology": "none",
+        "evidence": [],
+        "confidence": 0.95,
+        "narrative": "The account received five inbound payments on 2022‑09‑07 from only three counterparties, with no outbound or return flows. No fan‑out, fan‑in, cycle, or hub patterns were observed. Only a single small red flag (multiple small inbound payments) exists, insufficient for escalation. Therefore the alert is closed as per the model’s decision."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 4,
+      "seconds": 50.377036904000306,
+      "error": null
+    },
+    {
+      "alert_id": "2022-09-08:0113798:809220590",
+      "report": {
+        "alert_id": "2022-09-08:0113798:809220590",
+        "decision": "escalate",
+        "typology": "unclassified",
+        "evidence": [
+          {
+            "transaction_id": 3992471,
+            "amount_usd": 2417.62
+          },
+          {
+            "transaction_id": 3735408,
+            "amount_usd": 46.75
+          }
+        ],
+        "confidence": 0.85,
+        "narrative": "The account sent a $2,417.62 ACH payment (#3992471) and received a $46.75 credit‑card payment (#3735408) on the same day. No cycles, no branching, and no large split or gather pattern were found. The model already flagged this day, and the limited activity does not match any known laundering typology. Therefore the case is escalated as unclassified."
+      },
+      "grounded": true,
+      "hallucinated_ids": 0,
+      "steps": 5,
+      "seconds": 40.09966509200058,
+      "error": null
+    }
+  ]
+}
