@@ -48,6 +48,20 @@
 
 ## Consequences
 
+- **Verified end to end in Docker.** `investigate_alerts` with day 10 Sep and top 3 ran in the
+  Airflow container against Ollama on the GPU and succeeded in 8 minutes:
+  - every tool answered inside the container, `search_typologies` included, and `explain_score`
+    gave each alert the score the batch had given it (0.997182 for the first);
+  - all three reports passed verification, with no invented transaction; each investigation took
+    144–189 s, pauses included;
+  - `/cases` showed the three investigations and none on the fourth alert.
+  - In hindsight, the three account-days hold scatter-gather laundering. The agent escalated
+    all three, as the score alone would, and named the typology wrong each time (fan-in twice,
+    cycle once), as on the golden set (`docs/agent_eval.md`).
+- **The GPU sets the pace.** With its clocks locked at 210–700 MHz, the laptop's GPU went from 77
+  to 84 °C in 30 s of generation. The run went through only because a watcher outside the repository
+  paused the agent's process at 80 °C and resumed it at 70 °C, six times. Docker Desktop runs
+  containers in their own VM, so the watcher signals the process through `docker exec`.
 - **Ranks mean the same as on the case sets**: the batch ranks a day's account-days as the
   evaluation does, so the agent's `model_call_rank` rule (ADR-0019) holds.
 - **Train days can be investigated**, which the case sets never hold; their scores are in-sample,

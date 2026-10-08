@@ -65,13 +65,26 @@ async def investigate_day(settings: Settings, day: date, top: int) -> list[Inves
         raise ValueError(f"{day} has no alert queue")
     # The investigator sees an alert as it does on the case sets: the day's phase is not its call.
     alerts = [CaseAlert(**alert.model_dump(exclude={"phase"})) for alert in queued]
-    return await investigate_alerts(
-        settings,
-        alerts,
-        lambda result: write_investigation(
-            settings, result, investigation_path(settings, result.alert_id)
-        ),
-        batch_day=day,
+
+    def keep(result: Investigation) -> None:  # as each one ends: a run takes minutes an alert
+        path = investigation_path(settings, result.alert_id)
+        log_investigation(result, write_investigation(settings, result, path))
+
+    return await investigate_alerts(settings, alerts, keep, batch_day=day)
+
+
+def log_investigation(investigation: Investigation, path: Path) -> None:
+    """What an investigation took and concluded, and where it was kept."""
+    report = investigation.report
+    logger.info(
+        "%s in %.0f s, %d tool calls, %d model calls; grounded: %s; written to %s\n%s",
+        investigation.alert_id,
+        investigation.seconds,
+        investigation.steps,
+        investigation.llm_calls,
+        investigation.grounding.grounded if investigation.grounding else None,
+        path,
+        report.model_dump_json(indent=1) if report else investigation.error,
     )
 
 
