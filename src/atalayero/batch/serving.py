@@ -5,7 +5,9 @@ warehouse; the API and the dashboard only ever open `batch.serving_path`, read-o
 builds a new serving database from the complete days and moves it into place in one step, so a
 reader sees either the old one or the new one, and never blocks a run.
 
-It holds no labels: only what the monitoring system knows at alert time.
+It holds no label of any transaction or alert: only what the monitoring system knows at alert
+time, and the KPIs dbt builds from the batch (`dbt build --select tag:batch`). Those are
+aggregates computed with the dataset's labels, in hindsight, and say so.
 """
 
 import logging
@@ -21,6 +23,8 @@ from atalayero.settings import Settings
 from atalayero.streaming.consumer import ALERT_COLUMNS
 
 logger = logging.getLogger(__name__)
+
+KPI_TABLES = ("kpi_daily", "kpi_rules", "kpi_typologies")  # dbt marts over the batch's files
 
 # Schemas of the tables built from day files, for when no day has written one yet.
 _ALERTS = (
@@ -159,9 +163,22 @@ def build_serving(settings: Settings, path: Path) -> dict[str, int]:
             else None,
             ", ".join(f"{name} {kind}" for name, kind in _DRIFT.items()),
         )
+        built = {
+            name
+            for (name,) in con.execute(
+                "SELECT table_name FROM duckdb_tables() "
+                "WHERE database_name = 'wh' AND schema_name = 'marts'"
+            ).fetchall()
+        }
+        for name in KPI_TABLES:
+            if name in built:
+                con.execute(f"CREATE TABLE {name} AS SELECT * FROM wh.marts.{name} ORDER BY ALL")
+            else:
+                logger.warning("No %s in the warehouse: run `dbt build --select tag:batch`", name)
+        tables = ("days", "alerts", "rule_alerts", "alert_transactions", "drift")
         rows = {
             name: con.execute(f"SELECT count(*) FROM {name}").fetchone()[0]
-            for name in ("days", "alerts", "rule_alerts", "alert_transactions", "drift")
+            for name in (*tables, *(k for k in KPI_TABLES if k in built))
         }
         con.execute("DETACH wh")
     return rows
