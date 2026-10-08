@@ -1,3 +1,4 @@
+import sys
 from collections.abc import Callable
 from pathlib import Path
 
@@ -9,6 +10,13 @@ from atalayero.settings import Settings
 
 APP = str(Path(__file__).parents[2] / "dashboard" / "app.py")
 BuildKpis = Callable[[Settings, Path], None]
+
+
+@pytest.fixture(autouse=True)
+def restore_main(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Streamlit installs the app as `__main__` and leaves it there; spawned workers of later
+    tests (the graph features) would then run the dashboard as their main module."""
+    monkeypatch.setitem(sys.modules, "__main__", sys.modules["__main__"])
 
 
 @pytest.fixture(scope="module")
