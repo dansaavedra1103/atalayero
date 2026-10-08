@@ -53,11 +53,12 @@ def _build_kpis(settings: Settings, tmp_path: Path) -> None:
     assert result.returncode == 0, result.stdout[-3000:]
 
 
-@pytest.fixture
-def with_kpis(replayed: Settings, tmp_path: Path) -> Settings:
-    _build_kpis(replayed, tmp_path)
-    publish(replayed)
-    return replayed
+@pytest.fixture(scope="module")
+def with_kpis(replayed_once: Settings, tmp_path_factory: pytest.TempPathFactory) -> Settings:
+    """The replayed fixture with its KPIs built and published, once: these tests only read."""
+    _build_kpis(replayed_once, tmp_path_factory.mktemp("dbt"))
+    publish(replayed_once)
+    return replayed_once
 
 
 def _expected(settings: Settings) -> tuple[pd.DataFrame, pd.DataFrame]:
