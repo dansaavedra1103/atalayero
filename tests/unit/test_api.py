@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import shutil
 from collections.abc import Callable, Sequence
 from datetime import date
@@ -190,10 +191,13 @@ def test_a_case_shows_its_account_day(served: Settings, client: TestClient) -> N
 
 
 def test_a_case_shows_the_investigation_of_its_day(
-    served: Settings, client: TestClient, monkeypatch: pytest.MonkeyPatch
+    served: Settings,
+    client: TestClient,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
 ) -> None:
     """`investigate_day` hands the agent the top of the day's queue, as the case sets show
-    alerts, and keeps each investigation where `/cases` reads it."""
+    alerts, logs each investigation as it ends, and keeps it where `/cases` reads it."""
     day = date(2022, 9, 8)
     handed: list[tuple[list[CaseAlert], date | None]] = []
 
@@ -212,9 +216,12 @@ def test_a_case_shows_the_investigation_of_its_day(
     monkeypatch.setattr("atalayero.agent.run.investigate_alerts", agent)
     queue = _get(client, "/alerts", day=day.isoformat()).json()["alerts"]
     try:
-        asyncio.run(investigate_day(served, day, 2))
+        with caplog.at_level(logging.INFO, logger="atalayero.agent.run"):
+            asyncio.run(investigate_day(served, day, 2))
 
         [(alerts, batch_day)] = handed
+        logged = [r.getMessage().split(" in ")[0] for r in caplog.records]
+        assert logged == [a.alert_id for a in alerts]
         assert batch_day == day
         assert [a.alert_id for a in alerts] == [a["alert_id"] for a in queue[:2]]
         assert all(type(a) is CaseAlert for a in alerts)  # not the day's phase

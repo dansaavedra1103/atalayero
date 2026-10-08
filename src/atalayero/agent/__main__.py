@@ -5,13 +5,8 @@ import argparse
 import asyncio
 import logging
 from datetime import date
-from pathlib import Path
-from typing import TYPE_CHECKING
 
 from atalayero.settings import Settings
-
-if TYPE_CHECKING:
-    from atalayero.agent.graph import Investigation
 
 
 def main() -> None:
@@ -60,20 +55,17 @@ def investigate_day(
 ) -> None:
     from atalayero.agent.run import investigate_day as run
     from atalayero.batch.day import MissingDaysError
-    from atalayero.batch.queries import investigation_path
 
     if top < 1:
         parser.error("--top takes a positive number")
     try:
-        results = asyncio.run(run(settings, day, top))
+        asyncio.run(run(settings, day, top))  # logs each investigation as it ends
     except (MissingDaysError, ValueError) as error:  # before any investigation starts
         parser.error(str(error))
-    for result in results:
-        _log(result, investigation_path(settings, result.alert_id))
 
 
 def investigate(settings: Settings, alert_id: str | None, parser: argparse.ArgumentParser) -> None:
-    from atalayero.agent.run import investigate_alerts, write_investigation
+    from atalayero.agent.run import investigate_alerts, log_investigation, write_investigation
     from atalayero.evals.golden import load_alerts
 
     alerts = {
@@ -87,21 +79,7 @@ def investigate(settings: Settings, alert_id: str | None, parser: argparse.Argum
     if case_set == "golden":
         logging.warning("A golden-set alert: the golden set is for reported results (ADR-0015)")
     [result] = asyncio.run(investigate_alerts(settings, [alert]))
-    _log(result, write_investigation(settings, result))
-
-
-def _log(result: "Investigation", path: Path) -> None:
-    report = result.report.model_dump_json(indent=1) if result.report else None
-    logging.info(
-        "%s in %.0f s, %d tool calls, %d model calls; grounded: %s; written to %s\n%s",
-        result.alert_id,
-        result.seconds,
-        result.steps,
-        result.llm_calls,
-        result.grounding.grounded if result.grounding else None,
-        path,
-        report or result.error,
-    )
+    log_investigation(result, write_investigation(settings, result))
 
 
 if __name__ == "__main__":
