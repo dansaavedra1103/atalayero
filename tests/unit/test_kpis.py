@@ -1,7 +1,4 @@
-import gc
-import os
-import subprocess
-import sys
+from collections.abc import Callable
 from pathlib import Path
 
 import duckdb
@@ -15,48 +12,24 @@ from atalayero.monitoring.kpis import (
     ServingUnavailableError,
     daily_kpis,
     drift_days,
+    queue_sources,
     rule_kpis,
+    rule_totals,
+    summary,
     typology_kpis,
+    typology_totals,
 )
 from atalayero.settings import Settings
 
-
-def _build_kpis(settings: Settings, tmp_path: Path) -> None:
-    """`dbt build --select tag:batch` on the fixture's warehouse and batch files, in its own
-    process as in production: DuckDB lets one process open a file in one database only."""
-    gc.collect()  # connections the model fixtures left open would hold a lock on the file
-    env = {
-        **os.environ,
-        "ATALAYERO_DUCKDB_PATH": str(settings.duckdb_path),
-        "ATALAYERO_BATCH__DIR": str(settings.batch.dir),
-    }
-    result = subprocess.run(
-        [
-            str(Path(sys.executable).parent / "dbt"),
-            "build",
-            "--project-dir",
-            "dbt",
-            "--profiles-dir",
-            "dbt",
-            "--select",
-            "tag:batch",
-            "--target-path",
-            str(tmp_path / "dbt-target"),
-            "--log-path",
-            str(tmp_path / "dbt-logs"),
-        ],
-        env=env,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    assert result.returncode == 0, result.stdout[-3000:]
+BuildKpis = Callable[[Settings, Path], None]
 
 
 @pytest.fixture(scope="module")
-def with_kpis(replayed_once: Settings, tmp_path_factory: pytest.TempPathFactory) -> Settings:
+def with_kpis(
+    replayed_once: Settings, tmp_path_factory: pytest.TempPathFactory, build_kpis: BuildKpis
+) -> Settings:
     """The replayed fixture with its KPIs built and published, once: these tests only read."""
-    _build_kpis(replayed_once, tmp_path_factory.mktemp("dbt"))
+    build_kpis(replayed_once, tmp_path_factory.mktemp("dbt"))
     publish(replayed_once)
     return replayed_once
 
@@ -146,12 +119,64 @@ def test_kpis_wait_for_the_serving_database(replayed: Settings) -> None:
 
 
 def test_the_kpi_models_build_before_the_batch_has_run(
-    fitted_settings: Settings, tmp_path: Path
+    fitted_settings: Settings, tmp_path: Path, build_kpis: BuildKpis
 ) -> None:
     empty = fitted_settings.model_copy(
         update={"batch": fitted_settings.batch.model_copy(update={"dir": tmp_path / "none"})}
     )
-    _build_kpis(empty, tmp_path)
+    build_kpis(empty, tmp_path)
     with duckdb.connect(str(empty.duckdb_path), read_only=True) as con:
         counts = [con.execute(f"SELECT count(*) FROM marts.{t}").fetchone()[0] for t in KPI_TABLES]
     assert counts == [0, 0, 0]
+
+
+def test_rates_over_several_days_are_pooled() -> None:
+    daily = pd.DataFrame(
+        {
+            "day": pd.to_datetime(["2022-09-01", "2022-09-02", "2022-09-03"]),
+            "phase": ["warm-up", "test", "test"],
+            "alerts": [None, 10, 30],
+            "model_alerts": [None, 8, 20],
+            "rule_alerts": [None, 4, 15],
+            "alerts_with_laundering": [None, 5, 3],
+            "laundering_transactions": [9, 20, 0],
+            "laundering_detected": [None, 4, 0],
+        }
+    )
+    assert summary(daily) == {
+        "days": 2,  # the warm-up day has no queue
+        "alerts_per_day": 20.0,
+        "false_positive_share": pytest.approx(1 - 8 / 40),
+        "detection_rate": pytest.approx(4 / 20),
+    }
+    sources = queue_sources(daily).pivot(index="day", columns="source", values="alerts")
+    assert sources.loc["2022-09-02"].to_dict() == {"both": 2, "model_only": 6, "rules_only": 2}
+    assert (sources.sum(axis=1).to_numpy() == [10, 30]).all()
+    empty = summary(daily.iloc[:1])
+    assert empty["days"] == 0 and empty["detection_rate"] is None
+
+
+def test_rule_and_typology_totals_pool_their_days() -> None:
+    rules = pd.DataFrame(
+        {
+            "rule_id": ["R01", "R01", "R02"],
+            "alerts": [3, 1, 2],
+            "account_days": [2, 2, 2],
+            "account_days_with_laundering": [1, 0, 2],
+            "account_days_in_queue": [2, 1, 0],
+        }
+    )
+    totals = rule_totals(rules).set_index("rule_id")
+    assert totals.loc["R01", "hit_rate"] == pytest.approx(1 / 4)
+    assert totals.loc["R01", "in_queue"] == pytest.approx(3 / 4)
+    assert totals.loc["R02", "in_queue"] == 0
+    typologies = pd.DataFrame(
+        {
+            "typology": ["cycle", "cycle", "untyped"],
+            "laundering_transactions": [4, 6, 10],
+            "laundering_detected": [2, 3, 0],
+        }
+    )
+    totals = typology_totals(typologies)
+    assert list(totals["typology"]) == ["cycle", "untyped"]
+    assert list(totals["detection_rate"]) == [0.5, 0.0]

@@ -23,6 +23,7 @@ dependencies = [
     "pydantic-settings>=2.15.0",
     "pyyaml>=6.0.3",
     "scikit-learn>=1.9.1",
+    "streamlit>=1.64.0,<1.65",
     "uvicorn>=0.54.0",
 ]
 
