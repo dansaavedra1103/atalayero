@@ -44,59 +44,57 @@ def sample_patterns() -> Path:
 MakeTx = Callable[..., Transaction]
 
 
+def _transaction(
+    transaction_id: int,
+    minutes: float,
+    sender: str = "001:A",
+    receiver: str = "001:B",
+    usd: float = 6000.0,
+) -> Transaction:
+    amount = Decimal(str(usd))
+    return Transaction(
+        transaction_id=transaction_id,
+        transacted_at=T0 + timedelta(minutes=minutes),
+        sender_account_key=sender,
+        receiver_account_key=receiver,
+        amount_paid=amount,
+        payment_currency="US Dollar",
+        amount_paid_usd=usd,
+        amount_received=amount,
+        receiving_currency="US Dollar",
+        amount_received_usd=usd,
+        payment_format="ach",
+    )
+
+
 @pytest.fixture
 def make_tx() -> MakeTx:
     """Build a US Dollar transaction `minutes` after T0."""
-
-    def make(
-        transaction_id: int,
-        minutes: float,
-        sender: str = "001:A",
-        receiver: str = "001:B",
-        usd: float = 6000.0,
-    ) -> Transaction:
-        amount = Decimal(str(usd))
-        return Transaction(
-            transaction_id=transaction_id,
-            transacted_at=T0 + timedelta(minutes=minutes),
-            sender_account_key=sender,
-            receiver_account_key=receiver,
-            amount_paid=amount,
-            payment_currency="US Dollar",
-            amount_paid_usd=usd,
-            amount_received=amount,
-            receiving_currency="US Dollar",
-            amount_received_usd=usd,
-            payment_format="ach",
-        )
-
-    return make
+    return _transaction
 
 
 WriteDb = Callable[[list[Transaction]], Path]
+
+
+def _write_fct_transactions(directory: Path, transactions: list[Transaction]) -> Path:
+    db = directory / "atalayero.duckdb"
+    fields = Transaction.model_fields
+    columns = ", ".join(f"{name} {_DUCKDB_TYPES[f.annotation]}" for name, f in fields.items())
+    with duckdb.connect(str(db)) as con:
+        con.execute("CREATE SCHEMA marts")
+        con.execute(f"CREATE TABLE marts.fct_transactions ({columns}, is_self_transfer BOOLEAN)")
+        con.executemany(
+            f"INSERT INTO marts.fct_transactions VALUES ({', '.join('?' * (len(fields) + 1))})",
+            [[*tx.model_dump().values(), False] for tx in transactions],
+        )
+    return db
 
 
 @pytest.fixture
 def fct_transactions_db(tmp_path: Path) -> WriteDb:
     """Write transactions to `marts.fct_transactions` in a fresh DuckDB file, with one extra
     column as in the real mart."""
-
-    def write(transactions: list[Transaction]) -> Path:
-        db = tmp_path / "atalayero.duckdb"
-        fields = Transaction.model_fields
-        columns = ", ".join(f"{name} {_DUCKDB_TYPES[f.annotation]}" for name, f in fields.items())
-        with duckdb.connect(str(db)) as con:
-            con.execute("CREATE SCHEMA marts")
-            con.execute(
-                f"CREATE TABLE marts.fct_transactions ({columns}, is_self_transfer BOOLEAN)"
-            )
-            con.executemany(
-                f"INSERT INTO marts.fct_transactions VALUES ({', '.join('?' * (len(fields) + 1))})",
-                [[*tx.model_dump().values(), False] for tx in transactions],
-            )
-        return db
-
-    return write
+    return lambda transactions: _write_fct_transactions(tmp_path, transactions)
 
 
 LoadTx = Callable[[list[Transaction]], duckdb.DuckDBPyConnection]
@@ -121,9 +119,7 @@ def load_tx() -> LoadTx:
     return load
 
 
-@pytest.fixture
-def small_params() -> dict[str, dict]:
-    """Hyperparameters of each model family that train in a blink."""
+def _small_params() -> dict[str, dict]:
     return {
         "logistic_regression": {"C": 1.0, "class_weight": "balanced", "negative_rate": 0.5},
         "lightgbm": {
@@ -138,6 +134,12 @@ def small_params() -> dict[str, dict]:
         },
         "isolation_forest": {"n_estimators": 20, "max_samples": 64, "max_features": 1.0},
     }
+
+
+@pytest.fixture
+def small_params() -> dict[str, dict]:
+    """Hyperparameters of each model family that train in a blink."""
+    return _small_params()
 
 
 @pytest.fixture
@@ -162,16 +164,7 @@ def synthetic() -> Callable[..., Dataset]:
     return synthetic
 
 
-@pytest.fixture
-def model_settings(
-    make_tx: MakeTx,
-    fct_transactions_db: WriteDb,
-    small_params: dict[str, dict],
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-) -> Settings:
-    """Four days of random transactions where large amounts are laundering: 5 Sep is warm-up,
-    6-7 Sep train, 8 Sep validation. Features, rule alerts and a small model config are ready."""
+def _model_settings(tmp_path: Path) -> Settings:
     from atalayero.features.graph import build_graph_features
     from atalayero.features.motifs import build_motif_features
     from atalayero.features.tabular import build_tabular_features
@@ -179,11 +172,10 @@ def model_settings(
     from atalayero.rules.schema import load_rules
     from atalayero.streaming.consumer import AlertSink
 
-    monkeypatch.chdir(REPO_ROOT)
     rng = random.Random(0)
     accounts = [f"00{i % 3}:{i}" for i in range(40)]
     transactions = [
-        make_tx(
+        _transaction(
             i,
             rng.randrange(0, 4 * DAY - 540),
             sender=rng.choice(accounts),
@@ -192,7 +184,7 @@ def model_settings(
         )
         for i in range(800)
     ]
-    db = fct_transactions_db(transactions)
+    db = _write_fct_transactions(tmp_path, transactions)
     with duckdb.connect(str(db)) as con:
         con.execute(
             "CREATE TABLE marts.fct_laundering_labels AS SELECT transaction_id, "
@@ -205,7 +197,7 @@ def model_settings(
         yaml.safe_dump(
             {
                 "version": "1.0",
-                "families": {name: {"params": small_params[name]} for name in FAMILIES},
+                "families": {name: {"params": _small_params()[name]} for name in FAMILIES},
                 "history": [{"version": "1.0", "date": "2026-10-05", "reason": "Tests"}],
             }
         )
@@ -259,9 +251,14 @@ def model_settings(
 
 
 @pytest.fixture
-def holdout_settings(model_settings: Settings) -> Settings:
-    """The model fixture with every split a day earlier, so that test holds 8 Sep: train is
-    6 Sep, validation 7 Sep, and the rule alerts fall on test."""
+def model_settings(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Settings:
+    """Four days of random transactions where large amounts are laundering: 5 Sep is warm-up,
+    6-7 Sep train, 8 Sep validation. Features, rule alerts and a small model config are ready."""
+    monkeypatch.chdir(REPO_ROOT)
+    return _model_settings(tmp_path)
+
+
+def _holdout(model_settings: Settings) -> Settings:
     return model_settings.model_copy(
         update={
             "splits": model_settings.splits.model_copy(
@@ -276,9 +273,13 @@ def holdout_settings(model_settings: Settings) -> Settings:
 
 
 @pytest.fixture
-def fitted_settings(holdout_settings: Settings) -> Settings:
-    """The holdout fixture with its models fitted: a champion trained on train (6 Sep) and the
-    families refit for the test run, with their scores of 8 Sep."""
+def holdout_settings(model_settings: Settings) -> Settings:
+    """The model fixture with every split a day earlier, so that test holds 8 Sep: train is
+    6 Sep, validation 7 Sep, and the rule alerts fall on test."""
+    return _holdout(model_settings)
+
+
+def _fit(holdout_settings: Settings) -> Settings:
     from atalayero.models.holdout import run_holdout
     from atalayero.models.train import train_and_evaluate
 
@@ -288,9 +289,13 @@ def fitted_settings(holdout_settings: Settings) -> Settings:
 
 
 @pytest.fixture
-def replayed(fitted_settings: Settings, tmp_path: Path) -> Settings:
-    """The fitted model fixture (warm-up 5 Sep, train 6, validation 7, test 8 Sep) replayed by
-    the daily batch, with the single-pass rule alerts beside it."""
+def fitted_settings(holdout_settings: Settings) -> Settings:
+    """The holdout fixture with its models fitted: a champion trained on train (6 Sep) and the
+    families refit for the test run, with their scores of 8 Sep."""
+    return _fit(holdout_settings)
+
+
+def _replay(fitted_settings: Settings, tmp_path: Path) -> Settings:
     from atalayero.batch.day import Batch
     from atalayero.rules.batch import evaluate_rules
 
@@ -305,3 +310,19 @@ def replayed(fitted_settings: Settings, tmp_path: Path) -> Settings:
     evaluate_rules(settings)  # the fixture's rule alerts are hand-made
     Batch(settings).replay()
     return settings
+
+
+@pytest.fixture
+def replayed(fitted_settings: Settings, tmp_path: Path) -> Settings:
+    """The fitted model fixture (warm-up 5 Sep, train 6, validation 7, test 8 Sep) replayed by
+    the daily batch, with the single-pass rule alerts beside it."""
+    return _replay(fitted_settings, tmp_path)
+
+
+@pytest.fixture(scope="module")
+def replayed_once(tmp_path_factory: pytest.TempPathFactory) -> Settings:
+    """`replayed`, built once for a whole module of tests that only read it."""
+    tmp_path = tmp_path_factory.mktemp("replayed")
+    with pytest.MonkeyPatch.context() as monkeypatch:
+        monkeypatch.chdir(REPO_ROOT)
+        return _replay(_fit(_holdout(_model_settings(tmp_path))), tmp_path)

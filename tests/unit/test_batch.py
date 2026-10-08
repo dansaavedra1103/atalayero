@@ -169,7 +169,8 @@ def test_days_after_a_rule_change_must_be_replayed(dense_settings: Settings) -> 
         batch.run_day(date(2022, 9, 7))
 
 
-def test_days_are_scored_queued_and_checked_for_drift_by_phase(replayed: Settings) -> None:
+def test_days_are_scored_queued_and_checked_for_drift_by_phase(replayed_once: Settings) -> None:
+    replayed = replayed_once
     phases = {d: load_manifest(replayed, date(2022, 9, d)) for d in (5, 6, 7, 8)}
     assert {d: m.phase for d, m in phases.items() if m} == {
         5: "warm-up",
@@ -183,7 +184,8 @@ def test_days_are_scored_queued_and_checked_for_drift_by_phase(replayed: Setting
     assert [phases[d].drift_detected is None for d in (5, 6, 7, 8)] == [True, True, False, False]
 
 
-def test_the_queue_is_the_one_the_evaluation_builds(replayed: Settings) -> None:
+def test_the_queue_is_the_one_the_evaluation_builds(replayed_once: Settings) -> None:
+    replayed = replayed_once
     evaluator = SplitEvaluator(replayed, "validation")
     data = load_split(replayed, "validation")
     champion = Registry(replayed).load_champion()
@@ -203,7 +205,8 @@ def test_the_queue_is_the_one_the_evaluation_builds(replayed: Settings) -> None:
     assert list(queue["rank"]) == list(expected["rank"])
 
 
-def test_drift_matches_the_split_report(replayed: Settings) -> None:
+def test_drift_matches_the_split_report(replayed_once: Settings) -> None:
+    replayed = replayed_once
     (expected,) = detect_drift(replayed, "validation").days
     path = day_dir(replayed, date(2022, 9, 7)) / "drift.json"
     from atalayero.monitoring.drift import DayDrift
