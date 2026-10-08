@@ -2,7 +2,7 @@
 # model, its options, the limits or the prompts in src/atalayero/agent/prompts/ bumps `version`
 # and adds a `history` entry with the reason. The model's digest is pinned in
 # config/settings.yaml (`ollama.models`).
-version: "1.3"
+version: "1.4"
 model: "gpt-oss:20b"
 think: low  # gpt-oss reasoning effort: low, medium or high
 options:  # Ollama options
@@ -41,3 +41,12 @@ history:
       to escalate in 7 of 7, all of them laundering, with "no pattern, normal activity". The
       model's call to escalate now stands, enforced by the draft's schema; the agent names its
       typology and evidence, and escalates an alert the model would close on a red flag
+  - version: "1.4"
+    date: "2026-10-07"
+    reason: >-
+      v1.3 got 30 of the first 37 dev cases right, against 32 for score-only: it overrode the
+      model's close twice, both clean, each on one red flag (a counterparty paying 7 accounts;
+      the inflows that raised an R01 alert). Among the model's closes on dev, each red flag we
+      measured shows on more clean alerts than laundering ones. Escalating a model close now takes
+      two red flags, neither of them the pattern of the rule that raised the alert nor the
+      account's everyday activity

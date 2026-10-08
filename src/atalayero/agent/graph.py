@@ -36,7 +36,7 @@ DRAFT_FIELDS = ("decision", "typology", "evidence", "confidence", "narrative")
 # What the drafting prompt says about the decision, by the model's call (ADR-0019).
 DECISION_RULES = {
     "escalate": '"escalate": the model\'s call to escalate stands.',
-    "close": '"escalate" when you found a red flag; otherwise "close", the model\'s call.',
+    "close": '"escalate" when you found two red flags; otherwise "close", the model\'s call.',
 }
 
 
