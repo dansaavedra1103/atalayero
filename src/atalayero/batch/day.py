@@ -41,7 +41,13 @@ from atalayero.ingestion.source import sql_literal
 from atalayero.models.data import model_inputs
 from atalayero.models.evaluate import HUBS_SQL
 from atalayero.models.families import transaction_scores
-from atalayero.monitoring.drift import DayKind, Reference, day_drift, drift_references
+from atalayero.monitoring.drift import (
+    DayDrift,
+    DayKind,
+    Reference,
+    day_drift,
+    drift_references,
+)
 from atalayero.rules.online import OnlineEvaluator
 from atalayero.rules.schema import Rule, load_rules
 from atalayero.schemas import Alert
@@ -397,6 +403,23 @@ class Batch:
             d for d in self.days if (first is None or d >= first) and (last is None or d <= last)
         ]
         return [self.run_day(day) for day in days]
+
+
+def day_drifted(settings: Settings, day: date) -> bool:
+    """Whether a complete day drifted from train; False for a day with no drift check (warm-up
+    and train days). Fails if the day is not complete."""
+    manifest = load_manifest(settings, day)
+    if manifest is None:
+        raise MissingDaysError(f"{day} is not complete: run it first")
+    if manifest.drift_detected:
+        drift = DayDrift.model_validate_json((day_dir(settings, day) / "drift.json").read_text())
+        for reason in drift.reasons:
+            logger.warning("%s drifts: %s", day, reason)
+    else:
+        logger.info(
+            "%s: %s", day, "no drift" if manifest.drift_detected is False else "not checked"
+        )
+    return bool(manifest.drift_detected)
 
 
 def read_alerts(path: Path) -> list[Alert]:

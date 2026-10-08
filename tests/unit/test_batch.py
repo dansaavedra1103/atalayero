@@ -8,7 +8,14 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from atalayero.batch.day import Batch, MissingDaysError, day_dir, load_manifest, read_alerts
+from atalayero.batch.day import (
+    Batch,
+    MissingDaysError,
+    day_dir,
+    day_drifted,
+    load_manifest,
+    read_alerts,
+)
 from atalayero.batch.serving import publish
 from atalayero.evals.golden import queue_cases
 from atalayero.features.graph import build_graph_features
@@ -268,3 +275,14 @@ def test_a_day_outside_the_simulation_is_refused(dense_settings: Settings) -> No
     with pytest.raises(ValueError, match="outside the simulation"):
         Batch(dense_settings).run_day(date(2022, 9, 11))
     assert datetime(2022, 9, 11) == dense_settings.splits.test_end
+
+
+def test_the_drift_verdict_is_the_manifests(replayed: Settings) -> None:
+    for d in (5, 6, 7, 8):
+        manifest = load_manifest(replayed, date(2022, 9, d))
+        assert manifest is not None
+        assert day_drifted(replayed, date(2022, 9, d)) is bool(manifest.drift_detected)
+    assert not day_drifted(replayed, date(2022, 9, 5))  # warm-up: not checked
+    (day_dir(replayed, date(2022, 9, 8)) / "manifest.json").unlink()
+    with pytest.raises(MissingDaysError, match="not complete"):
+        day_drifted(replayed, date(2022, 9, 8))

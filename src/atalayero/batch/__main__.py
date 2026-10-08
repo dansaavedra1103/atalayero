@@ -1,15 +1,19 @@
-"""CLI: python -m atalayero.batch day <YYYY-MM-DD> | replay [--first D] [--last D] | publish.
+"""CLI: python -m atalayero.batch day <D> | replay [--first D] [--last D] | publish | drifted <D>.
 
 After `day` or `replay`, `dbt build --select tag:batch` builds the KPIs and `publish` moves a new
-serving database into place (ADR-0020); `make daily` and `make replay` run all three."""
+serving database into place (ADR-0020); `make daily` and `make replay` run all three.
+`drifted` exits 0 if the day drifted from train and NO_DRIFT if not, for the scheduler to branch
+on (ADR-0021)."""
 
 import argparse
 import logging
 from datetime import date
 
-from atalayero.batch.day import Batch
+from atalayero.batch.day import Batch, day_drifted
 from atalayero.batch.serving import publish
 from atalayero.settings import Settings
+
+NO_DRIFT = 3  # exit code of `drifted` for a day that did not drift (or was not checked)
 
 
 def main() -> None:
@@ -21,6 +25,10 @@ def main() -> None:
     replay.add_argument("--first", type=date.fromisoformat)
     replay.add_argument("--last", type=date.fromisoformat)
     commands.add_parser("publish", help="publish the serving database from the complete days")
+    drifted = commands.add_parser(
+        "drifted", help=f"exit 0 if a complete day drifted from train, {NO_DRIFT} if not"
+    )
+    drifted.add_argument("day", type=date.fromisoformat)
     args = parser.parse_args()
     logging.basicConfig(
         level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s"
@@ -30,6 +38,8 @@ def main() -> None:
         Batch(settings).run_day(args.day)
     elif args.command == "replay":
         Batch(settings).replay(args.first, args.last)
+    elif args.command == "drifted":
+        raise SystemExit(0 if day_drifted(settings, args.day) else NO_DRIFT)
     else:
         publish(settings)
 
