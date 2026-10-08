@@ -25,7 +25,7 @@
    | --- | --- |
    | `/health` | Whether it is up and has data; no key needed |
    | `/alerts` | The queue by day and rank, filtered by day or source, in pages of up to 500 |
-   | `/cases/{alert_id}` | An alert, every transaction of its account-day with its score, and the agent's investigation if one ran |
+   | `/cases/{alert_id}` | An alert, every transaction of its account-day with its score, and the agent's investigation if one ran (ADR-0024) |
    | `/score/{transaction_id}` | The score the batch gave the transaction, the champion version behind it, and the alerts it raised |
 
    Responses use the shared schemas (`QueuedAlert`, `Case`, `TransactionScore`…). No route
