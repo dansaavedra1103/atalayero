@@ -1,6 +1,6 @@
 # ADR-0013: Bounded look-backs and fewer graph features
 
-- Status: accepted
+- Status: accepted; decision 4 qualified by ADR-0020: relay depths, and which of several tied cycles is found, also depend on state older than 96 h
 - Date: 2026-10-05
 
 ## Context
