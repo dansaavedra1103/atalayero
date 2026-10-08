@@ -68,6 +68,13 @@ ollama:
     "qwen3-embedding:0.6b": ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d
     "gpt-oss:20b": 17052f91a42e97930aa6e28a6c6c06a983e6a58dbb00434885a0cf5313e376f7  # the investigator's language model (config/agent.yaml)
 
+# Daily batch (ADR-0020): the simulation replayed one day at a time, each day in its own directory
+# under `dir`. The API and the dashboard read only the serving database the batch publishes.
+batch:
+  dir: data/batch
+  serving_path: data/serving.duckdb
+  alert_budget: 100  # model alerts a day in the queue, on top of the rules' alerts
+
 # The investigator agent (ADR-0018): its versioned config, and where `make investigate` writes
 # each investigation (report, verification, transcript).
 agent:
