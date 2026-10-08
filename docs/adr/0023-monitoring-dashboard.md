@@ -13,7 +13,8 @@
 - **Every outcome is hindsight.** False positives and detection come from the dataset's labels,
   and train days were scored by a model that saw them.
 - **Streamlit sends usage statistics** to its makers unless told not to, and has no login of its
-  own.
+  own. Started headless with no address for viewers, it also asks `checkip.amazonaws.com` for the
+  machine's public address, only to print it.
 
 ## Decision
 
@@ -38,8 +39,9 @@
 4. **Colour by role.** Series take the first three slots of the reference categorical palette,
    in fixed order, with their dark-mode steps when the viewer's theme is dark. Text keeps the
    theme's ink. A single series takes no legend.
-5. **Nothing leaves the machine.** `.streamlit/config.toml` turns usage statistics off. It keeps
-   XSRF protection on, takes no uploads, watches no files, shows viewers no developer menu, and
+5. **Nothing leaves the machine.** `.streamlit/config.toml` turns usage statistics off and sets
+   the address viewers open (`localhost`), so Streamlit never looks up the machine's public one.
+   It keeps XSRF protection on, takes no uploads, watches no files, shows viewers no developer menu, and
    shows no error details in the browser.
 6. **The container** reuses the API's image (the same environment, from the build cache). It
    listens on `127.0.0.1:8501` and mounts the repository read-only, with a read-only root and a
@@ -54,6 +56,11 @@
 
 - **No login.** Anyone who can reach the laptop's localhost sees the dashboard. Beyond it, the
   gateway would have to front it with authentication.
+- **One lookup remains possible.** When a page from another origin opens the dashboard's
+  websocket, Streamlit compares that origin with the machine's public address, which it asks
+  `checkip.amazonaws.com` for once; no setting turns this off. The request carries nothing from
+  the dashboard, and the origin is refused. Putting the container on the gateway's internal
+  network would close it.
 - **The palette was not re-validated here**: the validator needs Node, which this machine lacks.
   The three slots are the ones the reference palette documents as validated together, in both
   modes.
