@@ -4,7 +4,7 @@ SAMPLE_ENV := ATALAYERO_DATA_DIR=data/sample ATALAYERO_DUCKDB_PATH=data/sample/a
 # MLflow prints a hint for coding agents on import; it is noise in the logs.
 MLFLOW_ENV := MLFLOW_DISABLE_AGENT_HINT=1
 
-.PHONY: setup check test-integration ingest fixture fx-rates dbt dbt-sample up down stream rules evaluate features tune train mlflow-ui drift holdout pipeline notebook golden-set eval llm knowledge investigate daily replay test-airflow
+.PHONY: setup check test-integration ingest fixture fx-rates dbt dbt-sample up down stream rules evaluate features tune train mlflow-ui drift holdout pipeline notebook golden-set eval llm knowledge investigate daily replay test-airflow env
 
 # LightGBM needs the system OpenMP runtime: sudo apt-get install libgomp1 (ADR-0009).
 setup:
@@ -36,22 +36,18 @@ dbt-sample:
 	$(SAMPLE_ENV) uv run python -m atalayero.ingestion load-sample
 	$(SAMPLE_ENV) $(DBT_BUILD)
 
-# Host settings and local secrets for Docker Compose, written once (ADR-0021; never committed).
-.env:
-	@uv run python -c "import base64, os, secrets; print('\n'.join([ \
-		f'AIRFLOW_UID={os.getuid()}', 'ATALAYERO_ROOT=$(CURDIR)', \
-		f'AIRFLOW_POSTGRES_PASSWORD={secrets.token_hex(16)}', \
-		f'AIRFLOW_JWT_SECRET={secrets.token_hex(32)}', \
-		f'AIRFLOW_FERNET_KEY={base64.urlsafe_b64encode(os.urandom(32)).decode()}']))" > .env
-	@chmod 600 .env
+# Host settings and local secrets for Docker Compose: added when missing, never changed
+# (ADR-0021, ADR-0022; .env is never committed).
+env:
+	@python3 docker/local_env.py .env $(CURDIR)
 
-up: .env
+up: env
 	mkdir -p data/airflow
 	docker compose up -d --wait
 
 # The DAGs load in Airflow's own Python, and the project's environment in the image imports the
 # package (ADR-0021); needs the image (`make up`).
-test-airflow: .env
+test-airflow: env
 	docker compose run --rm --no-deps -w $(CURDIR) airflow python airflow/tests/check_dags.py
 	docker compose run --rm --no-deps -w $(CURDIR) -e PYTHONPATH=$(CURDIR)/src \
 		--entrypoint /opt/atalayero/venv/bin/python airflow \

@@ -117,6 +117,16 @@ class BatchSettings(BaseModel):
     alert_budget: int = Field(ge=1)
 
 
+class ApiSettings(BaseModel):
+    key_hashes: tuple[str, ...] = ()  # SHA-256 hex digests of the accepted API keys
+    requests_per_minute: int = Field(ge=1)  # per API key, refilled continuously
+    burst: int = Field(ge=1)  # requests a key may make at once
+    max_concurrent_queries: int = Field(ge=1)  # beyond them, 503 instead of queueing
+    page_limit: int = Field(ge=1)  # most alerts in one page
+    docs: bool = False  # serve /docs and /openapi.json
+    allowed_hosts: tuple[str, ...]
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_prefix="ATALAYERO_",
@@ -140,6 +150,7 @@ class Settings(BaseSettings):
     knowledge: KnowledgeSettings
     agent: AgentSettings
     batch: BatchSettings
+    api: ApiSettings
     dataset: DatasetSettings
     streaming: StreamingSettings
 

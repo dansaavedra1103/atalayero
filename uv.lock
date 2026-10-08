@@ -156,6 +156,7 @@ dependencies = [
     { name = "dbt-duckdb" },
     { name = "duckdb" },
     { name = "faiss-cpu" },
+    { name = "fastapi" },
     { name = "langgraph" },
     { name = "lightgbm" },
     { name = "mcp" },
@@ -167,6 +168,7 @@ dependencies = [
     { name = "pydantic-settings" },
     { name = "pyyaml" },
     { name = "scikit-learn" },
+    { name = "uvicorn" },
 ]
 
 [package.dev-dependencies]
@@ -186,6 +188,7 @@ requires-dist = [
     { name = "dbt-duckdb", specifier = ">=1.11.0" },
     { name = "duckdb", specifier = ">=1.5.6" },
     { name = "faiss-cpu", specifier = ">=1.15.1" },
+    { name = "fastapi", specifier = ">=0.142.2" },
     { name = "langgraph", specifier = ">=1.2.14" },
     { name = "lightgbm", specifier = ">=4.7.0" },
     { name = "mcp", specifier = ">=2.3.0" },
@@ -197,6 +200,7 @@ requires-dist = [
     { name = "pydantic-settings", specifier = ">=2.15.0" },
     { name = "pyyaml", specifier = ">=6.0.3" },
     { name = "scikit-learn", specifier = ">=1.9.1" },
+    { name = "uvicorn", specifier = ">=0.54.0" },
 ]
 
 [package.metadata.requires-dev]

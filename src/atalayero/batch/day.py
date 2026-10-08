@@ -26,7 +26,6 @@ import pickle
 from collections.abc import Callable, Sequence
 from datetime import UTC, date, datetime, time, timedelta
 from pathlib import Path
-from typing import Literal
 
 import duckdb
 import pandas as pd
@@ -50,7 +49,7 @@ from atalayero.monitoring.drift import (
 )
 from atalayero.rules.online import OnlineEvaluator
 from atalayero.rules.schema import Rule, load_rules
-from atalayero.schemas import Alert
+from atalayero.schemas import Alert, DayPhase
 from atalayero.settings import Settings
 from atalayero.streaming.consumer import write_alerts
 from atalayero.streaming.producer import iter_transactions
@@ -58,7 +57,6 @@ from atalayero.streaming.producer import iter_transactions
 logger = logging.getLogger(__name__)
 
 FEATURE_LOOKBACK = timedelta(hours=96)  # the longest look-back of any feature (ADR-0013)
-DayPhase = Literal["warm-up", "train", "validation", "test"]
 
 
 class MissingDaysError(RuntimeError):
