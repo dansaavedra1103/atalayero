@@ -1,4 +1,8 @@
+import gc
+import os
 import random
+import subprocess
+import sys
 from collections.abc import Callable
 from datetime import datetime, timedelta
 from decimal import Decimal
@@ -326,3 +330,44 @@ def replayed_once(tmp_path_factory: pytest.TempPathFactory) -> Settings:
     with pytest.MonkeyPatch.context() as monkeypatch:
         monkeypatch.chdir(REPO_ROOT)
         return _replay(_fit(_holdout(_model_settings(tmp_path))), tmp_path)
+
+
+def _build_kpis(settings: Settings, tmp_path: Path) -> None:
+    """`dbt build --select tag:batch` on the fixture's warehouse and batch files, in its own
+    process as in production: DuckDB lets one process open a file in one database only."""
+    gc.collect()  # connections the model fixtures left open would hold a lock on the file
+    env = {
+        **os.environ,
+        "ATALAYERO_DUCKDB_PATH": str(settings.duckdb_path),
+        "ATALAYERO_BATCH__DIR": str(settings.batch.dir),
+    }
+    result = subprocess.run(
+        [
+            str(Path(sys.executable).parent / "dbt"),
+            "build",
+            "--project-dir",
+            "dbt",
+            "--profiles-dir",
+            "dbt",
+            "--select",
+            "tag:batch",
+            "--target-path",
+            str(tmp_path / "dbt-target"),
+            "--log-path",
+            str(tmp_path / "dbt-logs"),
+        ],
+        env=env,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stdout[-3000:]
+
+
+BuildKpis = Callable[[Settings, Path], None]
+
+
+@pytest.fixture(scope="session")
+def build_kpis() -> BuildKpis:
+    """`dbt build --select tag:batch` on a fixture's warehouse and batch files."""
+    return _build_kpis

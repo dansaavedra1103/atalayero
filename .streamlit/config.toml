@@ -1,0 +1,19 @@
+# The dashboard's Streamlit settings (ADR-0023), read from the repository root, locally and in the
+# container: nothing leaves the machine, and nothing can be uploaded.
+[browser]
+gatherUsageStats = false  # Streamlit sends usage statistics unless told not to
+
+[server]
+headless = true
+enableXsrfProtection = true
+enableCORS = true
+maxUploadSize = 1  # MB; the dashboard takes no files
+fileWatcherType = "none"
+runOnSave = false
+
+[client]
+toolbarMode = "viewer"  # no developer options in the menu
+showErrorDetails = "none"  # errors say nothing in the browser; the trace stays in the logs
+
+[global]
+developmentMode = false

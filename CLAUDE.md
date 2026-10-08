@@ -40,7 +40,7 @@ All commands go through the Makefile. When you add a new command, add it to the 
 - `make dbt`      — dbt build on the full dataset (needs `make ingest`)
 - `make dbt-sample` — load the test fixtures into `data/sample/` and dbt build on them (what CI runs)
 - `make pipeline` — everything from the download to the single test run on the dev target: ingest → dbt → rules → features → evaluate → train → drift → holdout (about 17 min; leaves out `tune` and `stream`)
-- `make up`       — docker compose up and wait until healthy: Redpanda, Ollama on the GPU (ADR-0017), Airflow with its Postgres on http://localhost:8080 (ADR-0021; admin password in `data/airflow/passwords.json`), and the read-only API behind its gateway on http://localhost:8000 (ADR-0022; send `X-API-Key` from `.env`); first runs `make env`; later mlflow
+- `make up`       — docker compose up and wait until healthy: Redpanda, Ollama on the GPU (ADR-0017), Airflow with its Postgres on http://localhost:8080 (ADR-0021; admin password in `data/airflow/passwords.json`), the read-only API behind its gateway on http://localhost:8000 (ADR-0022; send `X-API-Key` from `.env`), and the dashboard on http://localhost:8501 (ADR-0023); first runs `make env`; later mlflow
 - `make env`      — add the missing host settings and local secrets to `.env` (never changes a value; never committed)
 - `make test-airflow` — load the DAGs in Airflow's Python and import the package with the image's project environment (needs `make up`; CI runs the same)
 - `make down`     — docker compose down
@@ -61,6 +61,7 @@ All commands go through the Makefile. When you add a new command, add it to the 
 - `make golden-set` — sample the agent's dev set (validation) and golden set (test) from the alert queues into `evals/` (ADR-0015; needs `make train` and `make holdout`)
 - `make daily DAY=<YYYY-MM-DD>` — the daily batch for one day of the simulation (ADR-0020): features, rule alerts, champion scores, alert queue and drift into `data/batch/days/<day>/`, then the KPIs in dbt (`--select tag:batch`) and a new `data/serving.duckdb`; needs the day before it (needs `make dbt` and `make train`)
 - `make replay`   — the same for every day of the simulation in order (1–10 Sep), about 15 min
+- `make dashboard` — the monitoring dashboard on http://localhost:8501 outside Docker (ADR-0023; needs `make replay`)
 - `make eval`     — run a detector offline on a case set and write a dated report to `evals/reports/`: `DETECTOR=baseline` (score-only) or `DETECTOR=agent` (resumable, cases cached in `data/evals/runs/`; needs `make knowledge`), `SET=dev` by default, `SET=golden` once per reported result
 
 ## Repo map

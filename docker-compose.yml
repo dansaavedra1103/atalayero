@@ -1,7 +1,8 @@
 # Local services: Redpanda (Kafka API) for the streaming replay; Ollama for the local models of
 # the investigator agent, on the GPU (ADR-0017); Airflow and its Postgres for the schedules
-# (ADR-0021); the API behind its gateway (ADR-0022). `make up` writes the .env they read (never
-# committed). Airflow and the gateway listen on localhost only; the API is not published at all.
+# (ADR-0021); the API behind its gateway (ADR-0022); the dashboard (ADR-0023). `make up` writes the
+# .env they read (never committed). Airflow, the gateway and the dashboard listen on localhost
+# only; the API is not published at all.
 services:
   redpanda:
     image: redpandadata/redpanda:v26.1.18
@@ -143,6 +144,37 @@ services:
     depends_on:
       api:
         condition: service_healthy
+  dashboard:
+    build:  # the API's image: the same project environment, from the build cache
+      context: .
+      dockerfile: docker/api.Dockerfile
+    image: atalayero-dashboard:0.4
+    entrypoint:
+      - /opt/atalayero/venv/bin/streamlit
+      - run
+      - dashboard/app.py
+      - --server.address=0.0.0.0
+      - --server.port=8501
+    working_dir: ${ATALAYERO_ROOT}  # where .streamlit/config.toml turns telemetry off
+    environment:
+      PYTHONPATH: ${ATALAYERO_ROOT}/src
+      HOME: /tmp  # Streamlit keeps its state under the home directory
+    volumes:
+      - ${ATALAYERO_ROOT}:${ATALAYERO_ROOT}:ro  # it reads data/serving.duckdb, nothing else
+    ports:
+      - "127.0.0.1:8501:8501"
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 1g
+    cpus: 1.0
+    pids_limit: 128
+    healthcheck:
+      test: ["CMD", "/opt/atalayero/venv/bin/python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8501/_stcore/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
 
 networks:
   backend:
