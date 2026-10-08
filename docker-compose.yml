@@ -1,5 +1,6 @@
 # Local services: Redpanda (Kafka API) for the streaming replay; Ollama for the local models of
-# the investigator agent, on the GPU (ADR-0017).
+# the investigator agent, on the GPU (ADR-0017); Airflow and its Postgres for the schedules
+# (ADR-0021). `make up` writes the .env they read (never committed). Airflow listens on localhost only.
 services:
   redpanda:
     image: redpandadata/redpanda:v26.1.18
@@ -41,6 +42,62 @@ services:
       interval: 5s
       timeout: 10s
       retries: 20
+  airflow-postgres:
+    image: postgres:16.15
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: ${AIRFLOW_POSTGRES_PASSWORD:?run make up, which writes .env}
+      POSTGRES_DB: airflow
+    volumes:
+      - airflow-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  airflow:
+    build:
+      context: .
+      dockerfile: docker/airflow.Dockerfile
+    image: atalayero-airflow:3.3.2
+    # Scheduler, DAG processor, triggerer and API server in one container: enough for one
+    # machine, with the LocalExecutor and Postgres for the metadata.
+    command: standalone
+    user: "${AIRFLOW_UID:?run make up}:0"
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__PARALLELISM: "2"  # a batch day takes a few GB; two tasks at most
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:${AIRFLOW_POSTGRES_PASSWORD}@airflow-postgres/airflow
+      AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY:?run make up}
+      AIRFLOW__API_AUTH__JWT_SECRET: ${AIRFLOW_JWT_SECRET:?run make up}
+      # One admin; Airflow generates the password into the passwords file, under data/airflow.
+      AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_USERS: admin:admin
+      AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_PASSWORDS_FILE: /opt/airflow/state/passwords.json
+      AIRFLOW__LOGGING__BASE_LOG_FOLDER: /opt/airflow/state/logs
+      PYTHONPATH: /opt/airflow/dags  # for the DAGs' shared module, atalayero_commands
+      ATALAYERO_ROOT: ${ATALAYERO_ROOT:?run make up}
+      ATALAYERO_OLLAMA__URL: http://ollama:11434
+    volumes:
+      # The repository at the same path as on the host, so that MLflow's recorded paths resolve;
+      # read-only but for data/.
+      - ${ATALAYERO_ROOT}:${ATALAYERO_ROOT}:ro
+      - ${ATALAYERO_ROOT}/data:${ATALAYERO_ROOT}/data
+      - ${ATALAYERO_ROOT}/airflow/dags:/opt/airflow/dags:ro
+      - ${ATALAYERO_ROOT}/data/airflow:/opt/airflow/state
+    ports:
+      - "127.0.0.1:8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/api/v2/monitor/health"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 60s
+    depends_on:
+      airflow-postgres:
+        condition: service_healthy
 
 volumes:
   ollama:
+  airflow-postgres:
