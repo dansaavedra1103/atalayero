@@ -11,16 +11,17 @@ project. Full design: `docs/design.md` — read it before planning work on a new
   Only exception: `docs/design.md`, the original design, stays in Spanish.
 
 ## Current status
-- Current phase: **4 — Product & ops** (Airflow DAGs for the daily batch, weekly retraining and
-  drift; FastAPI with `/score`, `/alerts`, `/cases/{id}` and `docker compose up` end to end;
-  Streamlit dashboard over KPI tables in DuckDB; runbook, architecture and data card; README in
-  English with a Spanish version).
-- Phase 1 closed with tag `v0.1` (ADR-0001…0005); phase 2 with `v0.2` (ADR-0006…0014); phase 3
-  with `v0.3` (ADR-0015…0019). Phase 4 wraps what exists: `make pipeline`, the rule engine, the
-  champion in MLflow and the investigator agent, which loses to score-only by one golden alert
-  (`docs/agent_eval.md`). No API, DAG, dashboard or KPI table exists yet.
+- **All four phases are closed.** Phase 1 closed with tag `v0.1` (ADR-0001…0005); phase 2 with
+  `v0.2` (ADR-0006…0014); phase 3 with `v0.3` (ADR-0015…0019); phase 4 with `v0.4`
+  (ADR-0020…0024).
+- What exists: `make pipeline`; the daily batch and its serving database (`make replay`, or the
+  Airflow DAGs `daily_batch`, `drift_monitoring`, `weekly_retrain` and the manual
+  `investigate_alerts`); the read-only API behind its gateway; the Streamlit dashboard; the
+  investigator agent, which loses to score-only by one golden alert (`docs/agent_eval.md`);
+  architecture, runbook, data card, model card and README in English and Spanish.
+- Left: the closing post of the project (one, at the end).
 - Phases: 1 Data · 2 Rules & models · 3 Agent & evals · 4 Product & ops.
-- Do not start work from a later phase unless I ask. I update this section when a phase closes.
+- Do not start new work beyond the phases unless I ask. I update this section when that changes.
 
 ## Stack
 Python 3.11 · uv · DuckDB · dbt · Redpanda (Kafka API)
