@@ -276,7 +276,8 @@ Fechas tentativas a medio tiempo (8 semanas). Cada fase cierra con un tag (v0.1 
 - [x]  Dashboard en Streamlit sobre la tabla de KPIs en DuckDB
 - [x]  `runbook.md`, `architecture.md` y `data_card.md`
 - [x]  README en inglés con diagrama y resultados, y versión en español
-- [ ]  Tag v0.4 y post de cierre del proyecto
+- [x]  Tag v0.4
+- [ ]  Post de cierre del proyecto
 
 ## Trampas a evitar
 
