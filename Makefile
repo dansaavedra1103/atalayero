@@ -53,8 +53,9 @@ up: .env
 # package (ADR-0021); needs the image (`make up`).
 test-airflow: .env
 	docker compose run --rm --no-deps -w $(CURDIR) airflow python airflow/tests/check_dags.py
-	docker compose run --rm --no-deps -w $(CURDIR) -e PYTHONPATH=$(CURDIR)/src airflow \
-		/opt/atalayero/venv/bin/python -c "import lightgbm, atalayero.batch.day, atalayero.models.registry"
+	docker compose run --rm --no-deps -w $(CURDIR) -e PYTHONPATH=$(CURDIR)/src \
+		--entrypoint /opt/atalayero/venv/bin/python airflow \
+		-c "import lightgbm, atalayero.batch.day, atalayero.models.registry"
 
 down:
 	docker compose down

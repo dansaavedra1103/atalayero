@@ -30,7 +30,8 @@ jobs:
       - run: >-
           docker run --rm -e ATALAYERO_ROOT="$PWD" -v "$PWD:$PWD:ro" -w "$PWD"
           atalayero-airflow:ci python airflow/tests/check_dags.py
+      # The image's entrypoint runs any other program as an `airflow` subcommand: bypass it.
       - run: >-
           docker run --rm -e PYTHONPATH="$PWD/src" -v "$PWD:$PWD:ro" -w "$PWD"
-          atalayero-airflow:ci /opt/atalayero/venv/bin/python -c
+          --entrypoint /opt/atalayero/venv/bin/python atalayero-airflow:ci -c
           "import lightgbm, atalayero.batch.day, atalayero.models.registry"
