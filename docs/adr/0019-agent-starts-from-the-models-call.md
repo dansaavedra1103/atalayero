@@ -44,6 +44,22 @@
     the other 79 cases on it.
   - The language model takes "I found no pattern" for "I found an ordinary explanation". From an
     account's own tools, no pattern is what most laundering looks like (above).
+- **v1.3 overrode the model's close on a single red flag, wrongly.** It ran 37 dev cases before
+  the run stopped (another power-off) and got 30 right; the model's call alone gets 32.
+  - It escalated 2 of the 11 model closes it saw, both clean: one because its counterparty paid 7
+    accounts that day, the other on the ten inflows that had raised its R01 alert.
+  - We counted each red flag on the 33 model closes of the dev set (23 clean, 9 untyped, 1
+    patterned) against their labels. This was an analysis only:
+
+    | On the alert's day | Clean | Laundering |
+    | --- | --- | --- |
+    | Money in and out | 10 | 5 |
+    | Three or more counterparties one way | 13 | 5 |
+    | A counterparty that pays or is paid by five or more accounts | 6 | 4 |
+    | A cycle back to the account (last three days) | 2 | 1 |
+
+  - 13 of the 14 rule alerts among them are clean. Six of the seven raised by R04, accounts with
+    50–170 payments sent in their week of history, show two or three of these red flags.
 - **ADR-0018 ruled that no prompt states the baseline's threshold**, so that the agent would
   decide on its own. The dev results show that this leaves the agent with less information than
   the baseline it is compared with.
@@ -58,10 +74,12 @@
    - **When the model escalates, the escalation stands.** The draft's JSON schema allows no other
      decision, and the agent checks it again: a report that closes goes back to investigation. The
      agent names the typology and the evidence, and writes the narrative.
-   - **When the model closes, the agent escalates on a red flag:** in and out on the same day,
-     split among or gathered from several counterparties, a counterparty that pays or is paid by
-     many accounts, money that comes back, accounts that only relay. Without one, the close
-     stands.
+   - **When the model closes, the agent escalates on two red flags** (version 1.4, after v1.3's
+     run, which escalated on one): in and out on the same day, split among or gathered from
+     several counterparties, a counterparty that pays or is paid by many accounts on the alert's
+     day, money that comes back, accounts that only relay. The pattern of the rule that raised
+     the alert does not count, nor does activity the account shows on most days. With fewer than
+     two, the close stands.
 3. **`model_call_rank` is the score-only baseline's threshold, fit on the dev set (1,133).**
    - A test checks that the two agree. A refit (a new champion model, a new dev set) cannot leave
      the agent on a stale threshold, and changing it bumps the config version.
@@ -83,6 +101,8 @@
     threshold, to escalate. The ceiling is a primary metric of 92.2% (every escalation right,
     the 7 clean alerts within the threshold still escalated). Every clean alert beyond the
     threshold that the agent escalates costs a point.
+- **v1.4's rule comes from the dev labels.** The counts above shaped it, so the dev set
+  overstates what it is worth; the golden run measures it.
 - **The agent cannot clear the model's false positives.** Closing alerts is what an investigator
   saves a team in practice; this agent does not, until a version shows on the dev set that it
   closes clean alerts without closing laundering. Its value lies in the escalations it adds, and
