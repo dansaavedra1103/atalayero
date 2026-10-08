@@ -68,7 +68,7 @@
 ## Consequences
 
 - **`make up` builds the image the first time**, which takes several minutes. It then starts
-  Airflow and Postgres beside Redpanda and Ollama. <!-- E2E: image size, idle RAM, replay time -->
+  Airflow and Postgres beside Redpanda and Ollama.
 - **The schedules show the mechanism, not new data.** Nothing new arrives, and the splits are
   fixed (ADR-0005). A retrain finds the same champion and promotes nothing. The drift on 10 Sep
   triggers a retrain that changes nothing.
