@@ -11,12 +11,14 @@ project. Full design: `docs/design.md` — read it before planning work on a new
   Only exception: `docs/design.md`, the original design, stays in Spanish.
 
 ## Current status
-- Current phase: **3 — Agent & evals** (typology notes indexed in FAISS, MCP server with the
-  agent's tools, LangGraph investigator with grounding checks, `CaseReport`, golden set, offline
-  evals against the score-only baseline).
-- Phase 1 closed with tag `v0.1` (ADR-0001…0005); phase 2 with tag `v0.2` (ADR-0006…0014).
-  Phase 3 starts from the test scores of the refit models (`data/reports/holdout_scores.parquet`,
-  ADR-0014); the golden set comes from the test split (ADR-0005).
+- Current phase: **4 — Product & ops** (Airflow DAGs for the daily batch, weekly retraining and
+  drift; FastAPI with `/score`, `/alerts`, `/cases/{id}` and `docker compose up` end to end;
+  Streamlit dashboard over KPI tables in DuckDB; runbook, architecture and data card; README in
+  English with a Spanish version).
+- Phase 1 closed with tag `v0.1` (ADR-0001…0005); phase 2 with `v0.2` (ADR-0006…0014); phase 3
+  with `v0.3` (ADR-0015…0019). Phase 4 wraps what exists: `make pipeline`, the rule engine, the
+  champion in MLflow and the investigator agent, which loses to score-only by one golden alert
+  (`docs/agent_eval.md`). No API, DAG, dashboard or KPI table exists yet.
 - Phases: 1 Data · 2 Rules & models · 3 Agent & evals · 4 Product & ops.
 - Do not start work from a later phase unless I ask. I update this section when a phase closes.
 
