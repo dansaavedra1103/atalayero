@@ -260,13 +260,13 @@ Fechas tentativas a medio tiempo (8 semanas). Cada fase cierra con un tag (v0.1 
 
 ### Fase 3 — Agente y evals (2 de noviembre de 2026 → 15 de noviembre de 2026)
 
-- [ ]  Escribir notas propias de tipologías e indexarlas en FAISS
-- [ ]  Servidor MCP con las cinco herramientas
-- [ ]  Grafo de LangGraph: triage, investigación, redacción, verificación de grounding
-- [ ]  Esquema `CaseReport` con Pydantic
-- [ ]  Golden set de 150–200 alertas en tres grupos: lavado con patrón, lavado sin patrón y falsos positivos
-- [ ]  Runner de evals y métricas; comparación contra baseline sin agente
-- [ ]  `agent_eval.md` con resultados y errores típicos
+- [x]  Escribir notas propias de tipologías e indexarlas en FAISS
+- [x]  Servidor MCP con las cinco herramientas
+- [x]  Grafo de LangGraph: triage, investigación, redacción, verificación de grounding
+- [x]  Esquema `CaseReport` con Pydantic
+- [x]  Golden set de 150–200 alertas en tres grupos: lavado con patrón, lavado sin patrón y falsos positivos
+- [x]  Runner de evals y métricas; comparación contra baseline sin agente
+- [x]  `agent_eval.md` con resultados y errores típicos
 - [ ]  Tag v0.3 y post: cuánto se equivoca el agente y cómo se midió
 
 ### Fase 4 — Producto y operación (16 de noviembre de 2026 → 29 de noviembre de 2026)
