@@ -57,8 +57,8 @@ All commands go through the Makefile. When you add a new command, add it to the 
 - `make knowledge` — embed the typology notes of `knowledge_base/typologies/` and build their FAISS index in `data/knowledge/` (needs `make llm`)
 - `make investigate ALERT=<id>` — run the investigator agent of `config/agent.yaml` on one alert of the case sets; report, verification and transcript to `data/agent/investigations/` (needs `make knowledge`)
 - `make golden-set` — sample the agent's dev set (validation) and golden set (test) from the alert queues into `evals/` (ADR-0015; needs `make train` and `make holdout`)
-- `make daily DAY=<YYYY-MM-DD>` — the daily batch for one day of the simulation (ADR-0020): features, rule alerts, champion scores, alert queue and drift into `data/batch/days/<day>/`, then publish `data/serving.duckdb`; needs the day before it (needs `make dbt` and `make train`)
-- `make replay`   — the daily batch for every day of the simulation in order (1–10 Sep), then publish `data/serving.duckdb`
+- `make daily DAY=<YYYY-MM-DD>` — the daily batch for one day of the simulation (ADR-0020): features, rule alerts, champion scores, alert queue and drift into `data/batch/days/<day>/`, then the KPIs in dbt (`--select tag:batch`) and a new `data/serving.duckdb`; needs the day before it (needs `make dbt` and `make train`)
+- `make replay`   — the same for every day of the simulation in order (1–10 Sep), about 15 min
 - `make eval`     — run a detector offline on a case set and write a dated report to `evals/reports/`: `DETECTOR=baseline` (score-only) or `DETECTOR=agent` (resumable, cases cached in `data/evals/runs/`; needs `make knowledge`), `SET=dev` by default, `SET=golden` once per reported result
 
 ## Repo map
