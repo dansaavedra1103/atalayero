@@ -1,8 +1,8 @@
 # Local services: Redpanda (Kafka API) for the streaming replay; Ollama for the local models of
 # the investigator agent, on the GPU (ADR-0017); Airflow and its Postgres for the schedules
 # (ADR-0021); the API behind its gateway (ADR-0022); the dashboard (ADR-0023). `make up` writes the
-# .env they read (never committed). Airflow, the gateway and the dashboard listen on localhost
-# only; the API is not published at all.
+# .env they read (never committed). Every published port listens on localhost only; the API is not
+# published at all.
 services:
   redpanda:
     image: redpandadata/redpanda:v26.1.18
@@ -15,7 +15,7 @@ services:
       - --kafka-addr=internal://0.0.0.0:9092,external://0.0.0.0:19092
       - --advertise-kafka-addr=internal://redpanda:9092,external://localhost:19092
     ports:
-      - "19092:19092"
+      - "127.0.0.1:19092:19092"
     healthcheck:
       test: ["CMD", "rpk", "cluster", "health", "--exit-when-healthy"]
       interval: 5s
@@ -24,7 +24,7 @@ services:
   ollama:
     image: ollama/ollama:0.35.1
     ports:
-      - "11434:11434"
+      - "127.0.0.1:11434:11434"  # no authentication: never beyond this machine
     volumes:
       - ollama:/root/.ollama  # model weights survive `make down`
     environment:
