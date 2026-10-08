@@ -18,6 +18,6 @@ ENV UV_PROJECT_ENVIRONMENT=/opt/atalayero/venv \
     UV_COMPILE_BYTECODE=1
 WORKDIR /opt/atalayero/build
 COPY --chown=airflow:0 pyproject.toml uv.lock ./
-RUN uv sync --locked --no-dev --no-install-project --python /usr/local/bin/python3.11 \
+RUN uv sync --locked --no-dev --no-install-project --python /usr/python/bin/python3.11 \
     && rm -rf /home/airflow/.cache/uv
 WORKDIR /opt/airflow
