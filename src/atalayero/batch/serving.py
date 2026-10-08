@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 
 KPI_TABLES = ("kpi_daily", "kpi_rules", "kpi_typologies")  # dbt marts over the batch's files
 
+
 # Schemas of the tables built from day files, for when no day has written one yet.
 _ALERTS = (
     "alert_id VARCHAR, day DATE, account_key VARCHAR, sources VARCHAR[], score DOUBLE, "
@@ -153,6 +154,16 @@ def build_serving(settings: Settings, path: Path) -> dict[str, int]:
             "amount_received_usd DOUBLE, payment_format VARCHAR, score DOUBLE, "
             "raised_alert BOOLEAN",
         )
+        _table(
+            con,
+            "scores",
+            f"SELECT transaction_id, transacted_at::date AS day, score "
+            f"FROM read_parquet({_files(scores)}) "
+            f"JOIN wh.marts.fct_transactions USING (transaction_id) ORDER BY transaction_id"
+            if scores
+            else None,
+            "transaction_id BIGINT, day DATE, score DOUBLE",
+        )
         drift = [d / "drift.json" for d in drifted]
         drift_columns = "{" + ", ".join(f"'{n}': '{k}'" for n, k in _DRIFT.items()) + "}"
         _table(
@@ -175,7 +186,7 @@ def build_serving(settings: Settings, path: Path) -> dict[str, int]:
                 con.execute(f"CREATE TABLE {name} AS SELECT * FROM wh.marts.{name} ORDER BY ALL")
             else:
                 logger.warning("No %s in the warehouse: run `dbt build --select tag:batch`", name)
-        tables = ("days", "alerts", "rule_alerts", "alert_transactions", "drift")
+        tables = ("days", "alerts", "rule_alerts", "alert_transactions", "scores", "drift")
         rows = {
             name: con.execute(f"SELECT count(*) FROM {name}").fetchone()[0]
             for name in (*tables, *(k for k in KPI_TABLES if k in built))

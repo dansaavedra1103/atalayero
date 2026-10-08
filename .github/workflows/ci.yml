@@ -35,3 +35,19 @@ jobs:
           docker run --rm -e PYTHONPATH="$PWD/src" -v "$PWD:$PWD:ro" -w "$PWD"
           --entrypoint /opt/atalayero/venv/bin/python atalayero-airflow:ci -c
           "import lightgbm, atalayero.batch.day, atalayero.models.registry"
+
+  api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: docker build -f docker/api.Dockerfile -t atalayero-api:ci .
+      # The image's environment imports the API, as its unprivileged user (ADR-0022).
+      - run: >-
+          docker run --rm -e PYTHONPATH="$PWD/src" -v "$PWD:$PWD:ro" -w "$PWD" --read-only
+          --entrypoint /opt/atalayero/venv/bin/python atalayero-api:ci -c
+          "import atalayero.api.app"
+      # The gateway's configuration is valid nginx (the API's host resolved by hand).
+      - run: >-
+          docker run --rm --add-host api:127.0.0.1
+          -v "$PWD/docker/gateway/nginx.conf:/etc/nginx/conf.d/default.conf:ro"
+          nginxinc/nginx-unprivileged:1.30.4-alpine nginx -t

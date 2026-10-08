@@ -102,3 +102,67 @@ class CaseReport(BaseModel):
         if (self.decision == "close") != (self.typology == "none"):
             raise ValueError("a report closes with typology 'none', and only then")
         return self
+
+
+# What the API serves (ADR-0022), from the serving database the batch publishes (ADR-0020).
+DayPhase = Literal["warm-up", "train", "validation", "test"]
+
+
+class QueuedAlert(CaseAlert):
+    """An alert of the batch's queue, with the phase of its day: train days were scored by a
+    model that saw them."""
+
+    phase: DayPhase
+
+
+class AlertPage(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    total: int  # alerts that match, over every page
+    limit: int
+    offset: int
+    alerts: tuple[QueuedAlert, ...]
+
+
+class CaseTransaction(Transaction):
+    """A transaction of an alerted account-day, as the account saw it, with its score."""
+
+    direction: Literal["out", "in"]
+    score: float
+    raised_alert: bool  # among the transactions that raised the alert
+
+
+class CaseInvestigation(BaseModel):
+    """What the investigator agent concluded on the alert, if it ran (ADR-0018)."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    report: CaseReport | None
+    grounded: bool | None  # whether every cited transaction and amount checked out
+    config_version: str
+    error: str | None
+    investigated_at: datetime
+
+
+class Case(BaseModel):
+    """An alert with every transaction of its account-day, and the agent's investigation."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    alert: QueuedAlert
+    transactions: tuple[CaseTransaction, ...]
+    investigation: CaseInvestigation | None
+
+
+class TransactionScore(BaseModel):
+    """The score the batch gave a transaction, and the model that gave it."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    transaction_id: int
+    day: date
+    phase: DayPhase
+    score: float
+    champion_family: str
+    champion_version: str
+    alert_ids: tuple[str, ...]  # the alerts of the queue it raised

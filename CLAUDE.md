@@ -40,7 +40,8 @@ All commands go through the Makefile. When you add a new command, add it to the 
 - `make dbt`      — dbt build on the full dataset (needs `make ingest`)
 - `make dbt-sample` — load the test fixtures into `data/sample/` and dbt build on them (what CI runs)
 - `make pipeline` — everything from the download to the single test run on the dev target: ingest → dbt → rules → features → evaluate → train → drift → holdout (about 17 min; leaves out `tune` and `stream`)
-- `make up`       — docker compose up and wait until healthy: Redpanda, Ollama on the GPU (ADR-0017), and Airflow with its Postgres on http://localhost:8080 (ADR-0021; the first run builds the image and writes `.env` with local secrets; the admin password is in `data/airflow/passwords.json`); later api, mlflow
+- `make up`       — docker compose up and wait until healthy: Redpanda, Ollama on the GPU (ADR-0017), Airflow with its Postgres on http://localhost:8080 (ADR-0021; admin password in `data/airflow/passwords.json`), and the read-only API behind its gateway on http://localhost:8000 (ADR-0022; send `X-API-Key` from `.env`); first runs `make env`; later mlflow
+- `make env`      — add the missing host settings and local secrets to `.env` (never changes a value; never committed)
 - `make test-airflow` — load the DAGs in Airflow's Python and import the package with the image's project environment (needs `make up`; CI runs the same)
 - `make down`     — docker compose down
 - `make stream`   — replay the transactions through Redpanda and evaluate the YAML rules online; alerts to `data/stream/alerts/` (needs `make up` and `make dbt`)
