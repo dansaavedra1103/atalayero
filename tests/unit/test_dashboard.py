@@ -1,4 +1,5 @@
 import sys
+import tomllib
 from collections.abc import Callable
 from pathlib import Path
 
@@ -8,7 +9,8 @@ from streamlit.testing.v1 import AppTest
 from atalayero.batch.serving import publish
 from atalayero.settings import Settings
 
-APP = str(Path(__file__).parents[2] / "dashboard" / "app.py")
+ROOT = Path(__file__).parents[2]
+APP = str(ROOT / "dashboard" / "app.py")
 BuildKpis = Callable[[Settings, Path], None]
 
 
@@ -69,3 +71,10 @@ def test_the_dashboard_waits_for_published_data(
     app.run()
     assert not app.exception
     assert "No data published yet" in app.info[0].value
+
+
+def test_streamlit_keeps_everything_on_the_machine() -> None:
+    """No usage statistics, and no lookup of the public address to print an "External URL"."""
+    browser = tomllib.loads((ROOT / ".streamlit" / "config.toml").read_text())["browser"]
+    assert browser["gatherUsageStats"] is False
+    assert browser["serverAddress"] == "localhost"
