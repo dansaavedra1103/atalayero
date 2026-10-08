@@ -111,6 +111,12 @@ class AgentSettings(BaseModel):
     investigations_dir: Path
 
 
+class BatchSettings(BaseModel):
+    dir: Path
+    serving_path: Path
+    alert_budget: int = Field(ge=1)
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_prefix="ATALAYERO_",
@@ -133,6 +139,7 @@ class Settings(BaseSettings):
     ollama: OllamaSettings
     knowledge: KnowledgeSettings
     agent: AgentSettings
+    batch: BatchSettings
     dataset: DatasetSettings
     streaming: StreamingSettings
 
