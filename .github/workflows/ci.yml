@@ -34,7 +34,7 @@ jobs:
       - run: >-
           docker run --rm -e PYTHONPATH="$PWD/src" -v "$PWD:$PWD:ro" -w "$PWD"
           --entrypoint /opt/atalayero/venv/bin/python atalayero-airflow:ci -c
-          "import lightgbm, atalayero.batch.day, atalayero.models.registry"
+          "import lightgbm, atalayero.batch.day, atalayero.models.registry, atalayero.agent.run, atalayero.mcp_server.server"
 
   api:
     runs-on: ubuntu-latest

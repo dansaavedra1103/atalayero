@@ -10,12 +10,15 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
+import yaml
+
 REPO = Path(__file__).resolve().parents[2]
 DAGS = REPO / "airflow" / "dags"
 os.environ.setdefault("ATALAYERO_ROOT", str(REPO))
 sys.path.insert(0, str(DAGS))  # as PYTHONPATH does in the container, for atalayero_commands
 
 from airflow.dag_processing.dagbag import DagBag  # noqa: E402 (needs ATALAYERO_ROOT first)
+from airflow.sdk.definitions.param import ParamValidationError  # noqa: E402
 
 failures: list[str] = []
 
@@ -28,15 +31,16 @@ def check(condition: bool, message: str) -> None:
 bag = DagBag(dag_folder=str(DAGS))
 check(not bag.import_errors, f"import errors: {bag.import_errors}")
 check(
-    set(bag.dag_ids) == {"daily_batch", "drift_monitoring", "weekly_retrain"},
+    set(bag.dag_ids) == {"daily_batch", "drift_monitoring", "weekly_retrain", "investigate_alerts"},
     f"unexpected DAGs: {sorted(bag.dag_ids)}",
 )
 simulation = (datetime(2022, 9, 1), datetime(2022, 9, 10))
 for dag in bag.dags.values():
-    check(dag.catchup, f"{dag.dag_id} must catch up over the simulation")
-    check(dag.max_active_runs == 1, f"{dag.dag_id} must run one day at a time")
-    dates = (dag.start_date.replace(tzinfo=None), dag.end_date.replace(tzinfo=None))
-    check(dates == simulation, f"{dag.dag_id} must cover 1–10 Sep 2022, not {dates}")
+    check(dag.max_active_runs == 1, f"{dag.dag_id} must run one at a time")
+    if dag.timetable.can_be_scheduled:
+        check(dag.catchup, f"{dag.dag_id} must catch up over the simulation")
+        dates = (dag.start_date.replace(tzinfo=None), dag.end_date.replace(tzinfo=None))
+        check(dates == simulation, f"{dag.dag_id} must cover 1–10 Sep 2022, not {dates}")
     for task in dag.tasks:
         command = getattr(task, "bash_command", None)
         if command is not None:  # only the package's commands, with the project's environment
@@ -74,6 +78,27 @@ if drift is not None:
         trigger.logical_date == "{{ logical_date }}" and trigger.reset_dag_run,
         "the retrain run must take the drifted day as its logical date, and rerun on a retrigger",
     )
+
+agent = bag.dags.get("investigate_alerts")
+if agent is not None:
+    check(not agent.timetable.can_be_scheduled, "the agent runs by hand only")
+    # A manual run is dated when it is triggered: past an end date, it would get no task.
+    check(agent.end_date is None, "investigate_alerts must have no end date")
+    command = agent.get_task("investigate").bash_command
+    check("{{" not in command, "parameters must reach the command through its environment")
+    settings = yaml.safe_load((REPO / "config" / "settings.yaml").read_text())
+    top = agent.params.get_param("top")
+    check(
+        top.value == settings["batch"]["investigate_top"],
+        "the DAG's default top must be batch.investigate_top",
+    )
+    for name, value in (("day", "2022-09-01"), ("day", "2022-09-10; id"), ("top", 21)):
+        try:
+            agent.params.get_param(name).resolve(value)
+            failures.append(f"investigate_alerts accepts {name}={value!r}")
+        except ParamValidationError:
+            pass
+    check(agent.params.get_param("day").resolve("2022-09-02") == "2022-09-02", "2 Sep has a queue")
 
 if failures:
     print("\n".join(failures), file=sys.stderr)

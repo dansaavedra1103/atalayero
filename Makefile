@@ -4,7 +4,7 @@ SAMPLE_ENV := ATALAYERO_DATA_DIR=data/sample ATALAYERO_DUCKDB_PATH=data/sample/a
 # MLflow prints a hint for coding agents on import; it is noise in the logs.
 MLFLOW_ENV := MLFLOW_DISABLE_AGENT_HINT=1
 
-.PHONY: setup check test-integration ingest fixture fx-rates dbt dbt-sample up down stream rules evaluate features tune train mlflow-ui drift holdout pipeline notebook golden-set eval llm knowledge investigate daily replay test-airflow env dashboard
+.PHONY: setup check test-integration ingest fixture fx-rates dbt dbt-sample up down stream rules evaluate features tune train mlflow-ui drift holdout pipeline notebook golden-set eval llm knowledge investigate investigate-day daily replay test-airflow env dashboard
 
 # LightGBM needs the system OpenMP runtime: sudo apt-get install libgomp1 (ADR-0009).
 setup:
@@ -51,7 +51,7 @@ test-airflow: env
 	docker compose run --rm --no-deps -w $(CURDIR) airflow python airflow/tests/check_dags.py
 	docker compose run --rm --no-deps -w $(CURDIR) -e PYTHONPATH=$(CURDIR)/src \
 		--entrypoint /opt/atalayero/venv/bin/python airflow \
-		-c "import lightgbm, atalayero.batch.day, atalayero.models.registry"
+		-c "import lightgbm, atalayero.batch.day, atalayero.models.registry, atalayero.agent.run, atalayero.mcp_server.server"
 
 down:
 	docker compose down
@@ -125,6 +125,11 @@ knowledge:
 # One investigation by the agent, on an alert of the case sets (ADR-0018; needs `make knowledge`).
 investigate:
 	$(MLFLOW_ENV) uv run python -m atalayero.agent investigate --alert "$(ALERT)"
+
+# The agent on the top of a day's alert queue, by rank, kept beside the day for the API and the
+# dashboard (ADR-0024; TOP defaults to batch.investigate_top; needs `make knowledge` and the day).
+investigate-day:
+	$(MLFLOW_ENV) uv run python -m atalayero.agent investigate --day "$(DAY)" $(if $(TOP),--top "$(TOP)")
 
 # The daily batch (ADR-0020): one day of the simulation, or every day in order; then the KPIs in
 # dbt, and a new serving database for the API and the dashboard.

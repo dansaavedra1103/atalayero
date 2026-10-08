@@ -34,7 +34,6 @@ def published(
 def app(published: Settings, monkeypatch: pytest.MonkeyPatch) -> AppTest:
     """The dashboard, reading the published fixture through its own `Settings()`."""
     monkeypatch.setenv("ATALAYERO_BATCH__SERVING_PATH", str(published.batch.serving_path))
-    monkeypatch.setenv("ATALAYERO_AGENT__INVESTIGATIONS_DIR", str(published.data_dir / "none"))
     return AppTest.from_file(APP, default_timeout=60)
 
 

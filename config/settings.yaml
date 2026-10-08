@@ -74,6 +74,9 @@ batch:
   dir: data/batch
   serving_path: data/serving.duckdb
   alert_budget: 100  # model alerts a day in the queue, on top of the rules' alerts
+  # Alerts of a day the agent investigates unless told otherwise, from the top of the queue
+  # (ADR-0024; the investigate_alerts DAG offers the same default).
+  investigate_top: 5
 
 # The API (ADR-0022), behind the gateway in docker-compose.yml. Keys are never in this file: the
 # API takes the SHA-256 of each accepted key from ATALAYERO_API__KEY_HASHES, which `make up` writes
@@ -87,7 +90,8 @@ api:
   allowed_hosts: [localhost, 127.0.0.1, api]  # Host headers it answers to, through the gateway
 
 # The investigator agent (ADR-0018): its versioned config, and where `make investigate` writes
-# each investigation (report, verification, transcript).
+# each investigation of the case sets (report, verification, transcript). Investigations of the
+# batch's queue go beside their day (ADR-0024).
 agent:
   config_path: config/agent.yaml
   investigations_dir: data/agent/investigations

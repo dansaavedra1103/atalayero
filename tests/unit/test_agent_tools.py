@@ -1,5 +1,8 @@
 import asyncio
+import gc
 import math
+import os
+import sys
 from collections.abc import Callable
 from datetime import date, datetime
 from pathlib import Path
@@ -8,9 +11,10 @@ from typing import Any
 import duckdb
 import pytest
 import yaml
-from mcp import Client
+from mcp import Client, StdioServerParameters
 
 from atalayero.agent.tools import MAX_NEIGHBOURS, MAX_TRANSACTIONS, TOP_FACTORS, ToolBox
+from atalayero.batch.day import day_alerts, day_dir
 from atalayero.mcp_server.server import build_server
 from atalayero.models.data import FEATURES, load_split
 from atalayero.models.families import transaction_scores
@@ -22,6 +26,7 @@ from atalayero.settings import Settings
 
 MakeTx = Callable[..., Transaction]
 WriteDb = Callable[[list[Transaction]], Path]
+Replay = Callable[[Settings, Path], Settings]
 
 SRC = Path(__file__).parents[2] / "src" / "atalayero"
 DAY = date(2022, 9, 5)  # T0 is 2022-09-05 09:00
@@ -255,3 +260,63 @@ def test_explain_score_uses_the_model_behind_each_split(lightgbm_settings: Setti
         magnitudes = [abs(f["log_odds"]) for f in top["top_factors"]]
         assert magnitudes == sorted(magnitudes, reverse=True)
         assert math.isfinite(top["baseline_log_odds"])
+
+
+@pytest.fixture
+def batch_settings(lightgbm_settings: Settings, replay: Replay, tmp_path: Path) -> Settings:
+    """The LightGBM fixture replayed by the daily batch: its champion scored 6 to 8 Sep."""
+    return replay(lightgbm_settings, tmp_path)
+
+
+def test_on_the_batch_explain_score_uses_the_champion_that_scored_the_day(
+    batch_settings: Settings,
+) -> None:
+    settings = batch_settings
+    # A train day, which no case set holds, and a test day, where the case sets explain the score
+    # of the model refit for the test run.
+    alerts = [day_alerts(settings, day)[0] for day in (date(2022, 9, 6), date(2022, 9, 8))]
+    toolbox = ToolBox(settings, alerts, batch=True)
+
+    for alert in alerts:
+        scores = (
+            duckdb.read_parquet(str(day_dir(settings, alert.day) / "scores.parquet"))
+            .df()
+            .set_index("transaction_id")["score"]
+        )
+        top = toolbox.explain_score(alert.alert_id)["explained"][0]
+        assert top["score"] == pytest.approx(scores[top["transaction_id"]], abs=1e-6)
+        assert top["score"] == pytest.approx(alert.score, abs=1e-6)  # the account-day's score
+
+    case_sets = ToolBox(settings, alerts)
+    with pytest.raises(ValueError, match="no evaluated split"):
+        case_sets.explain_score(alerts[0].alert_id)
+    refit = case_sets.explain_score(alerts[1].alert_id)["explained"][0]
+    assert refit["score"] != pytest.approx(alerts[1].score, abs=1e-6)
+
+
+def test_the_mcp_server_serves_a_day_of_the_batch(batch_settings: Settings) -> None:
+    settings = batch_settings
+    alert = day_alerts(settings, date(2022, 9, 8))[0]
+    other_day = day_alerts(settings, date(2022, 9, 7))[0]
+    gc.collect()  # a connection the fixtures left open would lock the warehouse
+    server = StdioServerParameters(
+        command=sys.executable,
+        args=["-m", "atalayero.mcp_server", "--day", "2022-09-08"],
+        env={
+            **os.environ,
+            "ATALAYERO_DUCKDB_PATH": str(settings.duckdb_path),
+            "ATALAYERO_BATCH__DIR": str(settings.batch.dir),
+        },
+    )
+
+    async def run() -> tuple[Any, Any]:
+        async with Client(server) as client:
+            return (
+                await client.call_tool("get_transactions", {"alert_id": alert.alert_id}),
+                await client.call_tool("get_transactions", {"alert_id": other_day.alert_id}),
+            )
+
+    served, refused = asyncio.run(run())
+
+    assert served.structured_content == ToolBox(settings, [alert]).transactions(alert.alert_id)
+    assert refused.is_error and "unknown alert" in refused.content[0].text

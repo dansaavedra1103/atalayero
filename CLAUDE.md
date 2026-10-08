@@ -58,6 +58,7 @@ All commands go through the Makefile. When you add a new command, add it to the 
 - `make llm`      — pull the local models of `config/settings.yaml` into Ollama over HTTP and check their pinned digests (needs `make up`)
 - `make knowledge` — embed the typology notes of `knowledge_base/typologies/` and build their FAISS index in `data/knowledge/` (needs `make llm`)
 - `make investigate ALERT=<id>` — run the investigator agent of `config/agent.yaml` on one alert of the case sets; report, verification and transcript to `data/agent/investigations/` (needs `make knowledge`)
+- `make investigate-day DAY=<YYYY-MM-DD> [TOP=<n>]` — run the investigator agent on the top `n` alerts of a day's queue (ADR-0024; default `batch.investigate_top`), explained with the champion that scored the day; to `data/batch/days/<day>/investigations/`, where `/cases` and the dashboard read them (needs `make knowledge` and the day; the `investigate_alerts` DAG does the same)
 - `make golden-set` — sample the agent's dev set (validation) and golden set (test) from the alert queues into `evals/` (ADR-0015; needs `make train` and `make holdout`)
 - `make daily DAY=<YYYY-MM-DD>` — the daily batch for one day of the simulation (ADR-0020): features, rule alerts, champion scores, alert queue and drift into `data/batch/days/<day>/`, then the KPIs in dbt (`--select tag:batch`) and a new `data/serving.duckdb`; needs the day before it (needs `make dbt` and `make train`)
 - `make replay`   — the same for every day of the simulation in order (1–10 Sep), about 15 min

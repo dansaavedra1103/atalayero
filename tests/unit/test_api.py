@@ -1,14 +1,22 @@
-import json
+import asyncio
+import shutil
+from collections.abc import Callable, Sequence
+from datetime import date
 from pathlib import Path
 
 import duckdb
 import pytest
 from fastapi.testclient import TestClient
 
+from atalayero.agent.graph import Investigation
+from atalayero.agent.grounding import Grounding
+from atalayero.agent.run import investigate_day
 from atalayero.api.app import create_app
 from atalayero.api.security import SECURITY_HEADERS, TokenBucket, key_digest
 from atalayero.batch import queries
+from atalayero.batch.day import day_dir
 from atalayero.batch.serving import publish
+from atalayero.schemas import CaseAlert, CaseReport, Evidence
 from atalayero.settings import Settings
 
 KEY = "test-key-0123456789"
@@ -29,12 +37,10 @@ def _settings(base: Settings, **api: object) -> Settings:
 
 
 @pytest.fixture(scope="module")
-def served(replayed_once: Settings, tmp_path_factory: pytest.TempPathFactory) -> Settings:
+def served(replayed_once: Settings) -> Settings:
     """The replayed fixture, published once for every test here: they only read it."""
     publish(replayed_once)
-    none_yet = tmp_path_factory.mktemp("investigations")
-    agent = replayed_once.agent.model_copy(update={"investigations_dir": none_yet})
-    return _settings(replayed_once.model_copy(update={"agent": agent}))
+    return _settings(replayed_once)
 
 
 def _client(settings: Settings) -> TestClient:
@@ -183,36 +189,65 @@ def test_a_case_shows_its_account_day(served: Settings, client: TestClient) -> N
     }
 
 
-def test_a_case_shows_the_agents_investigation(served: Settings, tmp_path: Path) -> None:
-    agent = served.agent.model_copy(update={"investigations_dir": tmp_path / "investigations"})
-    served = served.model_copy(update={"agent": agent})
-    client = _client(served)
-    alert = _get(client, "/alerts", limit=1).json()["alerts"][0]
-    report = {
-        "alert_id": alert["alert_id"],
-        "decision": "escalate",
-        "typology": "unclassified",
-        "evidence": [{"transaction_id": alert["transaction_ids"][0], "amount_usd": 1.0}],
-        "confidence": 0.7,
-        "narrative": "Test.",
-    }
-    path = served.agent.investigations_dir / f"{alert['alert_id'].replace(':', '_')}.json"
-    path.parent.mkdir(parents=True)
-    path.write_text(
-        json.dumps(
-            {
-                "alert_id": alert["alert_id"],
-                "report": report,
-                "grounding": {"grounded": True},
-                "config_version": "1.4",
-                "error": None,
-                "transcript": [],
-            }
-        )
+def test_a_case_shows_the_investigation_of_its_day(
+    served: Settings, client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """`investigate_day` hands the agent the top of the day's queue, as the case sets show
+    alerts, and keeps each investigation where `/cases` reads it."""
+    day = date(2022, 9, 8)
+    handed: list[tuple[list[CaseAlert], date | None]] = []
+
+    async def agent(
+        settings: Settings,
+        alerts: Sequence[CaseAlert],
+        on_result: Callable[[Investigation], None],
+        batch_day: date | None = None,
+    ) -> list[Investigation]:
+        handed.append((list(alerts), batch_day))
+        results = [_investigation(alert) for alert in alerts]
+        for result in results:
+            on_result(result)
+        return results
+
+    monkeypatch.setattr("atalayero.agent.run.investigate_alerts", agent)
+    queue = _get(client, "/alerts", day=day.isoformat()).json()["alerts"]
+    try:
+        asyncio.run(investigate_day(served, day, 2))
+
+        [(alerts, batch_day)] = handed
+        assert batch_day == day
+        assert [a.alert_id for a in alerts] == [a["alert_id"] for a in queue[:2]]
+        assert all(type(a) is CaseAlert for a in alerts)  # not the day's phase
+        investigation = _get(client, f"/cases/{queue[0]['alert_id']}").json()["investigation"]
+        assert investigation["report"]["decision"] == "escalate"
+        assert investigation["grounded"] is True and investigation["config_version"] == "1.4"
+        assert _get(client, f"/cases/{queue[2]['alert_id']}").json()["investigation"] is None
+    finally:
+        shutil.rmtree(day_dir(served, day) / "investigations", ignore_errors=True)
+
+
+def _investigation(alert: CaseAlert) -> Investigation:
+    report = CaseReport(
+        alert_id=alert.alert_id,
+        decision="escalate",
+        typology="unclassified",
+        evidence=(Evidence(transaction_id=alert.transaction_ids[0], amount_usd=1.0),),
+        confidence=0.7,
+        narrative="Test.",
     )
-    investigation = _get(client, f"/cases/{alert['alert_id']}").json()["investigation"]
-    assert investigation["report"]["decision"] == "escalate"
-    assert investigation["grounded"] is True and investigation["config_version"] == "1.4"
+    return Investigation(
+        alert_id=alert.alert_id,
+        report=report,
+        grounding=Grounding(grounded=True, hallucinated_ids=0, problems=[]),
+        steps=3,
+        llm_calls=5,
+        retries=0,
+        tokens=100,
+        seconds=2.0,
+        config_version="1.4",
+        prompts_sha256="x",
+        transcript=[],
+    )
 
 
 @pytest.mark.parametrize(

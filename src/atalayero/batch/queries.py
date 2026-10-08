@@ -8,6 +8,7 @@ the next call sees it. Queries take parameters, never interpolated values.
 import json
 import re
 from datetime import UTC, date, datetime
+from pathlib import Path
 from typing import Any
 
 import duckdb
@@ -101,9 +102,18 @@ def list_alerts(
     return AlertPage(total=total, limit=limit, offset=offset, alerts=tuple(_alert(r) for r in rows))
 
 
+def investigation_path(settings: Settings, alert_id: str) -> Path:
+    """Where the agent's investigation of a queued alert is kept: beside the alert's day
+    (ADR-0024). The case sets' investigations, explained with other models, live apart."""
+    day = alert_id.split(":", 1)[0]
+    name = f"{alert_id.replace(':', '_')}.json"
+    return settings.batch.dir / "days" / day / "investigations" / name
+
+
 def _investigation(settings: Settings, alert_id: str) -> CaseInvestigation | None:
-    """The agent's stored investigation of the alert, if any (written by `make investigate`)."""
-    path = settings.agent.investigations_dir / f"{alert_id.replace(':', '_')}.json"
+    """The agent's investigation of the alert, if it ran (`make investigate-day` or the
+    `investigate_alerts` DAG)."""
+    path = investigation_path(settings, alert_id)
     if not path.is_file():
         return None
     stored = json.loads(path.read_text())
