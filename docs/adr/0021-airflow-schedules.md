@@ -66,8 +66,8 @@
    - Airflow is not a dependency of the project, so these checks are a script, not tests in
      `make check`.
 6. **The agent stays off the schedule.** A manual `investigate_alerts` DAG comes in its own
-   change: the agent first has to take the batch's alerts and explain them with the model that
-   scored them.
+   change (ADR-0024): the agent first has to take the batch's alerts and explain them with the
+   model that scored them.
 
 ## Consequences
 
