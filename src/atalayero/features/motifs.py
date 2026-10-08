@@ -117,10 +117,13 @@ class MotifState:
 
 
 def motif_features(
-    rows: Iterable[Row],
+    rows: Iterable[Row], state: MotifState | None = None
 ) -> Iterator[tuple[int, int, float | None, int, int, int]]:
-    """Motif features of each row, given in event-time order: (transaction_id, *MOTIFS)."""
-    state = MotifState()
+    """Motif features of each row, given in event-time order: (transaction_id, *MOTIFS).
+
+    `state` carries on from where an earlier pass over the preceding rows stopped, and is updated
+    in place (ADR-0020)."""
+    state = MotifState() if state is None else state
     for now, minute in groupby(rows, key=lambda row: row[1]):
         batch = list(minute)
         state.expire(now)
@@ -131,9 +134,12 @@ def motif_features(
             state.add(row, features[3])
 
 
-def motif_features_frame(con: duckdb.DuckDBPyConnection, source: str) -> duckdb.DuckDBPyRelation:
+def motif_features_frame(
+    con: duckdb.DuckDBPyConnection, source: str, state: MotifState | None = None
+) -> duckdb.DuckDBPyRelation:
     """The motif features of every transaction in `source` (a table or view with the columns of
-    `marts.fct_transactions`), from the transactions in `source` alone."""
+    `marts.fct_transactions`), from the transactions in `source` alone, or carrying on from
+    `state` (updated in place)."""
     cursor = con.execute(
         f"""
         SELECT transaction_id, transacted_at, sender_account_key, receiver_account_key,
@@ -147,7 +153,7 @@ def motif_features_frame(con: duckdb.DuckDBPyConnection, source: str) -> duckdb.
         while batch := cursor.fetchmany(50_000):
             yield from batch
 
-    results = list(motif_features(rows()))
+    results = list(motif_features(rows(), state))
     columns = list(zip(*results, strict=True)) if results else [[] for _ in range(6)]
     con.register(
         "motifs",

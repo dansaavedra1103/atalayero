@@ -26,6 +26,14 @@ def test_until_is_exclusive(make_tx: MakeTx, fct_transactions_db: WriteDb) -> No
     assert [tx.transaction_id for tx in iter_transactions(db, until=until)] == [1, 2]
 
 
+def test_since_is_inclusive(make_tx: MakeTx, fct_transactions_db: WriteDb) -> None:
+    db = fct_transactions_db([make_tx(1, 0), make_tx(2, 5), make_tx(3, 10)])
+
+    since, until = make_tx(2, 5).transacted_at, make_tx(3, 10).transacted_at
+    assert [tx.transaction_id for tx in iter_transactions(db, since=since)] == [2, 3]
+    assert [tx.transaction_id for tx in iter_transactions(db, since=since, until=until)] == [2]
+
+
 def _fake_time() -> tuple[Callable[[], float], Callable[[float], None], list[float]]:
     now, sleeps = [0.0], []
 

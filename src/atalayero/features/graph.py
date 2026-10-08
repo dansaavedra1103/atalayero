@@ -81,14 +81,18 @@ def snapshot_features(edges: Sequence[Edge]) -> tuple[list[str], dict[str, np.nd
     return accounts, {name: np.array(v, dtype=_DTYPES[name]) for name, v in values.items()}
 
 
-def _snapshots(con: duckdb.DuckDBPyConnection, source: str) -> Iterator[tuple[date, list[Edge]]]:
-    """For each day with transactions in `source`, the edges of its snapshot."""
-    days = [
-        d
-        for (d,) in con.execute(
-            f"SELECT DISTINCT transacted_at::date FROM {source} ORDER BY 1"
-        ).fetchall()
-    ]
+def _snapshots(
+    con: duckdb.DuckDBPyConnection, source: str, days: Sequence[date] | None = None
+) -> Iterator[tuple[date, list[Edge]]]:
+    """For each day with transactions in `source`, or each of `days`, the edges of its
+    snapshot."""
+    if days is None:
+        days = [
+            d
+            for (d,) in con.execute(
+                f"SELECT DISTINCT transacted_at::date FROM {source} ORDER BY 1"
+            ).fetchall()
+        ]
     for day in days:
         end = datetime.combine(day, datetime.min.time())
         edges = con.execute(
@@ -106,12 +110,16 @@ def _snapshots(con: duckdb.DuckDBPyConnection, source: str) -> Iterator[tuple[da
 
 
 def graph_features(
-    con: duckdb.DuckDBPyConnection, source: str, executor: Executor | None = None
+    con: duckdb.DuckDBPyConnection,
+    source: str,
+    executor: Executor | None = None,
+    days: Sequence[date] | None = None,
 ) -> duckdb.DuckDBPyRelation:
     """The graph features of every transaction in `source` (a table or view with the columns of
-    `marts.fct_transactions`), from the transactions in `source` alone. Snapshots run on
-    `executor` if given."""
-    snapshots = list(_snapshots(con, source))
+    `marts.fct_transactions`), from the transactions in `source` alone; only of the transactions
+    of `days`, if given, so that only their snapshots are built. Snapshots run on `executor` if
+    given."""
+    snapshots = list(_snapshots(con, source, days))
     days = [day for day, _ in snapshots]
     if executor is None:
         results = [snapshot_features(edges) for _, edges in snapshots]
@@ -130,6 +138,10 @@ def graph_features(
     for name in _ACCOUNT:
         columns[name] = np.concatenate([features[name] for _, features in results])
     con.register("graph_accounts", columns)
+    where = ""
+    if days is not None:
+        listed = ", ".join(f"DATE '{day.isoformat()}'" for day in days)
+        where = f"WHERE t.transacted_at::date IN ({listed})"
     selected = ",\n".join(
         f"coalesce({alias}.{name}, {'false' if name == 'in_short_cycle' else '0'}) "
         f"AS {side}_graph_{name}"
@@ -144,6 +156,7 @@ def graph_features(
             ON s.account_key = t.sender_account_key AND s.day::date = t.transacted_at::date
         LEFT JOIN graph_accounts AS r
             ON r.account_key = t.receiver_account_key AND r.day::date = t.transacted_at::date
+        {where}
         """
     )
 

@@ -64,6 +64,18 @@ class CurvePoint(BaseModel):
     false_positive_share: float
 
 
+# The hub accounts (ADR-0004): the top `$n` senders of the train split, by transactions, with
+# the warehouse attached as `wh`. Reported apart in evaluations and left out of the alert queue.
+HUBS_SQL = """
+    SELECT sender_account_key AS account_key
+    FROM wh.marts.fct_transactions
+    WHERE transacted_at < $train_end
+    GROUP BY ALL
+    ORDER BY count(*) DESC, account_key
+    LIMIT $n
+"""
+
+
 class SplitEvaluator:
     """One split's account-days and labels, in an in-memory DuckDB that attaches the warehouse
     read-only."""
@@ -76,15 +88,7 @@ class SplitEvaluator:
         self.con.execute("SET enable_progress_bar = false")
         self.con.execute(f"ATTACH {sql_literal(str(settings.duckdb_path))} AS wh (READ_ONLY)")
         self.con.execute(
-            """
-            CREATE TEMP TABLE hubs AS
-            SELECT sender_account_key AS account_key
-            FROM wh.marts.fct_transactions
-            WHERE transacted_at < $train_end
-            GROUP BY ALL
-            ORDER BY count(*) DESC, account_key
-            LIMIT $n
-            """,
+            f"CREATE TEMP TABLE hubs AS {HUBS_SQL}",
             {"train_end": settings.splits.train_end, "n": settings.evaluation.hub_accounts},
         )
         self.con.execute(

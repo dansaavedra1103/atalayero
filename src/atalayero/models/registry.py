@@ -132,6 +132,14 @@ class Registry:
     def load_champion(self) -> Pipeline:
         return mlflow.sklearn.load_model(f"models:/{self.model_name}@{CHAMPION}")
 
+    def champion_version(self) -> str:
+        """The registered version that holds the champion alias now."""
+        return str(self.client.get_model_version_by_alias(self.model_name, CHAMPION).version)
+
+    def load_version(self, version: str) -> Pipeline:
+        """A registered version of the model, whatever holds the champion alias later."""
+        return mlflow.sklearn.load_model(f"models:/{self.model_name}/{version}")
+
     def load_holdout_model(self, family: str) -> Pipeline:
         """The latest model of `family` refit on train and validation by `make holdout`: the one
         behind the test scores. It is logged, never registered (ADR-0014)."""
