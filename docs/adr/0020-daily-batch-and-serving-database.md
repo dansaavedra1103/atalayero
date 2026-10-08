@@ -65,14 +65,31 @@
      the evaluation's budgets (ADR-0007).
    - **Drift compares the day with the train days' own files**, by kind of day, as `make drift`
      does (ADR-0012).
-5. **The serving database.** After each run, the batch builds `data/serving.duckdb` from the
+5. **KPIs in dbt.** dbt reads the day files back (`dbt build --select tag:batch`) and builds,
+   for the complete days only:
+   - `kpi_daily`: the queue, its false-positive share, and the share of the day's laundering
+     transactions on an account-day of the queue (detection);
+   - `kpi_rules`: each rule's alerts, account-days, hit rate (account-days that hold laundering,
+     hubs included) and how many reached the queue;
+   - `kpi_typologies`: the day's laundering by typology (`untyped` outside every documented
+     attempt), and how much of it the queue covered;
+   - `fct_batch_alerts`: each alert with whether its account-day holds laundering. It stays in
+     the warehouse.
+
+   **Every outcome uses the dataset's labels**, which no monitoring team has at alert time: the
+   KPIs are hindsight, and say so. A macro reads the day files when there are some, and gives the
+   same columns with no rows otherwise, so the project builds before the first replay and in CI.
+   The batch never writes the warehouse: dbt does.
+6. **The serving database.** After the KPIs, the batch builds `data/serving.duckdb` from the
    complete days and moves it into place in one step. It holds the days, the alert queue, the
-   rule alerts, every transaction of each alerted account-day with its score, and drift.
+   rule alerts, every transaction of each alerted account-day with its score, drift, and the
+   three KPI tables.
    - The API and the dashboard only ever open it, read-only. A reader holding the old file does
      not block the next publication, and never sees half of one.
-   - **It holds no labels**, only what the monitoring system knows at alert time.
-6. **Commands:** `make daily DAY=<day>` runs one day, `make replay` every day in order; both
-   publish. Airflow will call the same functions (ADR-0021).
+   - **It holds no label of any transaction or alert**, only what the monitoring system knows at
+     alert time, and the KPIs, which are aggregates.
+7. **Commands:** `make daily DAY=<day>` runs one day, `make replay` every day in order; both then
+   build the KPIs and publish. Airflow will run the same three steps (ADR-0021).
 
 ## Consequences
 
@@ -98,3 +115,7 @@
   scored the day; nothing rescores the days before.
 - **The serving database is rebuilt in full** at every publication. It is small: the queue and
   its transactions, not every score.
+- **What the KPIs show on the full data:** on the test days the queue covers 22–26% of the day's
+  laundering, and 21–45% of its account-days hold none. It covers 0.5% of the untyped laundering
+  (2 of 371 transactions). R02 hits laundering on 70–90% of its account-days, and none of them
+  reaches the queue: they are all hubs (ADR-0004).
