@@ -271,11 +271,11 @@ Fechas tentativas a medio tiempo (8 semanas). Cada fase cierra con un tag (v0.1 
 
 ### Fase 4 — Producto y operación (16 de noviembre de 2026 → 29 de noviembre de 2026)
 
-- [ ]  DAGs de Airflow: batch diario, reentrenamiento semanal, deriva
-- [ ]  API con FastAPI y `docker compose up` de punta a punta
-- [ ]  Dashboard en Streamlit sobre la tabla de KPIs en DuckDB
-- [ ]  `runbook.md`, `architecture.md` y `data_card.md`
-- [ ]  README en inglés con diagrama y resultados, y versión en español
+- [x]  DAGs de Airflow: batch diario, reentrenamiento semanal, deriva
+- [x]  API con FastAPI y `docker compose up` de punta a punta
+- [x]  Dashboard en Streamlit sobre la tabla de KPIs en DuckDB
+- [x]  `runbook.md`, `architecture.md` y `data_card.md`
+- [x]  README en inglés con diagrama y resultados, y versión en español
 - [ ]  Tag v0.4 y post de cierre del proyecto
 
 ## Trampas a evitar

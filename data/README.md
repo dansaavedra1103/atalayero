@@ -36,7 +36,15 @@ data/
 ├── features/motifs.parquet      # motif features of make features (cycles, relays, fan paths)
 ├── reports/                    # reports (JSON) of make evaluate, train, drift and holdout;
 │                               #   holdout_scores.parquet: test scores of every family
-└── mlflow/                     # MLflow tracking and registry (SQLite) and artifacts
+├── mlflow/                     # MLflow tracking and registry (SQLite) and artifacts
+├── knowledge/                  # FAISS index of the typology notes (make knowledge)
+├── agent/investigations/       # make investigate: the agent on alerts of the case sets
+├── evals/runs/                 # each make eval agent run's cases, so that a run can resume
+├── batch/days/<day>/           # the daily batch (ADR-0020): features, rule alerts, scores, the
+│                               #   alert queue, drift, carried state, manifest; investigations/
+│                               #   of the agent on the day's queue (ADR-0024)
+├── serving.duckdb              # what the API and the dashboard read, published by the batch
+└── airflow/                    # Airflow's logs and its generated admin password
 ```
 
 ## `raw.transactions`
