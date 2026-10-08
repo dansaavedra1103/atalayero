@@ -49,6 +49,10 @@
    - **`drift_monitoring`**: on the same days. It waits for the day's `publish`, then asks
      `python -m atalayero.batch drifted <day>`. That command exits 0 if the day drifted and 3
      if not, and on 3 the trigger of `weekly_retrain` is skipped.
+   - **The retrain it triggers is dated with the drifted day** (run `drift__<day>`), and a
+     second trigger for the same day reruns it. A run dated today would fall after
+     `weekly_retrain`'s end date, and Airflow would give it no task: the first version of this
+     DAG did exactly that, and its retrain "succeeded" in 12 ms without running.
    - **`weekly_retrain`**: weekly, which is one run on 4 Sep, plus every drift trigger. It
      rebuilds the features (with two graph workers instead of four) and runs the training.
      Training promotes a model only if it beats the champion's validation metric (ADR-0009).
@@ -66,6 +70,14 @@
    scored them.
 
 ## Consequences
+
+- **Verified end to end in Docker** (`make up` on the laptop):
+  - `daily_batch` ran the ten days of the simulation, one after another, all successful;
+  - `drift_monitoring` skipped the retrain on 9 Sep, and triggered it on 10 Sep, the day whose
+    graph features drift;
+  - the scheduled retrain (4 Sep) rebuilt the features and refit the families: the new LightGBM
+    (v2, 0.1902 detection without hubs on validation) does not beat the champion (0.1902), so
+    nothing was promoted.
 
 - **`make up` builds the image the first time**, which takes several minutes. It then starts
   Airflow and Postgres beside Redpanda and Ollama.
