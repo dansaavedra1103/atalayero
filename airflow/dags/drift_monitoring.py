@@ -38,9 +38,15 @@ with DAG(
         bash_command=package("atalayero.batch", "drifted", "{{ ds }}"),
         skip_on_exit_code=NO_DRIFT,
     )
+    # The retrain run takes the drifted day as its logical date: a run dated today would fall
+    # after `weekly_retrain`'s end date, and Airflow would give it no task to run. Triggering the
+    # same day again reruns it.
     retrain = TriggerDagRunOperator(
         task_id="trigger_retrain",
         trigger_dag_id="weekly_retrain",
+        trigger_run_id="drift__{{ ds }}",
+        logical_date="{{ logical_date }}",
+        reset_dag_run=True,
         conf={"reason": "drift on {{ ds }}"},
     )
 

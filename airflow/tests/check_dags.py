@@ -67,9 +67,12 @@ if drift is not None:
         drift.get_task("check_drift").skip_on_exit_code == [no_drift],
         "check_drift must skip on the batch's NO_DRIFT exit code",
     )
+    trigger = drift.get_task("trigger_retrain")
+    check(trigger.trigger_dag_id == "weekly_retrain", "drift triggers weekly_retrain")
+    # A run dated after weekly_retrain's end date would get no tasks: date it with the drifted day.
     check(
-        drift.get_task("trigger_retrain").trigger_dag_id == "weekly_retrain",
-        "drift triggers weekly_retrain",
+        trigger.logical_date == "{{ logical_date }}" and trigger.reset_dag_run,
+        "the retrain run must take the drifted day as its logical date, and rerun on a retrigger",
     )
 
 if failures:
