@@ -285,4 +285,7 @@ if rows:
             )
             st.write(report.narrative)
         else:
-            st.caption("The investigator agent has not looked at this alert.")
+            st.caption(
+                "The investigator agent has not looked at this alert: the `investigate_alerts` "
+                "DAG runs it on the top of a day's queue."
+            )

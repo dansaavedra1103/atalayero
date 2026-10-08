@@ -115,6 +115,7 @@ class BatchSettings(BaseModel):
     dir: Path
     serving_path: Path
     alert_budget: int = Field(ge=1)
+    investigate_top: int = Field(ge=1)
 
 
 class ApiSettings(BaseModel):

@@ -49,7 +49,7 @@ from atalayero.monitoring.drift import (
 )
 from atalayero.rules.online import OnlineEvaluator
 from atalayero.rules.schema import Rule, load_rules
-from atalayero.schemas import Alert, DayPhase
+from atalayero.schemas import Alert, DayPhase, QueuedAlert
 from atalayero.settings import Settings
 from atalayero.streaming.consumer import write_alerts
 from atalayero.streaming.producer import iter_transactions
@@ -427,6 +427,42 @@ def read_alerts(path: Path) -> list[Alert]:
         Alert(**{**dict(zip(relation.columns, row, strict=True)), "evidence": tuple(row[-1])})
         for row in relation.fetchall()
     ]
+
+
+def day_alerts(settings: Settings, day: date) -> list[QueuedAlert]:
+    """The day's alert queue, by rank; empty on the warm-up day. Fails if the day is not
+    complete."""
+    manifest = load_manifest(settings, day)
+    if manifest is None:
+        raise MissingDaysError(f"{day} is not complete: run it first")
+    if manifest.alerts is None:
+        return []
+    relation = duckdb.read_parquet(str(day_dir(settings, day) / "alerts.parquet")).order("rank")
+    return [
+        QueuedAlert(
+            **{
+                **dict(zip(relation.columns, row, strict=True)),
+                "sources": tuple(row[relation.columns.index("sources")]),
+                "transaction_ids": tuple(row[relation.columns.index("transaction_ids")]),
+                "phase": manifest.phase,
+            }
+        )
+        for row in relation.fetchall()
+    ]
+
+
+def day_features(settings: Settings, day: date, transaction_ids: Sequence[int]) -> pd.DataFrame:
+    """The model inputs of some of the day's transactions, as the batch computed and scored them,
+    indexed by transaction ID. No label is read: the investigator's `explain_score` uses it
+    (ADR-0024)."""
+    path = sql_literal(str(day_dir(settings, day) / "features.parquet"))
+    with duckdb.connect() as con:
+        frame = con.execute(
+            f"SELECT * FROM read_parquet({path}) WHERE list_contains($ids, transaction_id) "
+            "ORDER BY transaction_id",
+            {"ids": [int(i) for i in transaction_ids]},
+        ).df()
+    return model_inputs(frame).set_index(frame["transaction_id"].rename(None))
 
 
 def manifests(settings: Settings) -> list[DayManifest]:

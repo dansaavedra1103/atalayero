@@ -371,3 +371,9 @@ BuildKpis = Callable[[Settings, Path], None]
 def build_kpis() -> BuildKpis:
     """`dbt build --select tag:batch` on a fixture's warehouse and batch files."""
     return _build_kpis
+
+
+@pytest.fixture(scope="session")
+def replay() -> Callable[[Settings, Path], Settings]:
+    """The daily batch over a fitted fixture's whole simulation, written under a directory."""
+    return _replay

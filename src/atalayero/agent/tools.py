@@ -7,10 +7,13 @@ alert's day, without labels.
 - **No labels.** They live in their own mart, in the patterns file and in the case answers, and
   nothing here reads them.
 - **Capped outputs.** A busy account cannot flood the investigator's context.
+- **The model behind the score.** On the case sets, the models of the evaluation (ADR-0014); on
+  the batch's queue, the champion that scored the alert's day, with the day's own features
+  (ADR-0024).
 """
 
 from collections.abc import Iterable
-from datetime import datetime, time, timedelta
+from datetime import date, datetime, time, timedelta
 from typing import Any
 
 import duckdb
@@ -64,14 +67,17 @@ class ToolBox:
         settings: Settings,
         alerts: Iterable[CaseAlert],
         knowledge: Knowledge | None = None,
+        batch: bool = False,
     ) -> None:
         self.settings = settings
+        self.batch = batch  # the alerts are of the batch's queue, not of the case sets
         self._knowledge = knowledge  # loaded on first search
         self.alerts = {alert.alert_id: alert for alert in alerts}
         self.con = duckdb.connect()
         self.con.execute("SET enable_progress_bar = false")
         self.con.execute(f"ATTACH {sql_literal(str(settings.duckdb_path))} AS wh (READ_ONLY)")
         self._models: dict[Split, Pipeline] = {}
+        self._batch_models: dict[str, Pipeline] = {}  # by registered version
 
     def alert(self, alert_id: str) -> CaseAlert:
         try:
@@ -342,12 +348,23 @@ class ToolBox:
             )
         return self._models[split]
 
+    def _batch_model(self, day: date) -> Pipeline:
+        """The champion that scored the batch's day, as the day's manifest records it."""
+        from atalayero.batch.day import load_manifest
+        from atalayero.models.registry import Registry  # MLflow is slow to import
+
+        manifest = load_manifest(self.settings, day)
+        if manifest is None or manifest.champion is None:
+            raise ValueError(f"the batch has not scored {day}")
+        version = manifest.champion.version
+        if version not in self._batch_models:
+            self._batch_models[version] = Registry(self.settings).load_version(version)
+        return self._batch_models[version]
+
     def explain_score(self, alert_id: str) -> dict[str, Any]:
         """Why the model scored the alert's account-day as it did: its top-scored transactions,
         and the features that pushed each score up or down the most (LightGBM's own SHAP
         values, in log-odds)."""
-        from atalayero.models.data import load_features
-
         alert = self.alert(alert_id)
         start, cutoff = self._window(alert, 1)
         ids = [
@@ -357,12 +374,19 @@ class ToolBox:
                 {"start": start, "cutoff": cutoff, "account": alert.account_key},
             ).fetchall()
         ]
-        model = self._model(self._split(alert))
+        model = self._batch_model(alert.day) if self.batch else self._model(self._split(alert))
         if not hasattr(model[-1], "booster_"):
             raise ValueError(
                 f"explain_score needs a LightGBM model, not {type(model[-1]).__name__}"
             )
-        features = load_features(self.settings, ids)
+        if self.batch:
+            from atalayero.batch.day import day_features
+
+            features = day_features(self.settings, alert.day, ids)
+        else:
+            from atalayero.models.data import load_features
+
+            features = load_features(self.settings, ids)
         scores = model.predict_proba(features)[:, 1]
         top = np.argsort(-scores, kind="stable")[:TOP_SCORED]
         inputs = model[:-1].transform(features.iloc[top])

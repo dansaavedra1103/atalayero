@@ -2,10 +2,12 @@
 `atalayero.agent.tools`, served over stdio.
 
 Run it with `python -m atalayero.mcp_server`. It serves the alerts of the dev and golden sets, and
-never their answers.
+never their answers; with `--day`, the batch's queue of that day instead (ADR-0024).
 """
 
+import argparse
 from collections.abc import Callable
+from datetime import date
 from typing import Any
 
 from mcp.server.mcpserver import MCPServer
@@ -84,9 +86,23 @@ def build_server(toolbox: ToolBox) -> MCPServer:
 
 
 def main() -> None:
-    from atalayero.evals.golden import load_alerts
     from atalayero.settings import Settings
 
+    parser = argparse.ArgumentParser(prog="python -m atalayero.mcp_server")
+    parser.add_argument(
+        "--day",
+        type=date.fromisoformat,
+        help="serve the batch's alert queue of this day (YYYY-MM-DD) instead of the case sets",
+    )
+    args = parser.parse_args()
     settings = Settings()
-    alerts = [*load_alerts(settings, "dev"), *load_alerts(settings, "golden")]
-    build_server(ToolBox(settings, alerts)).run("stdio")
+    if args.day is None:
+        from atalayero.evals.golden import load_alerts
+
+        alerts = [*load_alerts(settings, "dev"), *load_alerts(settings, "golden")]
+        toolbox = ToolBox(settings, alerts)
+    else:
+        from atalayero.batch.day import day_alerts
+
+        toolbox = ToolBox(settings, day_alerts(settings, args.day), batch=True)
+    build_server(toolbox).run("stdio")
