@@ -1,0 +1,29 @@
+version: 2
+
+models:
+  - name: stg_batch_days
+    description: >
+      The complete days of the daily batch (ADR-0020), one row each, from the manifests under
+      ATALAYERO_BATCH__DIR (default data/batch). Empty before the first replay.
+    columns:
+      - name: day
+        data_tests: [unique, not_null]
+      - name: phase
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [warm-up, train, validation, test]
+
+  - name: stg_batch_alerts
+    description: The alert queue of each complete day, one row per account-day.
+    columns:
+      - name: alert_id
+        data_tests: [unique, not_null]
+      - name: day
+        data_tests: [not_null]
+
+  - name: stg_batch_rule_alerts
+    description: Every rule alert of each complete day, hubs included.
+    columns:
+      - name: alert_id
+        data_tests: [unique, not_null]

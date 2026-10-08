@@ -197,7 +197,7 @@ def model_settings(
         con.execute(
             "CREATE TABLE marts.fct_laundering_labels AS SELECT transaction_id, "
             "amount_paid_usd > 9000 AND transaction_id % 3 = 0 AS is_laundering, "
-            "'untyped' AS label_group, NULL::INTEGER AS attempt_id, NULL AS typology "
+            "'untyped' AS label_group, NULL::INTEGER AS attempt_id, NULL::VARCHAR AS typology "
             "FROM marts.fct_transactions"
         )
     config = tmp_path / "models.yaml"
@@ -285,3 +285,23 @@ def fitted_settings(holdout_settings: Settings) -> Settings:
     train_and_evaluate(holdout_settings)
     run_holdout(holdout_settings)
     return holdout_settings
+
+
+@pytest.fixture
+def replayed(fitted_settings: Settings, tmp_path: Path) -> Settings:
+    """The fitted model fixture (warm-up 5 Sep, train 6, validation 7, test 8 Sep) replayed by
+    the daily batch, with the single-pass rule alerts beside it."""
+    from atalayero.batch.day import Batch
+    from atalayero.rules.batch import evaluate_rules
+
+    settings = fitted_settings.model_copy(
+        update={
+            "data_dir": tmp_path,
+            "batch": fitted_settings.batch.model_copy(
+                update={"dir": tmp_path / "batch", "serving_path": tmp_path / "serving.duckdb"}
+            ),
+        }
+    )
+    evaluate_rules(settings)  # the fixture's rule alerts are hand-made
+    Batch(settings).replay()
+    return settings

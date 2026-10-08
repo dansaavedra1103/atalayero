@@ -17,12 +17,16 @@ models:
     staging:
       +schema: staging
       +materialized: view
+      batch:  # what the daily batch wrote (ADR-0020): `dbt build --select tag:batch`
+        +tags: [batch]
     intermediate:
       +schema: intermediate
       +materialized: table
     marts:
       +schema: marts
       +materialized: table
+      batch:
+        +tags: [batch]
 
 seeds:
   atalayero:

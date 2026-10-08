@@ -1,0 +1,40 @@
+version: 2
+
+# KPIs of the daily batch (ADR-0020), for the dashboard. False positives, detection and hit rates
+# use the dataset's labels: hindsight that no monitoring team has at alert time. Train days were
+# scored by a model that saw them, so their numbers are in-sample: read them by `phase`.
+models:
+  - name: fct_batch_alerts
+    description: >
+      Each alert of the queue with whether its account-day holds laundering, in hindsight. It
+      stays in the warehouse: the serving database gets only aggregates.
+    columns:
+      - name: alert_id
+        data_tests: [unique, not_null]
+
+  - name: kpi_daily
+    description: One row per complete day of the batch; the warm-up day has no queue.
+    columns:
+      - name: day
+        data_tests: [unique, not_null]
+      - name: false_positive_share
+        description: Share of the queue's account-days that hold no laundering.
+      - name: detection_rate
+        description: Share of the day's laundering transactions on an account-day of the queue.
+
+  - name: kpi_rules
+    description: One row per rule and complete day.
+    data_tests:
+      - unique:
+          column_name: "day || ':' || rule_id"
+    columns:
+      - name: hit_rate
+        description: Share of the rule's account-days that hold laundering, hubs included.
+
+  - name: kpi_typologies
+    description: >
+      One row per typology and complete day with a queue; `untyped` is laundering outside every
+      documented attempt.
+    data_tests:
+      - unique:
+          column_name: "day || ':' || typology"

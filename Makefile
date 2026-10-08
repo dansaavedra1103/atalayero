@@ -1,6 +1,6 @@
 DBT_BUILD := uv run dbt build --project-dir dbt --profiles-dir dbt
 # The test fixtures, loaded into their own disposable DuckDB file.
-SAMPLE_ENV := ATALAYERO_DATA_DIR=data/sample ATALAYERO_DUCKDB_PATH=data/sample/atalayero.duckdb
+SAMPLE_ENV := ATALAYERO_DATA_DIR=data/sample ATALAYERO_DUCKDB_PATH=data/sample/atalayero.duckdb ATALAYERO_BATCH__DIR=data/sample/batch
 # MLflow prints a hint for coding agents on import; it is noise in the logs.
 MLFLOW_ENV := MLFLOW_DISABLE_AGENT_HINT=1
 
@@ -112,11 +112,15 @@ knowledge:
 investigate:
 	$(MLFLOW_ENV) uv run python -m atalayero.agent investigate --alert "$(ALERT)"
 
-# The daily batch (ADR-0020): one day of the simulation, or every day in order; both publish the
-# serving database the API and the dashboard read.
+# The daily batch (ADR-0020): one day of the simulation, or every day in order; then the KPIs in
+# dbt, and a new serving database for the API and the dashboard.
 daily:
 	@test -n "$(DAY)" || (echo "usage: make daily DAY=YYYY-MM-DD" && exit 1)
 	$(MLFLOW_ENV) uv run python -m atalayero.batch day $(DAY)
+	$(DBT_BUILD) --select tag:batch
+	uv run python -m atalayero.batch publish
 
 replay:
 	$(MLFLOW_ENV) uv run python -m atalayero.batch replay
+	$(DBT_BUILD) --select tag:batch
+	uv run python -m atalayero.batch publish

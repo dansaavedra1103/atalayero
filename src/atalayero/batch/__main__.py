@@ -1,6 +1,7 @@
 """CLI: python -m atalayero.batch day <YYYY-MM-DD> | replay [--first D] [--last D] | publish.
 
-`day` and `replay` publish the serving database when they finish (ADR-0020)."""
+After `day` or `replay`, `dbt build --select tag:batch` builds the KPIs and `publish` moves a new
+serving database into place (ADR-0020); `make daily` and `make replay` run all three."""
 
 import argparse
 import logging
@@ -29,7 +30,8 @@ def main() -> None:
         Batch(settings).run_day(args.day)
     elif args.command == "replay":
         Batch(settings).replay(args.first, args.last)
-    publish(settings)
+    else:
+        publish(settings)
 
 
 if __name__ == "__main__":

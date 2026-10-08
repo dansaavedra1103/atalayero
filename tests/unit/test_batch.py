@@ -162,23 +162,6 @@ def test_days_after_a_rule_change_must_be_replayed(dense_settings: Settings) -> 
         batch.run_day(date(2022, 9, 7))
 
 
-@pytest.fixture
-def replayed(fitted_settings: Settings, tmp_path: Path) -> Settings:
-    """The fitted model fixture (warm-up 5 Sep, train 6, validation 7, test 8 Sep) replayed by
-    the batch, with the single-pass rule alerts beside it."""
-    settings = fitted_settings.model_copy(
-        update={
-            "data_dir": tmp_path,
-            "batch": fitted_settings.batch.model_copy(
-                update={"dir": tmp_path / "batch", "serving_path": tmp_path / "serving.duckdb"}
-            ),
-        }
-    )
-    evaluate_rules(settings)  # the fixture's rule alerts are hand-made
-    Batch(settings).replay()
-    return settings
-
-
 def test_days_are_scored_queued_and_checked_for_drift_by_phase(replayed: Settings) -> None:
     phases = {d: load_manifest(replayed, date(2022, 9, d)) for d in (5, 6, 7, 8)}
     assert {d: m.phase for d, m in phases.items() if m} == {
