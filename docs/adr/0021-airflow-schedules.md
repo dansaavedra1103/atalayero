@@ -88,5 +88,6 @@
   services of Airflow's reference Compose file, and a shared executor.
 - **The containers are tied to the host's layout** through the same-path mount. `data/` stays
   disposable.
-- **Only Airflow is limited to localhost.** Redpanda and Ollama still publish their ports on
-  every interface, as before this change.
+- **Airflow listens on localhost only.** Redpanda and Ollama still published their ports on
+  every interface when this was written. A later fix moved them to `127.0.0.1` as well, and
+  `tests/unit/test_compose.py` now checks every published port.
